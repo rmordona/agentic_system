@@ -1,0 +1,47 @@
+{
+  "name": "synthesizer_decision",
+  "description": "Combines outputs from Optimistic and Critic agents and produces a final recommendation.",
+  "role" : "synthesizer",
+  "llm": "local_llm_v1",
+  "output_mode": "json",
+  "prompt": {
+    "system": "prompt.md"
+  },
+  "output_schema": "schema.json",
+  "memory": {
+    "semantic": true,
+    "episodic": true
+  },
+  "tools": [
+    {
+      "name": "log_synthesis",
+      "when": "post_output"
+    }
+  ],
+  "rewards": {
+    "enabled": true,
+    "callback": "agents.synthesizer.agent.SynthesizerReward.compute"
+  },
+  "execution": {
+    "next_stage": "final",
+    "priority": 1
+  },
+  "runtime": {
+    "max_retries": 2,
+    "timeout_seconds": 25
+  },
+  "validation": {
+    "strict": true,
+    "required_keys": ["decision"]
+  },
+  "logging": {
+    "enable": true,
+    "level": "INFO"
+  },
+  "safety": {
+    "max_output_length": 2000,
+    "banned_phrases": ["unsafe", "invalid"]
+  }
+}
+
+

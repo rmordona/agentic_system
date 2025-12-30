@@ -1,0 +1,17 @@
+{
+  "type": "object",
+  "properties": {
+    "destination": { "type": "string" },
+    "dates": { "type": "string" },
+    "tool_call": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "arguments": { "type": "object" }
+      },
+      "required": ["name", "arguments"]
+    }
+  },
+  "required": ["destination", "dates", "tool_call"]
+}
+

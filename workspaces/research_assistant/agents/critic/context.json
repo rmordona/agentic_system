@@ -1,0 +1,49 @@
+{
+  "context": [
+    {
+      "name": "task",
+      "type": "state"
+    },
+    {
+      "name": "skill_outputs",
+      "type": "state"
+    },
+    {
+      "name": "semantic_memory",
+      "type": "memory",
+      "memory_type": "semantic",
+      "filters": {"top_k": 5}
+    },
+    {
+      "name": "episodic_summary",
+      "type": "memory",
+      "memory_type": "episodic",
+      "filters": {"top_k": 3}
+    },
+    {
+      "name": "optimistic_output",
+      "type": "memory",
+      "memory_type": "episodic",
+      "filters": {"top_k": 5, "agent": "optimistic"}
+    },
+    {
+      "name": "external_docs",
+      "type": "external",
+      "service": "knowledge_service",
+      "namespace": "global",
+      "filters": {"top_k": 5}
+    },
+    {
+      "name": "current_time",
+      "type": "computed",
+      "function": "runtime.helpers.get_current_time"
+    }
+        {
+      "name": "computed_reward",
+      "type": "computed",
+      "function": "agents.optimistic.reward_estimator"
+    }
+  ]
+}
+
+

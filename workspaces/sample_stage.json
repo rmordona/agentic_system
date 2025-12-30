@@ -1,0 +1,44 @@
+{
+  "stages": [
+    {
+      "name": "ideation",
+      "allowed_agents": ["optimistic_ideation"],
+      "exit_condition": "len(state.get('executed_agents_per_stage', {}).get('ideation', [])) > 0",
+      "next_stages": ["evaluation", "risk_check"],
+      "priority": 10,
+      "hitl": false
+    },
+    {
+      "name": "risk_check",
+      "allowed_agents": ["critic_evaluation"],
+      "exit_condition": "len(state.get('executed_agents_per_stage', {}).get('risk_check', [])) > 0",
+      "next_stages": ["synthesis"],
+      "priority": 5,
+      "hitl": true
+    },
+    {
+      "name": "evaluation",
+      "allowed_agents": ["critic_evaluation"],
+      "exit_condition": "state.get('rewards', {}).get('optimistic_ideation', 0) > 0.5",
+      "next_stages": ["synthesis"],
+      "priority": 5,
+      "hitl": true
+    },
+    {
+      "name": "synthesis",
+      "allowed_agents": ["synthesizer_decision"],
+      "exit_condition": "len(state.get('executed_agents_per_stage', {}).get('synthesis', [])) > 0",
+      "next_stages": ["final"],
+      "priority": 1,
+      "hitl": false
+    },
+    {
+      "name": "final",
+      "allowed_agents": [],
+      "terminal": true,
+      "exit_condition": "True",
+      "priority": 0
+    }
+  ]
+}
+

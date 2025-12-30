@@ -1,0 +1,60 @@
+{
+  "agents": {
+    "planner": {
+      "tools": [
+        "calculator",
+        "web_search",
+        "memory_read",
+        "vector_search"
+      ]
+    },
+
+    "executor": {
+      "tools": [
+        "calculator",
+        "python_exec",
+        "http_request",
+        "memory_write",
+        "vector_search"
+      ]
+    },
+
+    "critic": {
+      "tools": [
+        "memory_read",
+        "vector_search"
+      ]
+    },
+
+    "researcher": {
+      "tools": [
+        "web_search",
+        "vector_search",
+        "memory_read"
+      ]
+    }
+  },
+
+  "limits": {
+    "python_exec": {
+      "timeout_seconds": 5,
+      "max_output_bytes": 8192
+    },
+
+    "http_request": {
+      "allowed_methods": ["GET", "POST"],
+      "allowed_domains": [
+        "api.github.com",
+        "api.openai.com",
+        "httpbin.org"
+      ]
+    }
+  },
+
+  "audit": {
+    "enabled": true,
+    "log_level": "INFO",
+    "store_results": true
+  }
+}
+

@@ -1,0 +1,15 @@
+{
+  "type": "object",
+  "required": [
+    "major_risks",
+    "unrealistic_assumptions",
+    "failure_scenarios",
+    "required_changes"
+  ],
+  "properties": {
+    "major_risks": { "type": "array", "items": { "type": "string" } },
+    "unrealistic_assumptions": { "type": "array", "items": { "type": "string" } },
+    "failure_scenarios": { "type": "array", "items": { "type": "string" } },
+    "required_changes": { "type": "array", "items": { "type": "string" } }
+  }
+}

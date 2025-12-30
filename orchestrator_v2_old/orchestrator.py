@@ -1,0 +1,125 @@
+# orchestrator.py
+
+from __future__ import annotations
+import asyncio
+from typing import Any, Dict, Optional
+from events.event_bus import EventBus
+from langgraph.graph import StateGraph
+from graph.state import State, AgentOutput, set_default_channel
+from agent_registry import AgentRegistry
+from stage_registry import StageRegistry
+
+class Orchestrator:
+    """
+    Per-session orchestrator that manages execution of a LangGraph graph
+    for a given session and workspace.
+
+    Responsibilities:
+    - Maintain session state
+    - Route stages via stage_router node in the graph
+    - Fetch and persist memory for SkillAgents
+    - Emit events to the EventBus
+    - Handle optional HITL callbacks
+    """
+
+    def __init__(
+        self,
+        event_bus: EventBus,
+        agent_registry: AgentRegistry,
+        stage_registry: StageRegistry,
+        graph_builder,  # callable(agent_registry, stage_registry) -> StateGraph
+        hitl_callback: Optional[Any] = None
+    ):
+        self.event_bus = event_bus
+        self.agent_registry = agent_registry
+        self.stage_registry = stage_registry
+        self.hitl_callback = hitl_callback
+
+        # Compile the graph once per orchestrator
+        self.graph: StateGraph = graph_builder(agent_registry, stage_registry)
+        self.session_state: Dict[str, Any] = {}
+
+    async def run(self, session_id: str, task: str) -> Dict[str, Any]:
+        """
+        Run the session through the LangGraph.
+        Returns final session state.
+        """
+        # Initialize session state
+        self.session_state = {
+            "session_id": session_id,
+            "task": task,
+            "stage": self.stage_registry.first_stage(),
+            "done": False,
+            "history_agents": [],
+            "rewards": {},
+            "winner": {},
+            "decision": {},
+            "executed_agents_per_stage": {}
+        }
+
+        # Loop until graph signals done
+        while not self.session_state.get("done", False):
+            # LangGraph runs asynchronously and returns deltas per node
+            state_delta = await self.graph.astream(self.session_state)
+
+            # Merge deltas into session_state
+            self._merge_state_delta(state_delta)
+
+        return self.session_state
+
+    def _merge_state_delta(self, delta: Dict[str, Any]):
+        """
+        Merge LangGraph node delta into session state.
+        Handles history, rewards, winner, decision, executed_agents_per_stage.
+        """
+        for key, value in delta.items():
+            if key == "history_agents":
+                self.session_state.setdefault("history_agents", []).extend(value)
+            elif key == "rewards":
+                for k, v in value.items():
+                    self.session_state.setdefault("rewards", {}).setdefault(k, 0.0)
+                    self.session_state["rewards"][k] += v
+            elif key in {"winner", "decision"}:
+                self.session_state[key] = value
+            elif key == "executed_agents_per_stage":
+                for stage, agents in value.items():
+                    self.session_state.setdefault("executed_agents_per_stage", {}).setdefault(stage, [])
+                    for agent in agents:
+                        if agent not in self.session_state["executed_agents_per_stage"][stage]:
+                            self.session_state["executed_agents_per_stage"][stage].append(agent)
+            else:
+                self.session_state[key] = value
+
+    async def run_agent(self, agent_role: str) -> Any:
+        """
+        Run a single agent node in the graph.
+        Useful for testing or for targeted HITL interventions.
+        """
+        agent = self.agent_registry.get(agent_role)
+        if not agent:
+            raise ValueError(f"Agent '{agent_role}' not found")
+
+        output = await agent.run(self.session_state)
+        delta = {
+            "history_agents": [AgentOutput(
+                stage=self.session_state["stage"],
+                role=agent_role,
+                output=output
+            )],
+            "executed_agents_per_stage": {
+                self.session_state["stage"]: [agent_role]
+            }
+        }
+
+        self._merge_state_delta(delta)
+        return output
+
+    async def hitl_decision(self, decision: Any):
+        """
+        Invoke HITL callback if defined.
+        Can be used to skip stages or force agent selection.
+        """
+        if self.hitl_callback:
+            return await self.hitl_callback(self.session_state, decision)
+        return None
+

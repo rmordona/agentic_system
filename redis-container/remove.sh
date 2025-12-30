@@ -1,0 +1,1 @@
+podman rm redis-memory

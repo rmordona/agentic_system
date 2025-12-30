@@ -1,0 +1,133 @@
+{
+  "version": "1.0",
+  "description": "Platform-level generic tools available to agentic runtimes",
+  "tools": [
+    {
+      "name": "web_search",
+      "type": "information",
+      "description": "Search the web for up-to-date information",
+      "entrypoint": "runtime.tools.web_search.WebSearchTool",
+      "capabilities": ["read"],
+      "inputs": {
+        "query": "string"
+      },
+      "outputs": {
+        "results": "list[string]"
+      },
+      "safety": {
+        "rate_limited": true,
+        "audit": true
+      }
+    },
+    {
+      "name": "calculator",
+      "type": "utility",
+      "description": "Evaluate mathematical expressions safely",
+      "entrypoint": "runtime.tools.calculator.CalculatorTool",
+      "capabilities": ["read"],
+      "inputs": {
+        "expression": "string"
+      },
+      "outputs": {
+        "result": "number"
+      },
+      "safety": {
+        "sandboxed": true
+      }
+    },
+    {
+      "name": "python_exec",
+      "type": "execution",
+      "description": "Execute Python code in a sandboxed environment",
+      "entrypoint": "runtime.tools.python_exec.PythonExecTool",
+      "capabilities": ["execute"],
+      "inputs": {
+        "code": "string"
+      },
+      "outputs": {
+        "stdout": "string",
+        "stderr": "string"
+      },
+      "safety": {
+        "sandboxed": true,
+        "timeout_seconds": 5,
+        "audit": true
+      }
+    },
+    {
+      "name": "memory_write",
+      "type": "memory",
+      "description": "Write structured memory objects",
+      "entrypoint": "runtime.tools.memory.MemoryWriteTool",
+      "capabilities": ["write"],
+      "inputs": {
+        "schema": "string",
+        "payload": "object"
+      },
+      "outputs": {
+        "memory_id": "string"
+      },
+      "safety": {
+        "scoped": true,
+        "audit": true
+      }
+    },
+    {
+      "name": "memory_read",
+      "type": "memory",
+      "description": "Retrieve episodic or semantic memories",
+      "entrypoint": "runtime.tools.memory.MemoryReadTool",
+      "capabilities": ["read"],
+      "inputs": {
+        "query": "string",
+        "filters": "object"
+      },
+      "outputs": {
+        "memories": "list[object]"
+      },
+      "safety": {
+        "scoped": true,
+        "audit": true
+      }
+    },
+    {
+      "name": "vector_search",
+      "type": "embedding",
+      "description": "Semantic vector similarity search",
+      "entrypoint": "runtime.tools.vector_search.VectorSearchTool",
+      "capabilities": ["read"],
+      "inputs": {
+        "query": "string",
+        "top_k": "number"
+      },
+      "outputs": {
+        "results": "list[object]"
+      },
+      "safety": {
+        "scoped": true
+      }
+    },
+    {
+      "name": "http_request",
+      "type": "integration",
+      "description": "Make outbound HTTP requests to approved domains",
+      "entrypoint": "runtime.tools.http.HttpRequestTool",
+      "capabilities": ["read", "write"],
+      "inputs": {
+        "method": "string",
+        "url": "string",
+        "headers": "object",
+        "body": "object"
+      },
+      "outputs": {
+        "status": "number",
+        "response": "object"
+      },
+      "safety": {
+        "allowlist_required": true,
+        "audit": true
+      }
+    }
+  ]
+}
+

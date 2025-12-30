@@ -1,0 +1,26 @@
+{
+  "stages": [
+    {
+      "name": "ideation",
+      "allowed_agents": ["optimistic"],
+      "exit_condition": "len(state['executed_agents_per_stage'].get('ideation', [])) >= 1",
+      "next_stages": ["evaluation"],
+      "priority": 1
+    },
+    {
+      "name": "evaluation",
+      "allowed_agents": ["critic"],
+      "exit_condition": "len(state['executed_agents_per_stage'].get('evaluation', [])) >= 1",
+      "next_stages": ["synthesis"],
+      "priority": 1
+    },
+    {
+      "name": "synthesis",
+      "allowed_agents": ["synthesizer"],
+      "exit_condition": "True",
+      "next_stages": [],
+      "terminal": true
+    }
+  ]
+}
+

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Agentic LLM Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1, h2 { margin-bottom: 10px; }
+        #events { max-height: 300px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Agentic LLM Live Dashboard</h1>
+
+    <h2>Stage Progress</h2>
+    <div id="stage">Current Stage: N/A</div>
+
+    <h2>Rewards</h2>
+    <canvas id="rewardChart" width="600" height="200"></canvas>
+
+    <h2>Tool Calls & Events</h2>
+    <ul id="events"></ul>
+
+    <script>
+        // WebSocket connection
+        const ws = new WebSocket("ws://localhost:8000/ws");
+
+        const stageDiv = document.getElementById("stage");
+        const eventsUl = document.getElementById("events");
+
+        // Reward chart setup
+        const rewardData = {
+            labels: [],
+            datasets: [
+                { label: 'Novelty', data: [], borderColor: 'red', fill: false },
+                { label: 'Confidence', data: [], borderColor: 'blue', fill: false },
+                { label: 'Quality', data: [], borderColor: 'green', fill: false },
+                { label: 'Risk', data: [], borderColor: 'orange', fill: false }
+            ]
+        };
+
+        const ctx = document.getElementById('rewardChart').getContext('2d');
+        const rewardChart = new Chart(ctx, {
+            type: 'line',
+            data: rewardData,
+            options: { responsive: true, scales: { y: { min: 0, max: 1 } } }
+        });
+
+        // Handle incoming events
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+
+            // Stage updates
+            if (data.type === "stage_enter" || data.type === "stage_exit") {
+                stageDiv.textContent = "Current Stage: " + (data.payload.stage || "N/A");
+            }
+
+            // Reward updates
+            if (data.type === "reward_assigned") {
+                const agent = data.payload.agent;
+                const reward = data.payload.reward;
+
+                if (!rewardData.labels.includes(agent)) {
+                    rewardData.labels.push(agent);
+                    rewardData.datasets.forEach(ds => ds.data.push(0));
+                }
+
+                const idx = rewardData.labels.indexOf(agent);
+                rewardData.datasets[0].data[idx] = reward.novelty || 0;
+                rewardData.datasets[1].data[idx] = reward.confidence || 0;
+                rewardData.datasets[2].data[idx] = reward.quality || 0;
+                rewardData.datasets[3].data[idx] = reward.risk_score || 0;
+
+                rewardChart.update();
+            }
+
+            // Tool calls & general events
+            const li = document.createElement("li");
+            li.textContent = `[${data.payload.agent || data.payload.stage || 'global'}] ${data.type}: ${JSON.stringify(data.payload)}`;
+            eventsUl.appendChild(li);
+            eventsUl.scrollTop = eventsUl.scrollHeight; // auto scroll
+        };
+
+        ws.onopen = () => console.log("WebSo

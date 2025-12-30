@@ -1,0 +1,30 @@
+{
+  "type": "object",
+  "required": ["summary", "scorecard", "decision", "rationale"],
+  "properties": {
+    "summary": { "type": "string" },
+    "scorecard": {
+      "type": "object",
+      "required": [
+        "feasibility",
+        "differentiation",
+        "user_value",
+        "risk_mitigation",
+        "consistency"
+      ],
+      "properties": {
+        "feasibility": { "type": "number" },
+        "differentiation": { "type": "number" },
+        "user_value": { "type": "number" },
+        "risk_mitigation": { "type": "number" },
+        "consistency": { "type": "number" }
+      }
+    },
+    "decision": {
+      "type": "string",
+      "enum": ["continue", "winner"]
+    },
+    "rationale": { "type": "string" }
+  }
+}
+

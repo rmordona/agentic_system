@@ -1,0 +1,15 @@
+{
+  "type": "object",
+  "required": [
+    "title",
+    "core_ideas",
+    "key_features",
+    "win_rationale"
+  ],
+  "properties": {
+    "title":  { "type": "string"  },
+    "core_ideas": { "type": "array", "items": { "type": "string" } },
+    "key_features": { "type": "array", "items": { "type": "string" } },
+    "win_rationale": { "type": "array", "items": { "type": "string" } }
+  }
+}

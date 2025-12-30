@@ -1,0 +1,41 @@
+{
+  "type": "object",
+  "required": ["title", "core_idea", "features", "win_rationale"],
+  "properties": {
+    "title": { "type": "string" },
+    "core_idea": [
+          { "type": "string" },
+          {
+            "type": "object",
+            "required": ["name", "description"],
+            "properties" : {
+              "name": { "type": "string" },
+              "description": { "type": "string" }
+            }
+          },
+          {
+            "type": "array",
+            "items": {
+                 "type": "object",
+                 "required": ["name", "description"],
+                 "properties" : {
+                      "name": { "type": "string" },
+                      "description": { "type": "string" }
+                 }
+             }
+           }
+    ],
+    "features": {
+      "type": "array",
+      "items": { 
+          "type": "object",
+          "required": ["name", "description"],
+          "properties" : {
+              "name": { "type": "string" },
+              "description": { "type": "string" }
+          } 
+       }
+    },
+    "win_rationale": { "type": "string" }
+  }
+}

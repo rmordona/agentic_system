@@ -1,0 +1,28 @@
+{
+  "name": "research_assistant",
+  "version": "1.0.0",
+  "description": "Multi-agent research and decision workflow",
+  "owner": "platform-team",
+  "default_entry_stage": "analysis",
+  "reload": {
+    "enabled": true,
+    "strategy": "hash",
+    "interval_seconds": 30
+  },
+  "runtime": {
+    "max_concurrency": 5,
+    "timeout_seconds": 300
+  },
+  "memory": {
+    "name": "decision_workspace",
+    "memory": {
+      "episodic": {
+        "redis": {
+          "namespace": "decision_ws_episodic"
+        }
+      }
+    }
+  }
+
+}
+

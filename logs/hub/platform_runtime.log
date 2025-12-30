@@ -1,0 +1,221 @@
+[2025-12-29 10:17:40,075] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 11:26:30,298] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 11:27:52,751] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 11:28:15,220] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 11:37:23,634] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 11:44:47,365] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 11:46:26,785] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 11:55:42,687] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 11:58:00,449] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 11:58:52,848] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 12:00:23,939] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 12:00:37,366] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 12:10:21,173] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 12:11:02,729] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 12:35:45,822] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 12:37:28,993] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 12:39:24,358] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 12:40:40,425] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 12:40:54,235] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 12:41:39,393] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 12:42:42,794] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 12:43:04,751] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 12:49:01,304] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 12:49:01,305] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 13:07:37,651] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 13:07:37,652] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 13:20:54,936] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 13:20:54,937] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 13:21:09,285] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 13:21:09,286] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 13:21:32,273] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 13:21:32,274] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 13:21:32,276] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 13:23:42,383] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 13:23:42,384] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 13:23:42,386] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 13:24:53,284] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 13:24:53,720] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 13:24:53,725] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 13:25:46,628] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 13:25:46,629] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 13:25:46,631] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 13:34:00,349] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 13:34:00,350] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 13:34:00,352] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 13:38:20,255] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 13:38:20,256] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 13:38:20,259] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 13:38:20,263] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 13:47:18,390] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 13:47:18,391] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 13:47:18,393] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 13:47:18,398] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 15:04:28,086] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 15:04:28,088] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 15:04:28,096] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 15:04:28,100] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 15:24:23,477] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 15:24:23,478] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 15:24:23,481] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 15:24:23,485] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 15:31:30,332] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 15:31:30,333] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 15:31:30,335] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 15:31:30,339] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 15:33:01,380] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 15:33:01,381] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 15:33:01,384] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 15:33:01,388] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 15:42:21,214] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 15:42:21,215] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 15:42:21,217] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 15:42:21,221] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 15:45:23,612] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 15:45:23,613] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 15:45:23,616] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 15:45:23,620] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 15:49:36,664] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 15:49:36,665] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 15:49:36,667] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 15:49:36,671] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 15:58:07,741] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 15:58:07,743] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 15:58:07,745] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 15:58:07,749] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 16:05:03,754] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 16:05:03,755] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 16:05:03,757] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 16:05:03,761] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 16:08:56,685] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 16:08:56,686] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 16:08:56,688] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 16:08:56,692] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 16:12:40,067] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 16:12:40,068] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 16:12:40,091] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 16:12:40,096] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 16:16:46,526] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 16:16:46,527] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 16:16:46,529] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 16:16:46,533] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 16:17:17,476] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 16:17:17,477] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 16:17:17,479] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 16:17:17,484] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 16:31:22,730] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 16:31:22,731] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 16:31:22,733] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 16:31:22,738] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 16:35:13,929] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 16:35:13,930] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 16:35:13,932] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 16:35:13,936] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 16:40:36,112] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 16:40:36,113] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 16:40:36,115] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 16:40:36,119] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 16:41:23,516] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 16:41:23,517] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 16:41:23,519] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 16:41:23,523] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 16:42:14,707] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 16:42:14,708] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 16:42:14,710] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 16:42:14,714] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 16:42:32,538] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 16:42:32,539] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 16:42:32,542] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 16:42:32,546] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 16:42:52,742] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 16:42:52,743] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 16:42:52,745] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 16:42:52,750] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 17:59:18,465] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 17:59:18,466] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 17:59:18,468] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 17:59:18,472] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 17:59:38,189] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 17:59:38,190] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 17:59:38,192] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 17:59:38,196] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 18:00:18,325] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 18:00:18,326] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 18:00:18,329] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 18:00:18,333] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 18:01:14,293] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 18:01:14,294] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 18:01:14,297] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 18:01:14,301] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 18:07:05,645] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 18:07:05,646] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 18:07:05,648] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 18:07:05,653] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 18:08:43,430] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 18:08:43,432] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 18:08:43,434] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 18:08:43,438] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 18:12:12,590] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 18:12:12,592] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 18:12:12,594] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 18:12:12,598] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 18:16:11,756] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 18:16:11,757] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 18:16:11,760] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 18:16:11,764] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 18:16:39,786] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 18:16:39,788] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 18:16:39,790] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 18:16:39,794] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 18:19:01,663] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 18:19:01,665] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 18:19:01,667] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 18:19:01,671] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 18:19:43,118] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 18:19:43,119] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 18:19:43,121] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 18:19:43,125] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 18:20:10,540] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 18:20:10,541] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 18:20:10,543] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 18:20:10,548] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 18:20:49,701] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 18:20:49,702] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 18:20:49,705] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 18:20:49,709] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 18:21:19,191] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 18:21:19,193] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 18:21:19,195] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 18:21:19,199] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 18:37:53,517] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 18:37:53,518] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 18:37:53,521] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 18:37:53,525] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 18:42:17,301] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 18:42:17,302] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 18:42:17,304] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 18:42:17,308] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 18:42:40,530] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 18:42:40,531] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 18:42:40,533] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 18:42:40,561] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 18:54:00,978] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 18:54:00,979] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 18:54:00,981] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 18:54:00,985] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 18:54:52,426] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 18:54:52,427] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 18:54:52,429] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 18:54:52,456] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 19:01:09,878] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 19:01:09,879] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 19:01:09,881] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 19:01:09,886] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 19:02:11,568] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 19:02:11,569] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 19:02:11,571] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 19:02:11,576] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
+[2025-12-29 19:02:28,122] INFO [hub::platform_runtime] Initializing PlatformRuntime
+[2025-12-29 19:02:28,123] INFO [hub::platform_runtime] Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text'}
+[2025-12-29 19:02:28,125] INFO [hub::platform_runtime] ToolClient initialized
+[2025-12-29 19:02:28,130] INFO [hub::platform_runtime] PlatformRuntime initialized successfully
