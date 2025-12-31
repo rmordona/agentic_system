@@ -38,12 +38,13 @@ class SemanticMemory(BaseModel):
     Stores a compacted, semantic-level summary of multiple agent outputs
     for a given session and task, with a category for semantic classification.
     """
-    session_id: str               # session identifier
-    task: str                     # task associated with the memories
-    stage: str = "conversation"   # stage where compaction occurs (values are either conversation or summary)
-    content: Dict[str, Any]       # the actual compacted summary text
-    category: str                 # e.g., "intent", "preference", "constraint", "fact"
-    notes: Optional[str] = None   # optional field for metadata or annotations
+    key_namespace: Optional[tuple]                  # This includes session_id, agent, stage, namespace
+    task: str                                        # This includes user message
+    summary: Dict[str, Any]                          # he actual compacted summary text
+    category: Optional[str]                          # e.g., "intent", "preference", "constraint", "fact"
+    documents: Optional[Sequence[str]]               # Any document
+    metadatas: Optional[Sequence[Dict[str, Any]]]    # Any Metadata
+    annotations: Optional[Dict[str, Any]]            # optional field for metadata or annotations
 
 # This is the Summarized Episodic Memory
 # - Schema memory structures summarized from accumulated synthesizer memory
@@ -52,12 +53,13 @@ class EpisodicMemory(BaseModel):
     Stores a compacted, semantic-level summary of multiple agent outputs
     for a given session and task, with a category for semantic classification.
     """
-    session_id: str
-    task: str                   # task associated with the memories
-    agent: str                  # will always be "synthesizer"
-    stage: str                  # stage where compaction occurs (values are either conversation or summary)
-    caregory: str = "intent"    # e.g., "intent", "preference", "constraint", "fact"
-    summary: Dict[str, Any]     # he actual compacted summary text
+    key_namespace: Optional[tuple]                   # This includes session_id, agent, stage, namespace
+    task: str                                        # This includes user message
+    summary: Dict[str, Any]                          # he actual compacted summary text
+    category: Optional[str]                          # e.g., "intent", "preference", "constraint", "fact"
+    documents: Optional[Sequence[str]]               # Any document
+    metadatas: Optional[Sequence[Dict[str, Any]]]    # Any Metadata
+    annotations: Optional[Dict[str, Any]] = None     # optional field for metadata or annotations
 
 
 # Required in Pydantic v2

@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Optional, Union
 from langmem import create_memory_manager, create_memory_searcher
 from langchain_core.runnables import Runnable
 from runtime.memory_adapters.base import MemoryAdapter
+from runtime.memory_schemas import EpisodicMemory, SemanticMemory
 from llm.local_llm import LocalLLM, LocalLLMChatModel
 
 class LangMemSemanticAdapter(MemoryAdapter):
@@ -18,37 +19,42 @@ class LangMemSemanticAdapter(MemoryAdapter):
 
         self.searcher = create_memory_searcher( chat_model)
 
+
+    def _key(self, session_id: str, namespace: str, uid: str):
+        return f"{session_id}:{self.namespace}:{uid}"
+
     async def store_memory(
         self,
-        memory: BaseModel,
-        namespace: Optional[str] = None
+        memory: Union[Dict, BaseModel, EpisodicMemory]
+        # namespace: Optional[str] = None
     ) -> str:
         """
         Stores a memory object in Redis. Returns the generated key.
         """
         key = str(uuid4())
-        langmem_key = self._key(memory.session_id, key)
+        langmem_key = self._key(memory.session_id, memory.namespace, key)
 
         await self.manager.add(memory.model_dump_json() )
         return langmem_key
 
+
     async def fetch_memory(
         self,
-        namespace: Optional[str] = None,
-        offset: Optional[str]  = None,
-        session_id: Optional[str] = None,
-        agent: Optional[str] = None,
-        stage: Optional[str] = None,
-        task: Optional[str] = None,
-        filter: Optional[Dict[str, Any]] = None,
-        query: Optional[str] = None,
-        *,
-        top_k: Optional[int] = 5,
-        limit: Optional[int] = None,
+        key_namespace: tuple = None,
+        filters: Optional[Dict[str, Any]] = None,
+        top_k: Optional[int] = None,
+        limit: Optional[int] = None
     ) -> List[Dict[str, Any]]:
         """
         Fetch semantic memories via metadata filtering.
         """
+        keys=dict(key_namespace)
+        session_id = keys["session_id"]
+        agent      = keys["agent"]
+        stage      = keys["stage"]
+        namespace  = keys["namespace"]
+
+        '''
         filters = {}
 
         if session_id:
@@ -59,6 +65,7 @@ class LangMemSemanticAdapter(MemoryAdapter):
             filter["agent"] = agent
         if stage:
             filter["stage"] = stage
+        '''
 
         # Call the RunnableSequence instead of .search()
         # It will return a list of results
@@ -91,3 +98,38 @@ class LangMemSemanticAdapter(MemoryAdapter):
     async def clear(self):
         """Delete all keys in this namespace."""
         return
+
+    async def add_embeddings(
+        self,
+        memory: Union[Dict, BaseModel, SemanticMemory]
+    ) -> None:
+        """Add embeddings to the semantic store."""
+        return
+
+    async def semantic_search(
+        cls,
+        query: str, 
+        top_k: Optional[int] = None, 
+        limit: Optional[int] = None,
+        filters: Optional[Dict[str, Any]] = None
+    ) -> List[Dict[str, Any]]:
+        """Perform semantic similarity search."""
+        return await self.searcher.search(
+            query=query,
+            filters=filters,
+            limit=limit,
+        )
+
+    async def nl_to_sql(
+        cls,
+        query: str, 
+        top_k: Optional[int] = None, 
+        limit: Optional[int] = None,
+        filters: Optional[Dict[str, Any]] = None
+    ) -> List[Dict[str, Any]]:
+        """Perform semantic similarity search."""
+        return await self.searcher.search(
+            query=query,
+            filters=filters,
+            limit=limit,
+        )

@@ -86,16 +86,13 @@ class AgentRegistry:
                 memory_context = MemoryContext(
                     memory_manager=self.memory_manager,
                     namespace=f"workspace:{self.workspace_name}",
-                    agent=skill_name
                 )
 
                 agent = SkillAgent(
                     workspace_path=self.workspace_path,
                     skill_name=skill_name,
                     stage_meta={},          # injected later
-                    llm=self.llm,
                     memory_context=memory_context,   # inject context instead of manager
-                    embedding_store=self.embedding_store,
                     tool_client=self.tool_client,
                     event_bus=self.event_bus
                 )

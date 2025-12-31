@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, Dict
 from fastmcp import Client
 from langchain_core.prompts import PromptTemplate
+from runtime.memory_adapters.memory_context import MemoryContext
 from runtime.logger import AgentLogger
 
 
@@ -31,7 +32,7 @@ class BaseSkill:
         self,
         workspace_dir: Path,
         skill_name: str,
-        memory_context,      # 🔑 expects MemoryContext
+        memory_context: MemoryContext,      # 🔑 expects MemoryContext
         tool_client: Client,
         event_bus=None,
     ):
@@ -71,7 +72,7 @@ class BaseSkill:
         logger.info(f"Running {self.workspace_name} workspace ...")
 
         # Bind session and stage to context for this run
-        runtime_context = self.memory_context.with_session(state["session_id"]).with_stage(state["stage"])
+        runtime_context = self.memory_context.with_session(state["session_id"]).with_stage(state["stage"]).with_task(state["task"]).generate_key_namespace()
 
         context = await self._resolve_context(state, runtime_context)
         logger.info(f"{self.workspace_name}: Context retrieved: {context}")
@@ -108,12 +109,17 @@ class BaseSkill:
                 resolved[name] = await self._resolve_memory(ctx, runtime_context, state)
 
             elif source == "embedding":
-                resolved[name] = await runtime_context.search(
+                resolved[name] = await runtime_context.semantic_search(
                     query=state["task"],
                     top_k=ctx.get("top_k", 5),
-                    filter=ctx.get("filters", None)
+                    filters=ctx.get("filters", None)
                 )
-
+            elif source == "nl2sql":
+                resolved[name] = await runtime_context.nl_to_query(
+                    query=state["task"],
+                    top_k=ctx.get("top_k", 5),
+                    filters=ctx.get("filters", None)
+                )
             elif source == "external":
                 resolved[name] = await self.tool_client.call(
                     service=ctx["service"],
@@ -128,6 +134,17 @@ class BaseSkill:
 
         return resolved
 
+    # ------------------------------------------------------------------
+    # Memory Persistence
+    # ------------------------------------------------------------------
+
+    async def _persist_memory(self, output: Any, runtime_context):
+        await runtime_context.store(memory=output)
+
+    # ------------------------------------------------------------------
+    # Memory Resolution
+    # ------------------------------------------------------------------
+
     async def _resolve_memory(self, ctx: dict, runtime_context, state: dict):
         memory_type = ctx.get("memory_type", "semantic")
         filters = ctx.get("filters", {})
@@ -136,12 +153,14 @@ class BaseSkill:
             # context already bound
             return await runtime_context.query(
                 query=state["task"],
-                top_k=filters.get("top_k", 5),
+                top_k=filters.get("top_k", None),
+                limit=filters.get("limit", None),
             )
 
         if memory_type == "episodic":
             return await runtime_context.fetch_memory(
-                top_k=filters.get("top_k", 3),
+                top_k=filters.get("top_k", None),
+                limit=filters.get("limit", None),
             )
 
         return None
@@ -191,14 +210,7 @@ class BaseSkill:
                     },
                 )
 
-    # ------------------------------------------------------------------
-    # Memory Persistence
-    # ------------------------------------------------------------------
 
-    async def _persist_memory(self, output: Any, runtime_context):
-        await runtime_context.store(
-            memory=output
-        )
 
     # ------------------------------------------------------------------
     # LangGraph State Delta

@@ -12,77 +12,96 @@ class MemoryContext:
         agent: Optional[str] = None,
         stage: Optional[str] = None,
         task: Optional[str] = None,
-        top_k: int = 5,
-        limit: int = 5,
+        top_k: Optional[int] = None,
+        limit: Optional[int] = None,
     ):
+
         self.memory_manager = memory_manager
         self.namespace = namespace
-        self.session_id = session_id
         self.agent = agent
-        self.stage = stage
-        self.task = task
         self.top_k = top_k
         self.limit = limit
 
-    # ----------------------------
-    # Episodic memory
-    # ----------------------------
-    async def store_episodic(self, memory):
-        return await self.memory_manager.store_episodic(
-            session_id=self.session_id,
-            agent=self.agent,
-            stage=self.stage,
-            memory=memory
-        )
+        # Dynamically updated during Agent.run()
+        self.session_id = session_id
+        self.stage = stage
+        self.task = task
 
-    async def fetch_episodic(self, filters: Optional[Dict[str, Any]] = None, top_k: Optional[int] = None):
-        return await self.memory_manager.fetch_episodic(
-            session_id=self.session_id,
-            agent=self.agent,
-            stage=self.stage,
+        # A new key_namespace will be formed as store key
+        self.key_namespace = None
+
+    # ----------------------------
+    # Episodic store memory
+    # ----------------------------
+
+    async def store(self, memory):
+        return await self.memory_manager.store( 
+                key_namespace=self.key_namespace,  
+                task=self.task, 
+                memory=memory 
+            )
+
+    # ----------------------------
+    # Episodic fetch memory
+    # ----------------------------
+
+    async def fetch_memory(
+        self, 
+        filters: Optional[Dict[str, Any]] = None, 
+        top_k: Optional[int] = None,
+        limit: Optional[int] = None
+        ):
+        return await self.memory_manager.fetch_memory(
+            key_namespace=self.key_namespace,
             filters=filters,
-            top_k=top_k or self.top_k
+            top_k=top_k or self.top_k,
+            limit=limit or self.limit
         )
 
     # ----------------------------
     # Semantic memory
     # ----------------------------
-    async def store_semantic(self, memory):
-        return await self.memory_manager.store_semantic(
-            session_id=self.session_id,
-            agent=self.agent,
-            stage=self.stage,
-            memory=memory
-        )
-
-    async def fetch_semantic(self, filters: Optional[Dict[str, Any]] = None, top_k: Optional[int] = None):
-        return await self.memory_manager.fetch_semantic(
-            session_id=self.session_id,
-            agent=self.agent,
-            task=self.task,
-            filters=filters,
-            top_k=top_k or self.top_k
-        )
-
-    async def query(self, query: str, top_k: Optional[int] = None, filters: Optional[Dict[str, Any]] = None):
-        return await self.memory_manager.query(
-            query=query,
-            namespace=self.namespace,
-            session_id=self.session_id,
-            agent=self.agent,
-            stage=self.stage,
-            task=self.task,
-            top_k=top_k or self.top_k,
-            filter=filters
-        )
-
-    async def add_embeddings(self, *, ids, embeddings, documents=None, metadatas=None):
+    '''
+    async def add_embeddings(self, embeddings, documents=None, metadatas=None):
         return await self.memory_manager.add_embeddings(
-            ids=ids,
+            session_id=self.session_id,
+            agent=self.agent,
+            stage=self.stage,
             embeddings=embeddings,
             documents=documents,
             metadatas=metadatas,
             namespace=self.namespace
+        ):
+    '''
+
+    async def semantic_search(
+        self, 
+        query: str, 
+        top_k: Optional[int] = None, 
+        limit: Optional[int] = None,
+        filters: Optional[Dict[str, Any]] = None
+        ):
+        return await self.memory_manager.semantic_search(
+            query=query,
+            top_k=top_k or self.top_k,
+            limit=limit or self.limit,
+            key_namespace=self.key_namespace,
+            filters=filters
+        )
+
+    async def nl_to_sql(
+        self, 
+        query: str, 
+        top_k: Optional[int] = None, 
+        limit: Optional[int] = None,
+        filters: Optional[Dict[str, Any]] = None
+        ):
+        return await self.memory_manager.nl_to_sql(
+            query=query,
+            top_k=top_k or self.top_k,
+            limit=limit or self.limit,
+            key_namespace=self.key_namespace,
+            filters=filters
         )
 
     # ----------------------------
@@ -111,3 +130,35 @@ class MemoryContext:
             top_k=self.top_k,
             limit=self.limit
         )
+
+    def with_task(self, task: str) -> "MemoryContext":
+        return MemoryContext(
+            memory_manager=self.memory_manager,
+            namespace=self.namespace,
+            session_id=self.session_id,
+            agent=self.agent,
+            stage=self.stage,
+            task=task,
+            top_k=self.top_k,
+            limit=self.limit
+        )
+
+    def with_namespace(self, namespace: str) -> "MemoryContext":
+        return MemoryContext(
+            memory_manager=self.memory_manager,
+            namespace=namespace,
+            session_id=self.session_id,
+            agent=self.agent,
+            stage=self.stage,
+            task=self.task,
+            top_k=self.top_k,
+            limit=self.limit
+        )
+
+    def generate_key_namespace(self)  -> "MemoryContext":
+        self.key_namespace = (
+                ("session_id",  self.session_id),
+                ("agent",       self.agent),
+                ("stage",       self.stage),
+                ("namespace",   self.namespace) )
+        return self

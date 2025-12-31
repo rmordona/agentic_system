@@ -1,7 +1,8 @@
-from runtime.memory_adapters.base import MemoryAdapter
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
 import chromadb
+from runtime.memory_adapters.base import MemoryAdapter
+from runtime.memory_schemas import EpisodicMemory, SemanticMemory
 
 class ChromaDBAdapter(MemoryAdapter):
     def __init__(self, collection_name: str, chroma_client=None):
@@ -9,34 +10,72 @@ class ChromaDBAdapter(MemoryAdapter):
         self.client = chroma_client or chromadb.Client()
         self.collection = self.client.get_or_create_collection(collection_name)
 
+
+    def _key(self, key_namespace:tuple):
+        keys=dict(key_namespace)
+        session_id = keys["session_id"]
+        agent      = keys["agent"]
+        stage      = keys["agent"]
+        namespace  = keys["namespace"]
+        return f"{session_id}:{agent}:{stage}:{namespace}"
+
     async def store_memory(
         self,
-        memory: BaseModel,
-        namespace: Optional[str] = None
+        memory: Union[Dict, BaseModel, EpisodicMemory]
+        #namespace: Optional[str] = None
     ) -> str:
         memory_dict = memory.model_dump()
-        key = memory_dict.get("session_id") + "-" + memory_dict.get("agent")
+        chrome_key = self._key(memory.key_namespace)
+
         # ChromaDB expects embeddings, so you’d embed the memory text if needed
-        self.collection.add([key], [memory_dict])
-        return key
+        self.collection.add([chrome_key], [memory_dict])
+        return chrome_key
 
     async def fetch_memory(
         self,
-        namespace: Optional[str] = None,
-        session_id: Optional[str] = None,
-        agent: Optional[str] = None,
-        stage: Optional[str] = None,
-        task: Optional[str] = None,
-        filter: Optional[Dict[str, Any]] = None,
-        query: Optional[str] = None,
-        *,
-        top_k: Optional[int] = 5,
-        limit: Optional[int] = None,
+        key_namespace: tuple = None,
+        filters: Optional[Dict[str, Any]] = None,
+        top_k: Optional[int] = None,
+        limit: Optional[int] = None
     ) -> List[Dict[str, Any]]:
         # query logic based on metadata filters
+
+        keys=dict(key_namespace)
+        session_id = keys["session_id"]
+        agent      = keys["agent"]
+        stage      = keys["stage"]
+        namespace  = keys["namespace"]
+
         results = self.collection.query(
             filter={"session_id": session_id} if session_id else {},
             n_results=limit
         )
         return results
 
+    
+    async def add_embeddings(
+        self,
+        memory: Union[Dict, BaseModel, SemanticMemory]
+    ) -> None:
+        """Add embeddings to the semantic store."""
+        return
+
+    async def semantic_search(
+        cls,
+        query: str, 
+        top_k: Optional[int] = None, 
+        limit: Optional[int] = None,
+        filters: Optional[Dict[str, Any]] = None
+    ) -> List[Dict[str, Any]]:
+        """Perform semantic similarity search."""
+        return {}
+
+    async def nl_to_sql(
+        cls,
+        query: str, 
+        top_k: Optional[int] = None, 
+        limit: Optional[int] = None,
+        filters: Optional[Dict[str, Any]] = None
+    ) -> List[Dict[str, Any]]:
+        """Perform semantic similarity search."""
+        return {}

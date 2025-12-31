@@ -72,38 +72,18 @@ class MemoryAdapter(ABC):
         """Add embeddings to the semantic store."""
         pass
 
+
     @classmethod
     @abstractmethod
-    async def query_embeddings(
+    async def query(
         cls,
         *,
         query_embedding: Sequence[float],
         namespace: Optional[str] = None,
         top_k: int = 5,
-        filter: Optional[Dict[str, Any]] = None,
+        filters: Optional[Dict[str, Any]] = None,
     ) -> List[Dict[str, Any]]:
         """Perform semantic similarity search."""
-        pass
-
-    # ============================================================
-    # Async Search (Tool-Compatible)
-    # ============================================================
-
-    @classmethod
-    @abstractmethod
-    async def asearch(
-        cls,
-        namespace: Optional[str] = None,
-        query: Optional[str] = None,
-        *,
-        offset: int = 0,
-        limit: int = 5,
-        **kwargs,
-    ) -> List[Dict[str, Any]]:
-        """
-        Async search entrypoint for tool frameworks
-        (e.g., LangGraph / LangMem).
-        """
         pass
 
     # ============================================================

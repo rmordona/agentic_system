@@ -1,9 +1,9 @@
-# runtime/memory_adapters/postgres_adapter.py
-from runtime.memory_adapters.base import MemoryAdapter
 from pydantic import BaseModel
 from typing import Any, Dict, List, Optional
 import asyncpg
 import json
+from runtime.memory_adapters.base import MemoryAdapter
+from runtime.memory_schemas import EpisodicMemory, SemanticMemory
 
 class PostgresAdapter(MemoryAdapter):
     def __init__(self, dsn: str, table_name: str = "memories"):
@@ -31,21 +31,24 @@ class PostgresAdapter(MemoryAdapter):
 
     async def store_memory(
         self,
-        memory: BaseModel,
-        namespace: Optional[str] = None
+        memory: Union[Dict, BaseModel, EpisodicMemory]
+        # namespace: Optional[str] = None
     ) -> str:
+        memory_dict = memory.model_dump()
+        keys = dict(memory_dict.get("key_namespace"))
         await self._init_pool()
         memory_dict = memory.model_dump()
         async with self.pool.acquire() as conn:
             result = await conn.fetchrow(
                 f"""
-                INSERT INTO {self.table_name} (session_id, agent, stage, task, memory)
-                VALUES ($1, $2, $3, $4, $5)
+                INSERT INTO {self.table_name} (session_id, agent, stage, namespace, task, memory)
+                VALUES ($1, $2, $3, $4, $5, $6)
                 RETURNING id
                 """,
-                memory_dict.get("session_id"),
-                memory_dict.get("agent"),
-                memory_dict.get("stage"),
+                keys.get("session_id"),
+                keys.get("agent"),
+                keys.get("stage"),
+                keys.get("namespace"),
                 memory_dict.get("task"),
                 json.dumps(memory_dict),
             )
@@ -53,32 +56,34 @@ class PostgresAdapter(MemoryAdapter):
 
     async def fetch_memory(
         self,
-        namespace: Optional[str] = None,
-        session_id: Optional[str] = None,
-        agent: Optional[str] = None,
-        stage: Optional[str] = None,
-        task: Optional[str] = None,
-        filter: Optional[Dict[str, Any]] = None,
-        query: Optional[str] = None,
-        *,
-        top_k: Optional[int] = 5,
-        limit: Optional[int] = None,
+        key_namespace: tuple = None,
+        filters: Optional[Dict[str, Any]] = None,
+        top_k: Optional[int] = None,
+        limit: Optional[int] = None
     ) -> List[Dict[str, Any]]:
+
+
+        keys=dict(key_namespace)
+        session_id = keys["session_id"]
+        agent      = keys["agent"]
+        stage      = keys["stage"]
+        namespace  = keys["namespace"]
+
         await self._init_pool()
         query = f"SELECT memory FROM {self.table_name} WHERE 1=1"
         params = []
         if session_id:
             params.append(session_id)
-            query += f" AND session_id = ${len(params)}"
+            query += f" AND session_id = :session_id"
         if agent:
             params.append(agent)
-            query += f" AND agent = ${len(params)}"
+            query += f" AND agent = :agent"
         if stage:
             params.append(stage)
-            query += f" AND stage = ${len(params)}"
-        if task:
-            params.append(task)
-            query += f" AND task = ${len(params)}"
+            query += f" AND stage = :stage"
+        if namespace:
+            params.append(namespace)
+            query += f" AND task = :namespace"
 
         async with self.pool.acquire() as conn:
             rows = await conn.fetch(query, *params)
@@ -92,3 +97,29 @@ class PostgresAdapter(MemoryAdapter):
             else:
                 await conn.execute(f"DELETE FROM {self.table_name}")
 
+    async def add_embeddings(
+        self,
+        memory: Union[Dict, BaseModel, SemanticMemory]
+    ) -> None:
+        """Add embeddings to the semantic store."""
+        return
+
+    async def semantic_search(
+        cls,
+        query: str, 
+        top_k: Optional[int] = None, 
+        limit: Optional[int] = None,
+        filters: Optional[Dict[str, Any]] = None
+    ) -> List[Dict[str, Any]]:
+        """Perform semantic similarity search."""
+        return {}
+
+    async def nl_to_sql(
+        cls,
+        query: str, 
+        top_k: Optional[int] = None, 
+        limit: Optional[int] = None,
+        filters: Optional[Dict[str, Any]] = None
+    ) -> List[Dict[str, Any]]:
+        """Perform semantic similarity search."""
+        return {}
