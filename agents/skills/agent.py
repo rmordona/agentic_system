@@ -18,9 +18,7 @@ class SkillAgent(BaseSkill):
         workspace_path: Path,
         skill_name: str,
         stage_meta: dict,
-        llm,
-        memory_manager,
-        embedding_store,
+        memory_context,        # 🔑 replaced memory_manager with memory_context
         tool_client,
         event_bus=None
     ):
@@ -32,9 +30,7 @@ class SkillAgent(BaseSkill):
         super().__init__(
             workspace_dir=workspace_path,
             skill_name=skill_name,
-            llm=llm,
-            memory_manager=memory_manager,
-            embedding_store=embedding_store,
+            memory_context=memory_context,  # pass context to BaseSkill as memory_manager
             tool_client=tool_client,
             event_bus=event_bus
         )

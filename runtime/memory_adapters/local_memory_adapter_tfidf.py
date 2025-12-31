@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from runtime.memory_adapters.base import MemoryAdapter
+from runtime.memory_schemas import GenericMemory
 import json
 import uuid
 
@@ -32,7 +33,11 @@ class LocalMemoryAdapter(MemoryAdapter):
     # Core storage
     # -----------------------------------------------------------------
 
-    async def store_memory(self, memory: BaseModel) -> str:
+    async def store_memory(
+        self,
+        memory: BaseModel,
+        namespace: Optional[str] = None
+    ) -> str:
         mem_dict = memory.dict()
         mem_dict["_id"] = str(uuid.uuid4())
         self._memory.append(mem_dict)
@@ -43,12 +48,15 @@ class LocalMemoryAdapter(MemoryAdapter):
 
     async def fetch_memory(
         self,
+        query: Optional[str] = None,
+        namespace: Optional[str] = None,
         session_id: Optional[str] = None,
         agent: Optional[str] = None,
         stage: Optional[str] = None,
         task: Optional[str] = None,
-        filters: Optional[Dict[str, Any]] = None,
-        top_k: Optional[int] = 5
+        filter: Optional[Dict[str, Any]] = None,
+        top_k: Optional[int] = 5,
+        limit: Optional[int] = None
     ) -> List[Dict[str, Any]]:
         """
         Fetch memory objects filtered by session, agent, stage, task, or additional filters.
@@ -65,13 +73,13 @@ class LocalMemoryAdapter(MemoryAdapter):
             results = [m for m in results if m.get("stage") == stage]
         if task:
             results = [m for m in results if m.get("task") == task]
-        if filters:
-            for k, v in filters.items():
+        if filter:
+            for k, v in filter.items():
                 if k != "query":
                     results = [m for m in results if m.get(k) == v]
 
         # Semantic-ish search using TF-IDF
-        query_text = filters.get("query") if filters else None
+        query_text = filter.get("query") if filter else None
         if query_text and results:
             corpus = [m["text"] for m in results if "text" in m]
             if corpus:
@@ -82,6 +90,26 @@ class LocalMemoryAdapter(MemoryAdapter):
                 results = [results[i] for i in top_indices if sims[i] > 0]
 
         return results[:top_k] if top_k else results
+
+    async def asearch(
+        self,
+        namespace: Optional[str] = None,
+        query: Optional[str] = None,
+        *,
+        offset: Optional[str]  = None,
+        limit: Optional[int] = None,
+        **kwargs,
+    ) -> List[Dict[str, Any]]:
+
+        results = await self.fetch_memory(
+                namespace=namespace,
+                query=query,
+                **kwargs,
+            )
+        paged = results[offset : offset + limit]
+        
+        return [GenericMemory(data=r) for r in paged]
+
 
     async def clear(self, session_id: Optional[str] = None):
         if session_id:

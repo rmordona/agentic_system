@@ -33,14 +33,19 @@ class RedisEpisodicAdapter(MemoryAdapter):
         )
         return redis_key
 
+
     async def fetch_memory(
         self,
+        namespace: Optional[str] = None,
         session_id: Optional[str] = None,
-        agent: Optional[Union[str, List[str]]] = None,
-        stage: Optional[Union[str, List[str]]] = None,
+        agent: Optional[str] = None,
+        stage: Optional[str] = None,
         task: Optional[str] = None,
-        filters: Optional[Dict[str, Any]] = None, 
-        top_k: Optional[int] = None
+        filter: Optional[Dict[str, Any]] = None,
+        query: Optional[str] = None,
+        *,
+        top_k: Optional[int] = 5,
+        limit: Optional[int] = None,
     ) -> List[Dict[str, Any]]:
         """
         Fetch stored memories filtered by task, agent, or stage.

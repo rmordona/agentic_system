@@ -18,7 +18,11 @@ class OracleAdapter(MemoryAdapter):
             self.pool = await loop.run_in_executor(None, lambda: oracledb.create_pool(user="user", password="pass", dsn=self.dsn, min=1, max=5))
             # Table creation can be handled outside in production
 
-    async def store_memory(self, memory: BaseModel) -> str:
+    async def store_memory(
+        self,
+        memory: BaseModel,
+        namespace: Optional[str] = None
+    ) -> str:
         await self._init_pool()
         memory_dict = memory.model_dump()
         loop = asyncio.get_event_loop()
@@ -36,7 +40,19 @@ class OracleAdapter(MemoryAdapter):
             key = await loop.run_in_executor(None, _insert)
         return key
 
-    async def fetch_memory(self, session_id=None, agent=None, stage=None, task=None, filters=None, top_k=10):
+    async def fetch_memory(
+        self,
+        namespace: Optional[str] = None,
+        session_id: Optional[str] = None,
+        agent: Optional[str] = None,
+        stage: Optional[str] = None,
+        task: Optional[str] = None,
+        filter: Optional[Dict[str, Any]] = None,
+        query: Optional[str] = None,
+        *,
+        top_k: Optional[int] = 5,
+        limit: Optional[int] = None,
+    ) -> List[Dict[str, Any]]:
         await self._init_pool()
         loop = asyncio.get_event_loop()
         async with asyncio.Lock():

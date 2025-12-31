@@ -9,7 +9,6 @@ from fastmcp import Client
 from langchain_core.prompts import PromptTemplate
 from runtime.logger import AgentLogger
 
-
 class BaseSkill:
     """
     Workspace-scoped, filesystem-driven execution unit.
@@ -17,7 +16,7 @@ class BaseSkill:
     Workspace layout:
       workspace/
         stage.json
-        agents/
+        skills/
           <skill_name>/
             skill.json
             context.json
@@ -31,8 +30,10 @@ class BaseSkill:
         self,
         workspace_dir: Path,
         skill_name: str,
-        memory_context,      # 🔑 expects MemoryContext
-        tool_client: Client,
+        llm,
+        memory_manager,
+        embedding_store,
+        tool_client: MCPClient,
         event_bus=None,
     ):
         self.workspace_dir = workspace_dir
@@ -40,7 +41,9 @@ class BaseSkill:
         self.skill_name = skill_name
         self.skill_dir = workspace_dir / "agents" / skill_name
 
-        self.memory_context = memory_context    # 🔑 scoped MemoryContext
+        self.llm = llm
+        self.memory_manager = memory_manager
+        self.embedding_store = embedding_store
         self.tool_client = tool_client
         self.event_bus = event_bus
 
@@ -55,7 +58,7 @@ class BaseSkill:
         self.output_mode = self.skill_meta.get("output_mode", "text")
         self.tools = self.skill_meta.get("tools", [])
 
-        # 🔑 Bind workspace logger ONCE
+            # 🔑 Bind workspace logger ONCE
         global logger
         logger = AgentLogger.get_logger(self.workspace_name, component="system")
 
@@ -70,14 +73,11 @@ class BaseSkill:
         print(f"Entering next agent run: {state}")
         logger.info(f"Running {self.workspace_name} workspace ...")
 
-        # Bind session and stage to context for this run
-        runtime_context = self.memory_context.with_session(state["session_id"]).with_stage(state["stage"])
-
-        context = await self._resolve_context(state, runtime_context)
+        context = await self._resolve_context(state)
         logger.info(f"{self.workspace_name}: Context retrieved: {context}")
  
         prompt = self._render_prompt(context)
-        logger.info(f"{self.workspace_name}: Prompt rendered.")
+        logger.info(f"{self.workspace_name}: Context retrieved: {context}")
 
         output = await self._call_llm(prompt)
         logger.info(f"{self.workspace_name}: Output: {output}")
@@ -86,7 +86,7 @@ class BaseSkill:
             output = self._validate_schema(output)
 
         await self._maybe_call_tools(output, state)
-        await self._persist_memory(output, runtime_context)
+        await self._persist_memory(output, state)
 
         return self._emit_state_delta(output, state)
 
@@ -94,7 +94,7 @@ class BaseSkill:
     # Context Resolution
     # ------------------------------------------------------------------
 
-    async def _resolve_context(self, state: Dict[str, Any], runtime_context) -> Dict[str, Any]:
+    async def _resolve_context(self, state: Dict[str, Any]) -> Dict[str, Any]:
         resolved: Dict[str, Any] = {}
 
         for ctx in self.context_meta.get("context", []):
@@ -105,13 +105,13 @@ class BaseSkill:
                 resolved[name] = state.get(ctx.get("key", name))
 
             elif source == "memory":
-                resolved[name] = await self._resolve_memory(ctx, runtime_context, state)
+                resolved[name] = await self._resolve_memory(ctx, state)
 
             elif source == "embedding":
-                resolved[name] = await runtime_context.search(
+                resolved[name] = await self.embedding_store.search(
+                    workspace=self.workspace_dir.name,
                     query=state["task"],
                     top_k=ctx.get("top_k", 5),
-                    filter=ctx.get("filters", None)
                 )
 
             elif source == "external":
@@ -128,19 +128,23 @@ class BaseSkill:
 
         return resolved
 
-    async def _resolve_memory(self, ctx: dict, runtime_context, state: dict):
+    async def _resolve_memory(self, ctx: dict, state: dict):
         memory_type = ctx.get("memory_type", "semantic")
         filters = ctx.get("filters", {})
 
         if memory_type == "semantic":
-            # context already bound
-            return await runtime_context.query(
-                query=state["task"],
+            return await self.memory_manager.fetch_semantic(
+                session_id=state["session_id"],
+                agent=filters.get("agent"),
+                task=state["task"],
                 top_k=filters.get("top_k", 5),
             )
 
         if memory_type == "episodic":
-            return await runtime_context.fetch_memory(
+            return await self.memory_manager.fetch_episodic(
+                session_id=state["session_id"],
+                agent=filters.get("agent"),
+                stage=state["stage"],
                 top_k=filters.get("top_k", 3),
             )
 
@@ -170,9 +174,11 @@ class BaseSkill:
             )
 
     async def _call_llm(self, prompt: str) -> Any:
-        raise NotImplementedError("LLM execution is now handled by memory adapters or external tools.")
+        response = await self.llm.generate(prompt)
+        return json.loads(response) if self.output_mode == "json" else response
 
     def _validate_schema(self, output: Any) -> Any:
+        # Optional: jsonschema.validate(...)
         return output
 
     # ------------------------------------------------------------------
@@ -195,9 +201,13 @@ class BaseSkill:
     # Memory Persistence
     # ------------------------------------------------------------------
 
-    async def _persist_memory(self, output: Any, runtime_context):
-        await runtime_context.store(
-            memory=output
+    async def _persist_memory(self, output: Any, state: dict):
+        await self.memory_manager.store(
+            workspace=self.workspace_dir.name,
+            session_id=state["session_id"],
+            agent=self.role,
+            stage=state["stage"],
+            output=output,
         )
 
     # ------------------------------------------------------------------
@@ -240,3 +250,6 @@ class BaseSkill:
     def _load_prompt(self, name: str) -> str:
         with open(self.skill_dir / name) as f:
             return f.read()
+
+    
+

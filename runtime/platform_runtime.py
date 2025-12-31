@@ -129,10 +129,10 @@ class PlatformRuntime:
         # --------------------------------------------------
         # Memory Manager
         # --------------------------------------------------
-        episodic_adapter = MemoryFactory.build(
+        episodic_adapter = MemoryFactory.get_episodic_adapter(
             cls.config["memory"]["episodic"]
         )
-        semantic_adapter = MemoryFactory.build(
+        semantic_adapter = MemoryFactory.get_semantic_adapter(
             cls.config["memory"]["semantic"],
             llm=cls.llm,
             embedding_store=cls.embedding_store,

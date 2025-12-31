@@ -1873,3 +1873,59 @@
 2025-12-30 17:18:31,283 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
 2025-12-30 17:18:31,283 | INFO    | system | platform_runtime:161 | initialize | PlatformRuntime initialized successfully
 2025-12-30 17:18:31,294 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-30 17:40:15,405 | INFO    | system | platform_runtime:84 | initialize | Initializing PlatformRuntime
+2025-12-30 17:40:15,414 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-30 17:40:15,414 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-30 17:40:15,415 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-30 17:40:15,415 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-30 17:40:15,415 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-30 17:40:15,415 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-30 17:40:15,415 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-30 17:40:15,416 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-30 17:40:15,416 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-30 17:40:15,416 | INFO    | system | platform_runtime:122 | initialize | ToolClient initialized
+2025-12-30 17:40:15,420 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-30 17:40:15,420 | INFO    | system | platform_runtime:161 | initialize | PlatformRuntime initialized successfully
+2025-12-30 17:40:15,432 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-30 17:41:34,767 | INFO    | system | platform_runtime:84 | initialize | Initializing PlatformRuntime
+2025-12-30 17:41:34,768 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-30 17:41:34,768 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-30 17:41:34,768 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-30 17:41:34,769 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-30 17:41:34,769 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-30 17:41:34,769 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-30 17:41:34,769 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-30 17:41:34,769 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-30 17:41:34,770 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-30 17:41:34,770 | INFO    | system | platform_runtime:122 | initialize | ToolClient initialized
+2025-12-30 17:41:34,773 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-30 17:41:34,773 | INFO    | system | platform_runtime:161 | initialize | PlatformRuntime initialized successfully
+2025-12-30 17:41:34,785 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-30 17:42:04,836 | INFO    | system | platform_runtime:84 | initialize | Initializing PlatformRuntime
+2025-12-30 17:42:04,837 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-30 17:42:04,837 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-30 17:42:04,837 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-30 17:42:04,838 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-30 17:42:04,838 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-30 17:42:04,838 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-30 17:42:04,838 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-30 17:42:04,838 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-30 17:42:04,839 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-30 17:42:04,839 | INFO    | system | platform_runtime:122 | initialize | ToolClient initialized
+2025-12-30 17:42:04,842 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-30 17:42:04,842 | INFO    | system | platform_runtime:161 | initialize | PlatformRuntime initialized successfully
+2025-12-30 17:42:04,854 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-30 19:53:40,530 | INFO    | system | platform_runtime:84 | initialize | Initializing PlatformRuntime
+2025-12-30 19:53:40,541 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-30 19:53:40,541 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-30 19:53:40,542 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-30 19:53:40,542 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-30 19:53:40,542 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-30 19:53:40,543 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-30 19:53:40,543 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-30 19:53:40,543 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-30 19:53:40,543 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-30 19:53:40,543 | INFO    | system | platform_runtime:122 | initialize | ToolClient initialized
+2025-12-30 19:53:40,547 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-30 19:53:40,547 | INFO    | system | platform_runtime:161 | initialize | PlatformRuntime initialized successfully
+2025-12-30 19:53:40,557 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant

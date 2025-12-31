@@ -18,7 +18,11 @@ class LangMemSemanticAdapter(MemoryAdapter):
 
         self.searcher = create_memory_searcher( chat_model)
 
-    async def store_memory(self, memory: BaseModel) -> str:
+    async def store_memory(
+        self,
+        memory: BaseModel,
+        namespace: Optional[str] = None
+    ) -> str:
         """
         Stores a memory object in Redis. Returns the generated key.
         """
@@ -30,13 +34,17 @@ class LangMemSemanticAdapter(MemoryAdapter):
 
     async def fetch_memory(
         self,
+        namespace: Optional[str] = None,
+        offset: Optional[str]  = None,
         session_id: Optional[str] = None,
+        agent: Optional[str] = None,
+        stage: Optional[str] = None,
         task: Optional[str] = None,
-        stage: Optional[str | list[str]] = None,
-        agent: Optional[str | list[str]] = None,
-        filters: Optional[Dict[str, Any]] = None, 
-        top_k: Optional[int] = None,
-       #limit: int = 20,
+        filter: Optional[Dict[str, Any]] = None,
+        query: Optional[str] = None,
+        *,
+        top_k: Optional[int] = 5,
+        limit: Optional[int] = None,
     ) -> List[Dict[str, Any]]:
         """
         Fetch semantic memories via metadata filtering.
@@ -44,19 +52,19 @@ class LangMemSemanticAdapter(MemoryAdapter):
         filters = {}
 
         if session_id:
-            filters["session_id"] = session_id
+            filter["session_id"] = session_id
         if task:
-            filters["task"] = task
+            filter["task"] = task
         if agent:
-            filters["agent"] = agent
+            filter["agent"] = agent
         if stage:
-            filters["stage"] = stage
+            filter["stage"] = stage
 
         # Call the RunnableSequence instead of .search()
         # It will return a list of results
         #results = await self.searcher.arun(query, k=top_k)
         # results = await Runnable(self.searcher).arun(query)
-        results = await self.searcher.asimilarity_search(query, k=top_k)
+        results = await self.searcher.search(query, k=top_k)
         
         # Or if synchronous context:
         # results = self.searcher.run(query, k=top_k)

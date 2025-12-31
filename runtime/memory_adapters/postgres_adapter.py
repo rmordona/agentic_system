@@ -29,7 +29,11 @@ class PostgresAdapter(MemoryAdapter):
                     """
                 )
 
-    async def store_memory(self, memory: BaseModel) -> str:
+    async def store_memory(
+        self,
+        memory: BaseModel,
+        namespace: Optional[str] = None
+    ) -> str:
         await self._init_pool()
         memory_dict = memory.model_dump()
         async with self.pool.acquire() as conn:
@@ -49,12 +53,16 @@ class PostgresAdapter(MemoryAdapter):
 
     async def fetch_memory(
         self,
+        namespace: Optional[str] = None,
         session_id: Optional[str] = None,
         agent: Optional[str] = None,
         stage: Optional[str] = None,
         task: Optional[str] = None,
-        filters: Optional[Dict[str, Any]] = None,
-        top_k: Optional[int] = 10,
+        filter: Optional[Dict[str, Any]] = None,
+        query: Optional[str] = None,
+        *,
+        top_k: Optional[int] = 5,
+        limit: Optional[int] = None,
     ) -> List[Dict[str, Any]]:
         await self._init_pool()
         query = f"SELECT memory FROM {self.table_name} WHERE 1=1"

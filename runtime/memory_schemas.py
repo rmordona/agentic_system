@@ -1,6 +1,9 @@
 from pydantic import BaseModel
 from typing import Any, Dict, List, Optional, Union
 
+class GenericMemory(BaseModel):
+    data: Dict[str, Any]
+
 # Short-Term memory level schemas
 # - Schema memory structures For Agents
 # - When saving memory, it must conform to one of these memory shapes.”

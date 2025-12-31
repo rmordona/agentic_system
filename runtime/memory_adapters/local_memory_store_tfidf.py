@@ -62,3 +62,13 @@ class LocalMemoryStore:
 
         return [self.data[i] for i in top_indices if sims[i] > 0]
 
+    async def asearch(self, query: str, top_k: int = 5):
+        if not self.embeddings or not self.data:
+            return []
+
+        query_vec = self.vectorizer.transform([query])
+        sims = cosine_similarity(query_vec, self.embeddings).flatten()
+        top_indices = sims.argsort()[::-1][:top_k]
+
+        return [self.data[i] for i in top_indices if sims[i] > 0]
+

@@ -24,6 +24,19 @@ Default: InMemoryStore
 Or whatever store you pass explicitly (Redis, SQLite, etc.)
 This is where the memory is actually persisted.
 
+
+In our list, we highlight the approach and strengths of each tool:
+
+Lilypad — Collaborative prompt engineering for business users and software developers.
+Mirascope — Lightweight and user-friendly LLM toolkit for software developers.
+LangSmith — Specialized in logging and experimenting with prompts.
+Weave — Trace-based debugging and scoring for LLM applications.
+Langfuse — Streamlined prompt management and evaluation.
+Haystack — Effective for structuring prompt pipelines.
+Agenta — Rapid and collaborative LLM application development.
+LangChain — Scalable and customizable LLM application framework.
+
+
 Criteria
 - consistency over long dialogues
 - low latency retrievals
@@ -1126,4 +1139,28 @@ On channels:
 -Tracks which agents have already executed per stage.
 - The reducer function merges incoming updates with the existing state:
 - This is how the stage router knows which agents have already run.
+
+
+Canonical Flow:
+
+Request / Session
+   ↓
+Build MemoryContext  ← CONTEXT IS SET HERE
+   ↓
+Build Tools (bound to context)
+   ↓
+Build Agent
+   ↓
+agent.invoke(...)
 - It’s not mapping every agent to every stage—it’s just recording executions dynamically as they happen.
+
+
+| Criterion         | Your Agents   | create_react_agent |
+| ----------------- | ------------- | ------------------ |
+| Control           | ✅ Full        | ❌ Limited          |
+| Memory Context    | ✅ Explicit    | ❌ Implicit         |
+| Multi-stage       | ✅ First-class | ❌ Awkward          |
+| Extensibility     | ✅ High        | ❌ Low              |
+| Boilerplate       | ❌ More        | ✅ Less             |
+| Production Safety | ✅ Yes         | ⚠️ Depends         |
+
