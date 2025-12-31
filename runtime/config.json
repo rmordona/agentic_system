@@ -18,13 +18,15 @@
     "chromadb": {
       "persist_directory": "./data/chromadb",
       "collections": ["embedding1", "embedding2"],
-      "embedding_model": "nomic-embed-text"
+      "embedding_model": "nomic-embed-text",
+      "dims": 768
     },
     "postgres": {
       "dsn": "postgresql://username:password@localhost:5432/agentic_embeddings",
       "persist_directory": "./data/postgres",
       "collections": ["embedding1", "embedding2"],
-      "embedding_model": "nomic-embed-text"
+      "embedding_model": "nomic-embed-text", 
+      "dims": 768
     }
   },
 

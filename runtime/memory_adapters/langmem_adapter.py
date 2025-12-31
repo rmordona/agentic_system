@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import Any, Dict, List, Optional, Union
 from langmem import create_memory_manager, create_memory_searcher
+from langchain_core.runnables import Runnable
 from runtime.memory_adapters.base import MemoryAdapter
 from llm.local_llm import LocalLLM, LocalLLMChatModel
 
@@ -51,11 +52,17 @@ class LangMemSemanticAdapter(MemoryAdapter):
         if stage:
             filters["stage"] = stage
 
-        return await self.searcher.search(
-            query="",
-            filters=filters,
-            limit=limit,
-        )
+        # Call the RunnableSequence instead of .search()
+        # It will return a list of results
+        #results = await self.searcher.arun(query, k=top_k)
+        # results = await Runnable(self.searcher).arun(query)
+        results = await self.searcher.asimilarity_search(query, k=top_k)
+        
+        # Or if synchronous context:
+        # results = self.searcher.run(query, k=top_k)
+
+
+        return results
 
     async def semantic_search(
         self,

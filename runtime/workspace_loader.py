@@ -16,50 +16,15 @@ class WorkspaceLoader:
     Compiles LangGraph graph based on stage.json and registered agents.
     """
 
-    def __init__(self, workspace_path: Path, llm, memory_manager, embedding_store, tool_client):
+    def __init__(self, workspace_path: Path):
         self.workspace_path = workspace_path
         self.workspace_name = workspace_path.name
-        self.llm = llm
-        self.memory_manager = memory_manager
-        self.embedding_store = embedding_store
-        self.tool_client = tool_client
-
-        self.agent_registry = AgentRegistry(workspace_path)
-        self.stage_registry = None
-        self.graph = None
+        
         self.version_hash = None
 
         # Bind workspace logger ONCE
         global logger
         logger = AgentLogger.get_logger(self.workspace_name, component="workspace_loader")
-
-    '''
-    async def load(self):
-        # 1. Load stage.json
-        stage_file = self.workspace_path / "stage.json"
-        self.stage_registry = StageRegistry(stage_file)
-
-        # 2. Load agents
-        agents_dir = self.workspace_path / "agents"
-        for agent_dir in agents_dir.iterdir():
-            if not agent_dir.is_dir():
-                continue
-
-            agent = SkillAgent(
-                skill_dir=agent_dir,
-                llm=self.llm,
-                memory_manager=self.memory_manager,
-                embedding_store=self.embedding_store,
-                tool_client=self.tool_client,
-            )
-            self.agent_registry.register(agent)
-
-        # 3. Build graph
-        self.graph = build_dynamic_graph(self.agent_registry, self.stage_registry)
-
-        # 4. Compute workspace version hash
-        self.version_hash = self._compute_version_hash()
-    '''
 
     # --------------------------------------------------
     # Load workspace.json configuration

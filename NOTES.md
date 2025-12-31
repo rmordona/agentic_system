@@ -12,6 +12,11 @@ Memory Frameworks
 - memO -production-focused (pro is licensed)
 - zep -research-led (academic open) 7 contributors, planned to open through Apache 2.0
 
+Competitors to LangMem, which provides memory for AI agents, include dedicated memory solutions like:
+    MemU, Zep, Cognee, Hyperspell, and OpenMemory, 
+along with broader agent/workflow platforms such as: 
+    LangChain, LangGraph, Flowise, and Lindy, all
+
 As for lenmem:
 
 Internally, LangMem uses a LangGraph Store:
@@ -1099,3 +1104,26 @@ Memory Schema evaluation
 | LangGraph                   | Agent history        | Semantic memory      | Optional                         | Redis / DB              |
 | Custom Multi-agent Platform | Per-agent, per-stage | Episodic + Semantic  | Strong (stage -> schema mapping) | Redis / VectorDB / JSON |
 
+
+
+On channels:
+
+"stage": LastValue(str)
+- This stores the current stage name.
+- LastValue ensures only the latest value wins.
+- Example: If the stage router moves from "ideation" → "evaluation", this channel updates to "evaluation".
+
+"done": LastValue(bool)
+- Indicates whether the workflow is complete.
+- Only the latest value matters: True or False.
+
+"agent_events": Topic(dict)
+- This is a fan-in channel that collects multiple events from agents.
+- Each agent node appends its execution result here.
+- Example: After the optimistic agent runs:
+
+"executed_agents_per_stage": BinaryOperatorAggregate(...)
+-Tracks which agents have already executed per stage.
+- The reducer function merges incoming updates with the existing state:
+- This is how the stage router knows which agents have already run.
+- It’s not mapping every agent to every stage—it’s just recording executions dynamically as they happen.

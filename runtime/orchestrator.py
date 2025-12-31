@@ -55,27 +55,43 @@ class Orchestrator:
         Run the session through the LangGraph.
         Returns final session state.
         """
-        '''
-        # Initialize session state
-        self.session_state = {
-            "session_id": session_id,
-            "task": task,
-            "stage": self.stage_registry.first_stage(),
-            "done": False,
-            "history_agents": [],
-            "rewards": {},
-            "winner": {},
-            "decision": {},
-            "executed_agents_per_stage": {}
-        }
-        '''
+        print(f"session_sate: {session_state}")
+
+        print("Just entered Orchestrator ...")
+        logger.info("Just entered Orchestrator ...")
+
+        await self.event_bus.emit(
+                "orchestrator_start",
+                {
+                    "task": session_state["task"],
+                    "session_id": session_state["session_id"],  # Useful for logging & memory
+                    "initial_state": session_state,
+                },
+            )
 
         async for event in self.graph.astream(session_state):
 
-            await self.event_bus.emit("graph_event", event)
-
+            logger.info("We are inside graph.astream - an event is emitted ...")
+            logger.info(event)
             print("We are inside graph.astream - an event is emitted:")
             print(event)
+
+            logger.info("Emitting graph_event ...")
+            print("Emitting graph_event ...")
+            await self.event_bus.emit("graph_event", event)
+            logger.info("Now waiting for graph_event response")
+            print("Now waiting for graph_event response")
+
+        print("Exited from graph.astream")
+
+        await self.event_bus.emit(
+                "orchestrator_end",
+                {
+                    "task": session_state["task"],
+                    "session_id": session_state["session_id"],  # Useful for logging & memory
+                    "initial_state": session_state,
+                },
+            )
 
 
         # Loop until graph signals done

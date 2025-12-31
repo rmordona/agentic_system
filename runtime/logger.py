@@ -55,7 +55,13 @@ class AgentLogger:
 
         cls.level = cls._parse_log_level(log_level)
 
-        logging.basicConfig(level=cls.level)
+        logging.basicConfig(
+            level=cls.level,
+            #format=(
+            #            "%(asctime)s | %(levelname)-7s | %(name)s | "
+            #            "%(filename)s:%(lineno)d | %(funcName)s | %(message)s"
+            #        ),
+        )
         cls._initialized = True
 
     @classmethod
@@ -78,7 +84,7 @@ class AgentLogger:
         if not cls._initialized:
             raise RuntimeError("AgentLogger.initialize() must be called first")
 
-        key = f"{workspace or 'hub'}::{component}"
+        key = f"{workspace or 'system'}"
         if key in cls._loggers:
             return cls._loggers[key]
 
@@ -87,7 +93,11 @@ class AgentLogger:
         logger.propagate = False
 
         # -------- Determine log path --------
-        if workspace:
+        print(f"logging: {workspace} {component}")
+        if component in { "system", "platform_runtime" }:
+            log_path = cls._base_log_dir / f"{component}.log"
+            print(f"path: {log_path}")
+        elif workspace:
             log_path = cls._base_log_dir / "workspaces" / workspace / f"{component}.log"
         else:
             # Bootstrap components
@@ -101,7 +111,9 @@ class AgentLogger:
 
         handler = logging.FileHandler(log_path)
         formatter = logging.Formatter(
-            "[%(asctime)s] %(levelname)s [%(name)s] %(message)s"
+            # "[%(asctime)s] %(levelname)s [%(name)s] %(message)s"
+            "%(asctime)s | %(levelname)-7s | %(name)s | "
+            "%(module)s:%(lineno)d | %(funcName)s | %(message)s"
         )
         handler.setFormatter(formatter)
 

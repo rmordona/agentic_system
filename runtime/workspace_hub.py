@@ -3,12 +3,14 @@ from pathlib import Path
 from typing import Dict
 
 from runtime.runtime_manager import RuntimeManager
-from runtime.logger import AgentLogger
-
-from llm.local_llm import LocalLLMChatModel
+from runtime.session_manager import SessionManager
 from runtime.memory_manager import MemoryManager
 from runtime.embeddings.base import EmbeddingStore
+from llm.local_llm import LocalLLMChatModel
 from runtime.tools.client import ToolClient
+from runtime.logger import AgentLogger
+
+from events.event_bus import EventBus
 
 class WorkspaceHub:
     """
@@ -19,9 +21,11 @@ class WorkspaceHub:
 
     def __new__(cls, workspaces_root: Path,
             llm: LocalLLMChatModel,
+            session_manager: SessionManager,
             memory_manager: MemoryManager, 
             embedding_store: EmbeddingStore, 
-            tool_client: ToolClient):
+            tool_client: ToolClient,
+            event_bus: EventBus):
         if cls._instance is None:
             cls._instance = super().__new__(cls)
             cls._instance._initialized = False
@@ -29,9 +33,11 @@ class WorkspaceHub:
 
     def __init__(self, workspaces_root: Path,
             llm: LocalLLMChatModel,
+            session_manager: SessionManager,
             memory_manager: MemoryManager, 
             embedding_store: EmbeddingStore, 
-            tool_client: ToolClient
+            tool_client: ToolClient,
+            event_bus: EventBus
     ):
         if self._initialized:
             return
@@ -41,13 +47,15 @@ class WorkspaceHub:
         self._initialized = True
 
         self.llm = llm
+        self.session_manager = session_manager
         self.memory_manager = memory_manager
         self.embedding_store = embedding_store
         self.tool_client = tool_client
+        self.event_bus = event_bus
 
         # 🔑 Bind workspace logger ONCE
         global logger
-        logger = AgentLogger.get_logger( workspace=None, component="workspace_hub" )
+        logger = AgentLogger.get_logger( workspace=None, component="system" )
 
         logger.info(f"WorkspaceHub initialized at {workspaces_root}")
 
@@ -79,7 +87,15 @@ class WorkspaceHub:
         if not workspace_dir.exists():
             raise ValueError(f"Workspace not found: {workspace_name}")
 
-        runtime = RuntimeManager(workspace_dir, self.memory_manager, self.embedding_store, self.tool_client)
+        runtime = RuntimeManager(
+            workspace_dir, 
+            self.llm,
+            self.session_manager, 
+            self.memory_manager, 
+            self.embedding_store, 
+            self.tool_client,
+            self.event_bus
+        )
         self._runtimes[workspace_name] = runtime
 
         logger.info(f"Runtime loaded for workspace: {workspace_name}")

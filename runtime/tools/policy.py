@@ -9,12 +9,15 @@ class ToolPolicy:
     """
 
     def __init__(self, policy: Dict):
-        self.logger = AgentLogger.get_logger(None, "tool_policy")
         self.policy = policy
+
+        global logger
+        logger = AgentLogger.get_logger(None, "tool_policy")
+
 
     def allowed_tools_for_agent(self, agent_role: str) -> List[str]:
         tools = self.policy.get("agents", {}).get(agent_role, {}).get("tools", [])
-        self.logger.debug(f"Allowed tools for {agent_role}: {tools}")
+        logger.debug(f"Allowed tools for {agent_role}: {tools}")
         return tools
 
     def check(self, agent_role: str, tool_name: str):

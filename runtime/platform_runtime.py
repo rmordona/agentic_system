@@ -7,6 +7,7 @@ from llm.local_llm import LocalLLMChatModel
 from runtime.config_loader import ConfigLoader
 from runtime.logger import AgentLogger
 from runtime.workspace_hub import WorkspaceHub
+from runtime.session_manager import SessionManager
 
 # Memory
 from runtime.memory_manager import MemoryManager
@@ -20,6 +21,8 @@ from runtime.tools.registry import ToolRegistry
 from runtime.tools.policy import ToolPolicy
 from runtime.tools.client import ToolClient
 
+from events.event_bus import EventBus
+
 
 class PlatformRuntime:
     """
@@ -29,12 +32,15 @@ class PlatformRuntime:
 
     _initialized = False
 
+    session_manager: SessionManager = None
     memory_manager: MemoryManager = None
     embedding_store: EmbeddingStore = None
     tool_registry: ToolRegistry = None
     tool_policy: ToolPOlicy = None
     tool_client: ToolClient = None
     workspace_hub: WorkspaceHub = None
+    event_bus: EventBus = None
+
 
     logger = None
 
@@ -70,7 +76,7 @@ class PlatformRuntime:
         )
         cls.logger = AgentLogger.get_logger(
             workspace=None,
-            component="platform_runtime",
+            component="system",
         )
 
         logger = cls.logger
@@ -78,7 +84,12 @@ class PlatformRuntime:
         logger.info("Initializing PlatformRuntime")
 
         # --------------------------------------------------
-        # LLM
+        # Event Bus
+        # --------------------------------------------------
+        cls.event_bus = EventBus()
+
+        # --------------------------------------------------
+        # LLM bootstrapping
         # --------------------------------------------------
         llm_config = cls.config["llm"]["model"]
         cls.llm = LocalLLMChatModel(
@@ -93,7 +104,7 @@ class PlatformRuntime:
 
 
         # --------------------------------------------------
-        # Tool Client 
+        # Tool Bootstrapping
         # --------------------------------------------------
     
         cls.tool_registry = ToolRegistry(tool_config_path)
@@ -108,8 +119,12 @@ class PlatformRuntime:
             policy=cls.tool_policy,
             agent_role="critic"
         )
-
         logger.info("ToolClient initialized")
+
+        # --------------------------------------------------
+        # Session Bootstrapping
+        # --------------------------------------------------
+        cls.session_manager = SessionManager()
 
         # --------------------------------------------------
         # Memory Manager
@@ -125,8 +140,9 @@ class PlatformRuntime:
 
         cls.memory_manager = MemoryManager(
             episodic=episodic_adapter,
-            semantic=semantic_adapter,
+            semantic=semantic_adapter
         )
+
 
         # --------------------------------------------------
         # Workspace Hub
@@ -134,9 +150,11 @@ class PlatformRuntime:
         cls.workspace_hub = WorkspaceHub(
             workspaces_root=workspaces_root,
             llm=cls.llm,
+            session_manager=cls.session_manager,
             memory_manager=cls.memory_manager,
             embedding_store=cls.embedding_store,
-            tool_client=cls.tool_client,  
+            tool_client=cls.tool_client,
+            event_bus=cls.event_bus
         )
 
         cls._initialized = True

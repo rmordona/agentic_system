@@ -1,5 +1,5 @@
 {
-  "name": "synthesizer_decision",
+  "name": "ideation_skill",
   "description": "Combines outputs from Optimistic and Critic agents and produces a final recommendation.",
   "role": "optimistic",
   "llm": "local_llm_v1",

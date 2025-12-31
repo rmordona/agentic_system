@@ -1,4 +1,4 @@
-# runtime/embedding/embedding_factory.py
+import logging
 from typing import Dict, Any, Optional
 from runtime.embeddings.base import EmbeddingStore
 #from runtime.embeddings.chroma_store import ChromaEmbeddingStore

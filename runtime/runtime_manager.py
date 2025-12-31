@@ -12,6 +12,8 @@ from runtime.stage_registry import StageRegistry
 from runtime.graph_manager import GraphManager
 from runtime.reload_manager import ReloadManager
 from runtime.orchestrator import Orchestrator
+from runtime.session_manager import SessionManager
+from runtime.lifecycle import register_lifecycle_handlers
 from runtime.logger import AgentLogger
 
 from llm.local_llm import LocalLLMChatModel
@@ -32,17 +34,22 @@ class RuntimeManager:
     """
 
     # Inherit the logger
+    llm = None
     memory_manager = None
     embedding_store = None
     tool_client = None
+    event_bus = None
 
     _instances: Dict[str, RuntimeManager] = {}
 
     def __new__(cls, 
             workspace_path: Path,
+            llm: LocalLLMChatModel,
+            session_manager: SessionManager,
             memory_manager: MemoryManager, 
             embedding_store: EmbeddingStore, 
-            tool_client: ToolClient
+            tool_client: ToolClient,
+            event_bus: EventBus,
         ):
         ws_name = workspace_path.name
         if ws_name not in cls._instances:
@@ -52,9 +59,12 @@ class RuntimeManager:
 
     def __init__(self, 
             workspace_path: Path,
+            llm: LocalLLMChatModel,
+            session_manager: SessionManager,
             memory_manager: MemoryManager, 
             embedding_store: EmbeddingStore, 
-            tool_client: ToolClient
+            tool_client: ToolClient,
+            event_bus: EventBus,
         ):
         if hasattr(self, "_initialized") and self._initialized:
             return  # Avoid re-initialization
@@ -63,6 +73,7 @@ class RuntimeManager:
         self.workspace_path = workspace_path
         self.workspace_name = workspace_path.name
 
+        self.event_bus = event_bus
         self.memory_manager = memory_manager
         self.embedding_store = embedding_store
         self.tool_client = tool_client
@@ -72,15 +83,18 @@ class RuntimeManager:
         logger = AgentLogger.get_logger(self.workspace_name, component="runtime")
 
         # ---- Singletons (loaded once per workspace) ----
-        self.workspace_meta = WorkspaceLoader(workspace_path,
-            llm=None,
-            memory_manager=self.memory_manager,
-            embedding_store=self.embedding_store,
-            tool_client=self.tool_client
-        ).load_workspace()
+        # Load Workspace Configuration (workspace.json)
+        self.workspace_meta = WorkspaceLoader(workspace_path).load_workspace()
         logger.info(f"Workspace metadata loaded: {self.workspace_meta.get('name')}")
 
-        self.agent_registry = AgentRegistry(workspace_path)
+        self.agent_registry = AgentRegistry(
+            workspace_path,
+            llm=self.llm,
+            memory_manager=self.memory_manager,
+            embedding_store=self.embedding_store,
+            tool_client=self.tool_client,
+            event_bus=self.event_bus
+        )
         self.agent_registry.load_agents()
         logger.info(f"Registered agents: {self.agent_registry.roles()}")
 
@@ -101,8 +115,8 @@ class RuntimeManager:
         self.reload_manager.start_periodic_reload()
         logger.info("Hot-reload enabled for skills/context")
 
-        self.event_bus = EventBus()
-        logger.info("Event Bus loaded")
+        #self.event_bus = EventBus()
+       # logger.info("Event Bus loaded")
 
         # ---- Per-session storage ----
         self._orchestrators: Dict[str, Orchestrator] = {}
@@ -117,6 +131,10 @@ class RuntimeManager:
         Returns the session_id.
         """
         session_id = session_id or str(uuid.uuid4())
+
+        # Stage registry, event bus, orchestrator
+        register_lifecycle_handlers(self.event_bus)
+
         orchestrator = Orchestrator(
             workspace_path=self.workspace_path,
             agent_registry=self.agent_registry,

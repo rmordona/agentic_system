@@ -39,7 +39,7 @@ class BaseSkill:
         self.workspace_dir = workspace_dir
         self.workspace_name = workspace_dir.name
         self.skill_name = skill_name
-        self.skill_dir = workspace_dir / "skills" / skill_name
+        self.skill_dir = workspace_dir / "agents" / skill_name
 
         self.llm = llm
         self.memory_manager = memory_manager
@@ -60,7 +60,7 @@ class BaseSkill:
 
             # 🔑 Bind workspace logger ONCE
         global logger
-        logger = AgentLogger.get_logger(self.workspace_name, component="base_skill")
+        logger = AgentLogger.get_logger(self.workspace_name, component="system")
 
     # ------------------------------------------------------------------
     # LangGraph Entry Point
@@ -70,10 +70,17 @@ class BaseSkill:
         """
         Executes the skill and returns a LangGraph-compatible state delta.
         """
+        print(f"Entering next agent run: {state}")
+        logger.info(f"Running {self.workspace_name} workspace ...")
 
         context = await self._resolve_context(state)
+        logger.info(f"{self.workspace_name}: Context retrieved: {context}")
+ 
         prompt = self._render_prompt(context)
+        logger.info(f"{self.workspace_name}: Context retrieved: {context}")
+
         output = await self._call_llm(prompt)
+        logger.info(f"{self.workspace_name}: Output: {output}")
 
         if self.schema:
             output = self._validate_schema(output)
@@ -127,18 +134,17 @@ class BaseSkill:
 
         if memory_type == "semantic":
             return await self.memory_manager.fetch_semantic(
-                workspace=self.workspace_dir.name,
                 session_id=state["session_id"],
+                agent=filters.get("agent"),
                 task=state["task"],
                 top_k=filters.get("top_k", 5),
             )
 
         if memory_type == "episodic":
             return await self.memory_manager.fetch_episodic(
-                workspace=self.workspace_dir.name,
                 session_id=state["session_id"],
-                stage=state["stage"],
                 agent=filters.get("agent"),
+                stage=state["stage"],
                 top_k=filters.get("top_k", 3),
             )
 
@@ -244,4 +250,6 @@ class BaseSkill:
     def _load_prompt(self, name: str) -> str:
         with open(self.skill_dir / name) as f:
             return f.read()
+
+    
 

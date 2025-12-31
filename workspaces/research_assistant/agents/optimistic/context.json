@@ -37,8 +37,8 @@
       "name": "current_time",
       "type": "computed",
       "function": "runtime.helpers.get_current_time"
-    }
-        {
+    },
+    {
       "name": "computed_reward",
       "type": "computed",
       "function": "agents.optimistic.reward_estimator"

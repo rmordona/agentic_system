@@ -28,12 +28,10 @@ class SkillAgent(BaseSkill):
         self.stage_meta = stage_meta
         self.skill_name = skill_name
 
-        skill_dir = workspace_path / "skills" / skill_name
-        if not skill_dir.exists():
-            raise FileNotFoundError(f"Skill not found: {skill_dir}")
-
+        # 🔑 Delegate filesystem responsibility to BaseSkill
         super().__init__(
-            skill_dir=skill_dir,
+            workspace_dir=workspace_path,
+            skill_name=skill_name,
             llm=llm,
             memory_manager=memory_manager,
             embedding_store=embedding_store,
@@ -41,7 +39,7 @@ class SkillAgent(BaseSkill):
             event_bus=event_bus
         )
 
-        # From skill.json
+        # From skill.json (already loaded by BaseSkill)
         self.role = self.skill_meta["role"]
         self.exit_condition = self.skill_meta.get("exit_condition")
 
@@ -50,19 +48,14 @@ class SkillAgent(BaseSkill):
     # ------------------------------------------------------------------
 
     async def __call__(self, state: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        LangGraph async node entry.
-        """
+        print(f"Entering next agent run (__call__): {state}")
 
-        # ---- Stage gate
         if not self._allowed_in_stage(state):
             return {}
 
-        # ---- Agent exit condition
         if self._should_exit(state):
             return {}
 
-        # ---- Delegate to BaseSkill
         return await self.run(state)
 
     # ------------------------------------------------------------------
@@ -87,9 +80,6 @@ class SkillAgent(BaseSkill):
     # ------------------------------------------------------------------
 
     def _should_exit(self, state: dict) -> bool:
-        """
-        Agent-level exit logic, defined in skill.json
-        """
         if not self.exit_condition:
             return False
 

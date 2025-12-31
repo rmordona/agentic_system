@@ -22,7 +22,7 @@ class MemoryManager:
 
         # Bind workspace logger ONCE
         global logger
-        logger = AgentLogger.get_logger(None, component="memory_manager")
+        logger = AgentLogger.get_logger(None, component="system")
 
     # ------------------------------
     # Store memory
@@ -53,31 +53,42 @@ class MemoryManager:
     # ------------------------------------------------------------------
     # Semantic Memory
     # ------------------------------------------------------------------
-    async def store_semantic(self, session_id: str, agent: str, memory: Union[Dict, SemanticMemory]):
+    async def store_semantic(
+        self, session_id: str, 
+        agent: str, 
+        stage: str, 
+        memory: Union[Dict, SemanticMemory]
+    ):
         """Store semantic memory"""
         async with self.lock:
             if isinstance(memory, dict):
                 memory = SemanticMemory(**memory)
             if self.semantic_adapter:
                 await self.semantic_adapter.store_memory(memory)
-            else:
-                self.semantic_memory[session_id][agent].append(memory.dict())
+            else: # In-memory Fallback 
+                mem = memory.dict()
+                self.in_memory_episodic[session_id][agent].append(mem)
             logger.debug(f"Stored semantic memory for {agent} in session {session_id}")
 
 
     # ------------------------------------------------------------------
     # Episodic Memory
     # ------------------------------------------------------------------
-    async def store_episodic(self, session_id: str, agent: str, stage: str, memory: Union[Dict, EpisodicMemory]):
+    async def store_episodic(
+        self, session_id: str, 
+        agent: str, 
+        stage: str, 
+        memory: Union[Dict, EpisodicMemory]
+    ):
         """Store episodic memory"""
         async with self.lock:
             if isinstance(memory, dict):
                 memory = EpisodicMemory(session_id=session_id, task=memory.get("task", ""), agent=agent, stage=stage, summary=memory)
             if self.episodic_adapter:
                 await self.episodic_adapter.store_memory(memory)
-            else:
+            else: # In-memory Fallback
                 mem = memory.dict()
-                self.episodic_memory[session_id][agent].append(mem)
+                self.in_memory_episodic[session_id][agent].append(mem)
             logger.debug(f"Stored episodic memory for {agent} at stage {stage} in session {session_id}")
 
 
@@ -93,6 +104,7 @@ class MemoryManager:
         filters: Optional[Dict[str, Any]] = None,
     ) -> List[Dict[str, Any]]:
         async with self.lock:
+            # Adapter
             if self.episodic_adapter:
                 return await self.episodic_adapter.fetch_memory(
                     session_id=session_id,
@@ -100,7 +112,7 @@ class MemoryManager:
                     stage=stage,
                     task=filters.get("task") if filters else None,
                 )
-            # In-memory fallback
+            # In-memory Fallback
             mems = []
             if agent:
                 mems = self.in_memory_episodic[session_id].get(agent, [])
@@ -127,6 +139,7 @@ class MemoryManager:
         filters: Optional[Dict[str, Any]] = None,
     ) -> List[Dict[str, Any]]:
         async with self.lock:
+            # Adapter
             if self.semantic_adapter:
                 return await self.semantic_adapter.fetch_memory(
                     session_id=session_id,
