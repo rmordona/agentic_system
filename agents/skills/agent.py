@@ -1,10 +1,33 @@
+# -----------------------------------------------------------------------------
+# Project: Agentic System
+# File: agents/skills/agent.py
+#
+# Description:
+#
+#    SkillAgent is a LangGraph node wrapper around BaseSkill.
+#
+#    It enforces stage constraints and agent-level exit conditions while
+#    delegating execution, memory usage, and tool invocation to BaseSkill.
+#
+#    SkillAgent does NOT implement business logic or prompting —
+#    it exists to integrate skills into the execution graph.
+#   
+#
+# Author: Raymond M.O. Ordona
+# Created: 2025-12-31
+# Copyright:
+#   © 2025 Raymondn Ordona. All rights reserved.
+# -----------------------------------------------------------------------------
+
 from __future__ import annotations
 
 from pathlib import Path
 from typing import Dict, Any
 
 from agents.skills.base_skill import BaseSkill
-
+from llm.model_manager import ModelManager
+from runtime.tools.client import ToolClient
+from events.event_bus import EventBus
 
 class SkillAgent(BaseSkill):
     """
@@ -18,9 +41,10 @@ class SkillAgent(BaseSkill):
         workspace_path: Path,
         skill_name: str,
         stage_meta: dict,
-        memory_context,        # 🔑 replaced memory_manager with memory_context
-        tool_client,
-        event_bus=None
+        runtime_context,        
+        model_manager: ModelManager,
+        tool_client: ToolClient,
+        event_bus: EventBus = None
     ):
         self.workspace_path = workspace_path
         self.stage_meta = stage_meta
@@ -30,7 +54,8 @@ class SkillAgent(BaseSkill):
         super().__init__(
             workspace_dir=workspace_path,
             skill_name=skill_name,
-            memory_context=memory_context,  # pass context to BaseSkill as memory_manager
+            runtime_context=runtime_context,  # pass context to BaseSkill as memory_manager
+            model_manager=model_manager,
             tool_client=tool_client,
             event_bus=event_bus
         )

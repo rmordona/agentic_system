@@ -3,7 +3,7 @@ import asyncio
 from pathlib import Path
 #import logging
 
-from runtime.platform_runtime import PlatformRuntime
+from runtime.bootstrap.platform import Platform
 from runtime.runtime_manager import RuntimeManager
 from runtime.workspace_hub import WorkspaceHub
 from runtime.logger import AgentLogger
@@ -11,7 +11,6 @@ from runtime.logger import AgentLogger
 # --------------------------------------------------
 # Logging
 # --------------------------------------------------
-aloha = None
 
 # -----------------------------
 # CLI Argument Parsing
@@ -30,10 +29,17 @@ async def main():
 
     workspaces_root = Path("workspaces")
 
-    # 1. Initialize PlatformRuntime (singleton shared resources)
-    PlatformRuntime.initialize( workspaces_root= workspaces_root )
+    # 1. Initialize Platform (singleton shared resources)
+    Platform.initialize( workspaces_root= workspaces_root )
 
-    workspace_hub = PlatformRuntime.workspace_hub
+    # 2. Discover workspace via WorkspaceHub
+    #workspace_hub = WorkspaceHub(workspaces_root=workspaces_root)
+    #workspace_path = workspace_hub.resolve(args.workspace)
+    #if not workspace_path.exists():
+    #    logger.error(f"Workspace '{args.workspace}' not found")
+    #    return
+
+    workspace_hub = Platform.workspace_hub
 
 
     # 3. Create or get workspace RuntimeManager (singleton per workspace)

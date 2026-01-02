@@ -1,11 +1,12 @@
 from __future__ import annotations
 from typing import Dict, Any
-from runtime.tools.registry import ToolRegistry
+from runtime.tools.base import Tool
+from runtime.tools.tool_registry import ToolRegistry
 from runtime.tools.policy import ToolPolicy
 from runtime.logger import AgentLogger
 
 
-class ToolClient:
+class ToolClient(Tool):
     """
     Execution gateway for tools.
     Used by agents.
@@ -20,12 +21,19 @@ class ToolClient:
         self.policy = policy
         self.agent_role = agent_role
 
+        # Bind workspace logger ONCE
         global logger
-        logger = AgentLogger.get_logger(None, f"tool_client.{agent_role}")
+        logger = AgentLogger.get_logger(None, component="system")
 
-    async def run(self, tool_name: str, **kwargs) -> Dict[str, Any]:
-        self.policy.check(self.agent_role, tool_name)
-        tool = self.registry.get(tool_name)
-        logger.info(f"Running tool '{tool_name}'")
-        return await tool.run(**kwargs)
+    async def call(self, 
+            tool_name: str, 
+            **kwargs
+            ) -> Dict[str, Any]:
+        allowed = self.policy.check(self.agent_role, tool_name)
+        if allowed:
+            tool = self.registry.get(tool_name)
+            logger.info(f"Running tool '{tool_name}' for '{self.agent_role}'")
+            return await tool.call(**kwargs)
+        logger.warning(f"'{self.agent_role}' is not allwed to run the tool '{tool_name}' ... Permission denied ...")
+        return {}
 

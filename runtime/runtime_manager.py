@@ -16,9 +16,9 @@ from runtime.session_manager import SessionManager
 from runtime.lifecycle import register_lifecycle_handlers
 from runtime.logger import AgentLogger
 
-from llm.local_llm import LocalLLMChatModel
-from runtime.memory_manager import MemoryManager
-from runtime.embeddings.base import EmbeddingStore
+from llm.model_manager import ModelManager
+#from runtime.memory_manager import MemoryManager
+#from runtime.embeddings.base import EmbeddingStore
 from runtime.tools.client import ToolClient
 
 from events.event_bus import EventBus
@@ -34,9 +34,9 @@ class RuntimeManager:
     """
 
     # Inherit the logger
-    llm = None
-    memory_manager = None
-    embedding_store = None
+    #llm_manager = None
+    #memory_manager = None
+    #embedding_store = None
     tool_client = None
     event_bus = None
 
@@ -44,10 +44,10 @@ class RuntimeManager:
 
     def __new__(cls, 
             workspace_path: Path,
-            llm: LocalLLMChatModel,
+            model_manager: ModelManager,
             session_manager: SessionManager,
-            memory_manager: MemoryManager, 
-            embedding_store: EmbeddingStore, 
+            #memory_manager: MemoryManager, 
+            #embedding_store: EmbeddingStore, 
             tool_client: ToolClient,
             event_bus: EventBus,
         ):
@@ -59,24 +59,28 @@ class RuntimeManager:
 
     def __init__(self, 
             workspace_path: Path,
-            llm: LocalLLMChatModel,
+            model_manager: ModelManager,
             session_manager: SessionManager,
-            memory_manager: MemoryManager, 
-            embedding_store: EmbeddingStore, 
+            #memory_manager: MemoryManager, 
+            #embedding_store: EmbeddingStore, 
             tool_client: ToolClient,
             event_bus: EventBus,
         ):
+
         if hasattr(self, "_initialized") and self._initialized:
             return  # Avoid re-initialization
+
         self._initialized = True
 
         self.workspace_path = workspace_path
         self.workspace_name = workspace_path.name
 
-        self.event_bus = event_bus
-        self.memory_manager = memory_manager
-        self.embedding_store = embedding_store
+        self.model_manager = model_manager
+        # self.memory_manager = memory_manager
+        #self.embedding_store = embedding_store
         self.tool_client = tool_client
+
+        self.event_bus = event_bus
 
         # 🔑 Bind workspace logger ONCE
         global logger
@@ -89,9 +93,9 @@ class RuntimeManager:
 
         self.agent_registry = AgentRegistry(
             workspace_path,
-            llm=self.llm,
-            memory_manager=self.memory_manager,
-            embedding_store=self.embedding_store,
+            model_manager=self.model_manager,
+            #memory_manager=self.memory_manager,
+            #embedding_store=self.embedding_store,
             tool_client=self.tool_client,
             event_bus=self.event_bus
         )

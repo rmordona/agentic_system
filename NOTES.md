@@ -6,6 +6,7 @@ Other Agentic frameworks
 - Prismatic
 
 Memory Frameworks
+- https://docs.langchain.com/oss/python/langgraph/memory
 - langmem
 - openai mem
 - memgpt/letta - Community-driven (genuinely open) 154 contributors
@@ -1164,3 +1165,48 @@ agent.invoke(...)
 | Boilerplate       | ❌ More        | ✅ Less             |
 | Production Safety | ✅ Yes         | ⚠️ Depends         |
 
+
+
+LLM Manager:
+
+┌─────────────────────────────┐
+│         LocalLLMManager     │  ← single façade used everywhere
+│                             │
+│  ┌──────── LLM ──────────┐ │
+│  │ init_chat_model()     │ │
+│  └──────────────────────┘ │
+│                             │
+│  ┌──── Memory Manager ───┐ │  ← logic, policies, lifecycle
+│  │ create_memory_manager │ │
+│  └──────────────────────┘ │
+│            │                │
+│  ┌──── Store Manager ─────┐ │  ← persistence backend
+│  │ create_memory_store…   │ │
+│  └──────────────────────┘ │
+└─────────────────────────────┘
+
+
+
+Provider 	Required Package	Example Chat Model Import
+OpenAI	langchain-openai	from langchain_openai import ChatOpenAI
+Anthropic	langchain-anthropic	from langchain_anthropic import ChatAnthropic
+Cohere	langchain-cohere	from langchain_cohere import ChatCohere
+Google (GenAI)	langchain-google-genai	from langchain_google_genai import ChatGoogleGenerativeAI
+Google (Vertex AI)	langchain-google-vertexai	from langchain_google_vertexai import ChatVertexAI
+Meta (Llama)	langchain-community (often via Azure ML or similar integration within community)	from langchain_community.chat_models.azureml_endpoint import LlamaChatContentFormatter (example specific integration)
+Mistral	langchain-mistralai	from langchain_mistralai import ChatMistralAI
+
+
+But you must choose a compatible embedding model:
+- nomic-embed-text → Ollama
+- text-embedding-3-large → OpenAI
+- embed-english-v3.0 → Cohere
+
+
+Concept	Ollama	OpenAI
+Max tokens	num_predict	max_tokens
+Temperature	options.temperature	temperature
+
+
+IMPORTANT: Common interface, but no common payload.  Agents should not care how payload looks.
+Streaming	stream: true	stream: true

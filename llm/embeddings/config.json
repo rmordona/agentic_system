@@ -1,0 +1,18 @@
+{
+  "embedding" : {
+    "default" : "ollama",
+    "openai" : {
+        "embed" : "openai:text-embedding-3-small",
+        "endpoint": ""
+    },
+    "cohere" : {
+      "embed" : "embed-v4.0",
+      "endpoint" : ""
+    },
+    "ollama" : {
+      "embed" : "nomic-embed-text:latest",
+      "endpoint" : "http://localhost:11434/api/embeddings"
+    }
+  }
+
+}

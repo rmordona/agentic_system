@@ -1,4 +1,12 @@
-# stage_registry.py
+"""
+StageRegistry loads and validates stage definitions for a workspace.
+
+It defines stage ordering, allowed agents, and exit conditions used by
+the StageGraph during execution.
+
+StageRegistry does NOT execute agents or manage state.
+"""
+
 
 from __future__ import annotations
 import json

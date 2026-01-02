@@ -1,3 +1,25 @@
+# -----------------------------------------------------------------------------
+# Project: Agentic System
+# File: agents/skills/base_skill.py
+#
+# Description:
+#
+#    BaseSkill is the filesystem-driven execution unit for a single agent skill.
+#
+#    It loads prompts, context definitions, tools, and schemas from the
+#    workspace, resolves runtime context, executes the skill, and persists
+#    results via MemoryContext.
+#
+#    BaseSkill does NOT route stages, manage sessions, or select agents.
+#    Those concerns belong to the graph and orchestrator layers.
+#   
+#
+# Author: Raymond M.O. Ordona
+# Created: 2025-12-31
+# Copyright:
+#   © 2025 Raymondn Ordona. All rights reserved.
+# -----------------------------------------------------------------------------
+
 from __future__ import annotations
 
 import asyncio
@@ -5,9 +27,10 @@ import importlib
 import json
 from pathlib import Path
 from typing import Any, Dict
-from fastmcp import Client
 from langchain_core.prompts import PromptTemplate
-from runtime.memory_adapters.memory_context import MemoryContext
+from runtime.runtime_context import RuntimeContext
+from llm.model_manager import ModelManager
+from runtime.tools.client import ToolClient
 from runtime.logger import AgentLogger
 
 
@@ -32,8 +55,9 @@ class BaseSkill:
         self,
         workspace_dir: Path,
         skill_name: str,
-        memory_context: MemoryContext,      # 🔑 expects MemoryContext
-        tool_client: Client,
+        runtime_context: RuntimeContext,      # 🔑 expects RuntimeContext
+        model_manager: ModelManager,
+        tool_client: ToolClient,
         event_bus=None,
     ):
         self.workspace_dir = workspace_dir
@@ -41,7 +65,8 @@ class BaseSkill:
         self.skill_name = skill_name
         self.skill_dir = workspace_dir / "agents" / skill_name
 
-        self.memory_context = memory_context    # 🔑 scoped MemoryContext
+        self.runtime_context = runtime_context    # 🔑 scoped RuntimeContext
+        self.model_manager = model_manager
         self.tool_client = tool_client
         self.event_bus = event_bus
 
@@ -58,7 +83,7 @@ class BaseSkill:
 
         # 🔑 Bind workspace logger ONCE
         global logger
-        logger = AgentLogger.get_logger(self.workspace_name, component="system")
+        logger = AgentLogger.get_logger(self.workspace_name, component="runtime")
 
     # ------------------------------------------------------------------
     # LangGraph Entry Point
@@ -69,19 +94,26 @@ class BaseSkill:
         Executes the skill and returns a LangGraph-compatible state delta.
         """
         print(f"Entering next agent run: {state}")
+        print(f"workspace: {self.workspace_name}")
         logger.info(f"Running {self.workspace_name} workspace ...")
 
         # Bind session and stage to context for this run
-        runtime_context = self.memory_context.with_session(state["session_id"]).with_stage(state["stage"]).with_task(state["task"]).generate_key_namespace()
+        logger.info(f"Now binding sessions, stage, task to memory context")
+        runtime_context = self.runtime_context.with_session(state["session_id"]).with_stage(state["stage"]).with_task(state["task"]).generate_key_namespace()
 
+        logger.info(f"Now Resolving context ...")
         context = await self._resolve_context(state, runtime_context)
-        logger.info(f"{self.workspace_name}: Context retrieved: {context}")
+        logger.info(f"Context completed and retrieved: {context}")
  
-        prompt = self._render_prompt(context)
-        logger.info(f"{self.workspace_name}: Prompt rendered.")
 
-        output = await self._call_llm(prompt)
-        logger.info(f"{self.workspace_name}: Output: {output}")
+        logger.info(f"Now Rendering prompt with context  ...")
+        prompt = self._render_prompt(context)
+        logger.info(f"Prompt rendered...")
+        logger.info(f"The System Prompt: {prompt}")
+
+        logger.info(f"Now calling llm with the rendered prompt  ...")
+        output = await self._call_llm(prompt, state)
+        logger.info(f"LLM completed with generated output: {output}")
 
         if self.schema:
             output = self._validate_schema(output)
@@ -98,45 +130,63 @@ class BaseSkill:
     async def _resolve_context(self, state: Dict[str, Any], runtime_context) -> Dict[str, Any]:
         resolved: Dict[str, Any] = {}
 
-        for ctx in self.context_meta.get("context", []):
-            name = ctx["name"]
-            source = ctx["type"]
+        try:
+            for ctx in self.context_meta.get("context", []):
+                name = ctx["name"]
+                source = ctx["type"]
 
-            if source == "state":
-                resolved[name] = state.get(ctx.get("key", name))
+                if source == "state":
+                    resolved[name] = state.get(ctx.get("key", name))
 
-            elif source == "memory":
-                resolved[name] = await self._resolve_memory(ctx, runtime_context, state)
+                elif source == "memory":
+                    resolved[name] = await self._resolve_memory(ctx, runtime_context, state)
 
-            elif source == "embedding":
-                resolved[name] = await runtime_context.semantic_search(
-                    query=state["task"],
-                    top_k=ctx.get("top_k", 5),
-                    filters=ctx.get("filters", None)
-                )
-            elif source == "nl2sql":
-                resolved[name] = await runtime_context.nl_to_query(
-                    query=state["task"],
-                    top_k=ctx.get("top_k", 5),
-                    filters=ctx.get("filters", None)
-                )
-            elif source == "external":
-                resolved[name] = await self.tool_client.call(
-                    service=ctx["service"],
-                    params=ctx.get("params", {}),
-                )
+                elif source == "embedding":
+                    resolved[name] = await runtime_context.semantic_search(
+                        query=state["task"],
+                        top_k=ctx.get("top_k", 5),
+                        filters=ctx.get("filters", None)
+                    )
+                elif source == "nl2sql":
+                    resolved[name] = await runtime_context.query(
+                        query=state["task"],
+                        top_k=ctx.get("top_k", 5),
+                        filters=ctx.get("filters", None)
+                    )
+                elif source == "external":
+                    resolved[name] = await self.tool_client.call(
+                        tool_name=ctx["service"],
+                        params=ctx.get("params", {}),
+                    )
+                elif source == "computed":
+                    resolved[name] = await self._compute_value(ctx, state)
+                elif source == "text":
+                    resolved[name] = ctx["text"]
+                else:
+                    resolved[name] = None
 
-            elif source == "computed":
-                resolved[name] = await self._compute_value(ctx, state)
-
-            else:
-                resolved[name] = None
+        except Exception as e:
+            logger.info(f"Failed to resolve context '{source}'")
+            logger.error(
+                f"Context Metadata being evaluated: '{self.context_meta}': {e}",
+                exc_info=True
+            )
 
         return resolved
 
     # ------------------------------------------------------------------
     # Memory Persistence
     # ------------------------------------------------------------------
+    from uuid import uuid4
+
+    def _memory_key(self, key_namespace:tuple):
+        uid = str(uuid4())
+        keys=dict(key_namespace)
+        session_id = keys["session_id"]
+        agent      = keys["agent"]
+        stage      = keys["agent"]
+        namespace  = keys["namespace"]
+        return f"{session_id}:{agent}:{stage}:{namespace}:{uid}"
 
     async def _persist_memory(self, output: Any, runtime_context):
         await runtime_context.store(memory=output)
@@ -188,8 +238,16 @@ class BaseSkill:
                 f"Available context keys: {list(context.keys())}"
             )
 
-    async def _call_llm(self, prompt: str) -> Any:
-        raise NotImplementedError("LLM execution is now handled by memory adapters or external tools.")
+    async def _call_llm(self, prompt: str, state: Dict[str, Any]) -> Any:
+        #try:
+        return await self.model_manager.generate(
+            prompt=prompt,
+            inputs=state,
+            memory_key=state.get("session_id")
+            )
+        #except:
+        #    raise NotImplementedError("LLM execution is now handled by memory adapters or external tools.")
+        return None
 
     def _validate_schema(self, output: Any) -> Any:
         return output

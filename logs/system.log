@@ -2274,3 +2274,1683 @@
 2025-12-31 14:36:47,068 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
 2025-12-31 14:36:47,068 | INFO    | system | platform_runtime:161 | initialize | PlatformRuntime initialized successfully
 2025-12-31 14:36:47,078 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 16:18:45,545 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 16:18:45,645 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 16:18:45,645 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 16:18:45,670 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-31 16:18:45,670 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-31 16:18:45,671 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-31 16:18:45,671 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-31 16:18:45,672 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-31 16:18:45,672 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-31 16:18:45,673 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-31 16:18:45,680 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 16:22:01,215 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 16:22:01,216 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 16:22:01,216 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 16:22:01,216 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-31 16:22:01,216 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-31 16:22:01,217 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-31 16:22:01,217 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-31 16:22:01,217 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-31 16:22:01,217 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-31 16:22:01,217 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-31 16:22:01,218 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 16:22:01,237 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 16:22:01,237 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 16:22:01,437 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 16:22:57,860 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 16:22:57,861 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 16:22:57,861 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 16:22:57,862 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-31 16:22:57,862 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-31 16:22:57,862 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-31 16:22:57,863 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-31 16:22:57,863 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-31 16:22:57,863 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-31 16:22:57,863 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-31 16:22:57,863 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 16:22:57,867 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 16:22:57,867 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 16:22:57,878 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 16:25:45,868 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 16:25:45,869 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 16:25:45,869 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 16:25:45,869 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-31 16:25:45,870 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-31 16:25:45,870 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-31 16:25:45,870 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-31 16:25:45,870 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-31 16:25:45,870 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-31 16:25:45,871 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-31 16:25:45,871 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 16:25:45,874 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 16:25:45,874 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 16:25:45,884 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 16:26:59,092 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 16:26:59,093 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 16:26:59,093 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 16:26:59,093 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-31 16:26:59,093 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-31 16:26:59,094 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-31 16:26:59,094 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-31 16:26:59,094 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-31 16:26:59,094 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-31 16:26:59,094 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-31 16:26:59,095 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 16:26:59,098 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 16:26:59,098 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 16:26:59,108 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 16:28:46,039 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 16:28:46,040 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 16:28:46,040 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 16:28:46,041 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-31 16:28:46,041 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-31 16:28:46,041 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-31 16:28:46,041 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-31 16:28:46,041 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-31 16:28:46,042 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-31 16:28:46,042 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-31 16:28:46,042 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 16:28:46,046 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 16:28:46,046 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 16:28:46,055 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 17:13:12,597 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 17:13:12,696 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 17:13:12,696 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 17:13:12,720 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-31 17:13:12,721 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-31 17:13:12,722 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-31 17:13:12,722 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-31 17:13:12,723 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-31 17:13:12,723 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-31 17:13:12,723 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-31 17:13:12,730 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 17:13:12,731 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 17:13:12,731 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 17:13:12,984 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 17:13:54,096 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 17:13:54,097 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 17:13:54,097 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 17:13:54,097 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-31 17:13:54,097 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-31 17:13:54,098 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-31 17:13:54,098 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-31 17:13:54,098 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-31 17:13:54,098 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-31 17:13:54,098 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-31 17:13:54,098 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 17:13:54,099 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 17:13:54,099 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 17:13:54,108 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 17:17:21,164 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 17:17:21,165 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 17:17:21,165 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 17:17:21,165 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-31 17:17:21,166 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-31 17:17:21,166 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-31 17:17:21,166 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-31 17:17:21,166 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-31 17:17:21,166 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-31 17:17:21,167 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-31 17:17:21,167 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 17:17:21,167 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 17:17:21,167 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 17:17:21,177 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 17:21:06,305 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 17:21:06,306 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 17:21:06,306 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 17:28:44,969 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 17:28:44,970 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 17:28:44,971 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 17:32:16,395 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 17:32:16,396 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 17:32:16,396 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 17:33:51,995 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 17:33:51,996 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 17:33:51,996 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 17:33:52,037 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-31 17:33:52,039 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-31 17:34:21,300 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 17:34:21,301 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 17:34:21,301 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 17:34:21,302 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-31 17:34:21,302 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-31 17:34:21,303 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-31 17:34:21,304 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-31 17:34:21,304 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-31 17:34:21,305 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-31 17:34:21,305 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-31 17:36:27,541 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 17:36:27,542 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 17:36:27,542 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 17:36:27,542 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-31 17:36:27,543 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-31 17:36:27,543 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-31 17:36:27,543 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-31 17:36:27,543 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-31 17:36:27,543 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-31 17:36:27,544 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-31 17:36:27,544 | INFO    | system | registry:29 | load | Registered tool: fastmcp_client
+2025-12-31 17:36:27,545 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 17:36:27,545 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 17:36:27,545 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 17:36:27,554 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 17:50:12,176 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 17:50:12,177 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 17:50:12,177 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 17:50:12,178 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-31 17:50:12,178 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-31 17:50:12,178 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-31 17:50:12,178 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-31 17:50:12,179 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-31 17:50:12,179 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-31 17:50:12,179 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-31 17:50:12,179 | INFO    | system | registry:29 | load | Registered tool: fastmcp_client
+2025-12-31 17:50:12,179 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 17:50:12,180 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 17:50:12,180 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 17:50:12,189 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 17:51:46,923 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 17:51:46,924 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 17:51:46,924 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 17:51:46,924 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-31 17:51:46,924 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-31 17:51:46,924 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-31 17:51:46,925 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-31 17:51:46,925 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-31 17:51:46,925 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-31 17:51:46,925 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-31 17:51:46,926 | INFO    | system | registry:29 | load | Registered tool: fastmcp_client
+2025-12-31 17:51:46,926 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 17:51:46,926 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 17:51:46,926 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 17:51:46,936 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 18:30:08,455 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 18:30:08,465 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 18:30:08,465 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 18:30:08,465 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-31 18:30:08,465 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-31 18:30:08,466 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-31 18:30:08,466 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-31 18:30:08,466 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-31 18:30:08,466 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-31 18:30:08,466 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-31 18:30:08,467 | INFO    | system | registry:29 | load | Registered tool: fastmcp_client
+2025-12-31 18:30:08,467 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 18:30:08,467 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 18:30:08,467 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 18:30:08,477 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 18:30:39,002 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 18:30:39,003 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 18:30:39,003 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 18:30:39,003 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-31 18:30:39,004 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-31 18:30:39,004 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-31 18:30:39,004 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-31 18:30:39,004 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-31 18:30:39,004 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-31 18:30:39,005 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-31 18:30:39,005 | INFO    | system | registry:29 | load | Registered tool: fastmcp_client
+2025-12-31 18:30:39,005 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 18:30:39,005 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 18:30:39,005 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 18:30:39,015 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 18:33:06,496 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 18:33:06,497 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 18:33:06,497 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 18:33:06,497 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-31 18:33:06,497 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-31 18:33:06,498 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-31 18:33:06,498 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-31 18:33:06,498 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-31 18:33:06,498 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-31 18:33:06,498 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-31 18:33:06,499 | INFO    | system | registry:29 | load | Registered tool: fastmcp_client
+2025-12-31 18:33:06,499 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 18:33:06,499 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 18:33:06,499 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 18:33:06,509 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 18:34:18,092 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 18:34:18,093 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 18:34:18,093 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 18:34:18,093 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-31 18:34:18,093 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-31 18:34:18,094 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-31 18:34:18,094 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-31 18:34:18,094 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-31 18:34:18,094 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-31 18:34:18,094 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-31 18:34:18,095 | INFO    | system | registry:29 | load | Registered tool: fastmcp_client
+2025-12-31 18:34:18,095 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 18:34:18,095 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 18:34:18,095 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 18:34:18,105 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 18:50:39,938 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 18:50:39,939 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 18:50:39,939 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 18:50:39,940 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-31 18:50:39,940 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-31 18:50:39,940 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-31 18:50:39,940 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-31 18:50:39,940 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-31 18:50:39,941 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-31 18:50:39,941 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-31 18:50:39,941 | INFO    | system | registry:29 | load | Registered tool: fastmcp_client
+2025-12-31 18:51:25,666 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 18:51:25,667 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 18:51:25,667 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 18:51:25,667 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-31 18:51:25,668 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-31 18:51:25,668 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-31 18:51:25,668 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-31 18:51:25,668 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-31 18:51:25,668 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-31 18:51:25,669 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-31 18:51:25,669 | INFO    | system | registry:29 | load | Registered tool: fastmcp_client
+2025-12-31 18:51:25,669 | INFO    | system | registry:29 | load | Registered tool: knowledge_service
+2025-12-31 18:51:42,181 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 18:51:42,182 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 18:51:42,182 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 18:51:42,182 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-31 18:51:42,182 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-31 18:51:42,183 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-31 18:51:42,183 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-31 18:51:42,183 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-31 18:51:42,183 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-31 18:51:42,183 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-31 18:51:42,184 | INFO    | system | registry:29 | load | Registered tool: fastmcp_client
+2025-12-31 18:51:42,184 | INFO    | system | registry:29 | load | Registered tool: knowledge_service
+2025-12-31 18:51:42,184 | INFO    | system | registry:29 | load | Registered tool: knowledge_service
+2025-12-31 18:51:42,185 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 18:51:42,185 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 18:51:42,185 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 18:51:42,194 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 18:57:35,918 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 18:57:35,919 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 18:57:35,919 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 18:57:35,919 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-31 18:57:35,919 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-31 18:57:35,920 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-31 18:57:35,920 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-31 18:57:35,920 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-31 18:57:35,920 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-31 18:57:35,920 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-31 18:57:36,732 | INFO    | system | registry:29 | load | Registered tool: fastmcp_client
+2025-12-31 18:57:36,732 | INFO    | system | registry:29 | load | Registered tool: knowledge_service
+2025-12-31 18:57:36,733 | INFO    | system | registry:29 | load | Registered tool: knowledge_service
+2025-12-31 18:57:36,733 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 18:57:36,733 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 18:57:36,733 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 18:57:36,743 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 18:59:37,709 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 18:59:37,710 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 18:59:37,710 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 18:59:37,710 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-31 18:59:37,711 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-31 18:59:37,711 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-31 18:59:37,711 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-31 18:59:37,711 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-31 18:59:37,711 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-31 18:59:37,712 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-31 18:59:38,470 | INFO    | system | registry:29 | load | Registered tool: fastmcp_client
+2025-12-31 18:59:38,470 | INFO    | system | registry:29 | load | Registered tool: knowledge_service
+2025-12-31 18:59:38,471 | INFO    | system | registry:29 | load | Registered tool: knowledge_service
+2025-12-31 18:59:38,471 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 18:59:38,471 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 18:59:38,471 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 18:59:38,481 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 19:20:36,064 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 19:20:36,065 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 19:20:36,065 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 19:20:36,066 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-31 19:20:36,066 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-31 19:20:36,066 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-31 19:20:36,067 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-31 19:20:36,067 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-31 19:20:36,067 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-31 19:20:36,067 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-31 19:20:36,859 | INFO    | system | registry:29 | load | Registered tool: fastmcp_client
+2025-12-31 19:20:36,859 | INFO    | system | registry:29 | load | Registered tool: knowledge_service
+2025-12-31 19:20:36,859 | INFO    | system | registry:29 | load | Registered tool: knowledge_service
+2025-12-31 19:20:36,860 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 19:20:36,860 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 19:20:36,860 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 19:20:36,869 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 19:24:44,880 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 19:24:44,954 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 19:24:44,955 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 19:24:44,972 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-31 19:24:44,973 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-31 19:24:44,979 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-31 19:24:44,980 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-31 19:24:44,980 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-31 19:24:44,981 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-31 19:24:44,981 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-31 19:24:48,510 | INFO    | system | registry:29 | load | Registered tool: fastmcp_client
+2025-12-31 19:24:48,510 | INFO    | system | registry:29 | load | Registered tool: knowledge_service
+2025-12-31 19:24:48,544 | INFO    | system | registry:29 | load | Registered tool: knowledge_service
+2025-12-31 19:24:48,557 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 19:24:48,557 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 19:24:48,557 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 19:24:48,827 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 19:24:48,836 | INFO    | system | policy:31 | check | Still continue
+2025-12-31 19:24:48,836 | INFO    | system | client:30 | call | Running tool 'knowledge_service'
+2025-12-31 19:25:37,909 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 19:25:37,909 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 19:25:37,910 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 19:25:37,910 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-31 19:25:37,910 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-31 19:25:37,910 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-31 19:25:37,911 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-31 19:25:37,911 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-31 19:25:37,911 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-31 19:25:37,911 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-31 19:25:38,699 | INFO    | system | registry:29 | load | Registered tool: fastmcp_client
+2025-12-31 19:25:38,699 | INFO    | system | registry:29 | load | Registered tool: knowledge_service
+2025-12-31 19:25:38,700 | INFO    | system | registry:29 | load | Registered tool: knowledge_service
+2025-12-31 19:25:38,700 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 19:25:38,700 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 19:25:38,700 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 19:25:38,710 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 19:25:38,719 | INFO    | system | policy:31 | check | Still continue 1
+2025-12-31 19:25:38,719 | INFO    | system | client:30 | call | Running tool 'knowledge_service'
+2025-12-31 19:26:05,633 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 19:26:05,634 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 19:26:05,634 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 19:26:05,634 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-31 19:26:05,635 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-31 19:26:05,635 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-31 19:26:05,635 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-31 19:26:05,635 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-31 19:26:05,636 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-31 19:26:05,636 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-31 19:26:06,437 | INFO    | system | registry:29 | load | Registered tool: fastmcp_client
+2025-12-31 19:26:06,437 | INFO    | system | registry:29 | load | Registered tool: knowledge_service
+2025-12-31 19:26:06,437 | INFO    | system | registry:29 | load | Registered tool: knowledge_service
+2025-12-31 19:26:06,437 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 19:26:06,438 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 19:26:06,438 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 19:26:06,447 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 19:26:06,456 | INFO    | system | policy:31 | check | Still continue 1
+2025-12-31 19:26:06,456 | INFO    | system | client:30 | call | Running tool 'knowledge_service'
+2025-12-31 19:27:08,199 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 19:27:08,200 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 19:27:08,200 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 19:27:08,200 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-31 19:27:08,200 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-31 19:27:08,201 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-31 19:27:08,201 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-31 19:27:08,201 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-31 19:27:08,201 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-31 19:27:08,201 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-31 19:27:08,990 | INFO    | system | registry:29 | load | Registered tool: fastmcp_client
+2025-12-31 19:27:08,990 | INFO    | system | registry:29 | load | Registered tool: knowledge_service
+2025-12-31 19:27:08,990 | INFO    | system | registry:29 | load | Registered tool: knowledge_service
+2025-12-31 19:27:08,990 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 19:27:08,991 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 19:27:08,991 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 19:27:09,000 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 19:30:59,597 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 19:30:59,598 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 19:30:59,598 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 19:30:59,598 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-31 19:30:59,598 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-31 19:30:59,599 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-31 19:30:59,599 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-31 19:30:59,599 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-31 19:30:59,599 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-31 19:30:59,599 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-31 19:31:00,398 | INFO    | system | registry:29 | load | Registered tool: fastmcp_client
+2025-12-31 19:31:00,398 | INFO    | system | registry:29 | load | Registered tool: knowledge_service
+2025-12-31 19:31:00,398 | INFO    | system | registry:29 | load | Registered tool: knowledge_service
+2025-12-31 19:31:00,398 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 19:31:00,399 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 19:31:00,399 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 19:31:00,408 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 19:31:00,418 | ERROR   | system | policy:31 | check | Caught a PermissionError: Agent 'critic' is not allowed to use tool 'knowledge_service'
+2025-12-31 19:31:00,418 | INFO    | system | client:30 | call | Running tool 'knowledge_service'
+2025-12-31 19:32:10,008 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 19:32:10,009 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 19:32:10,009 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 19:32:10,009 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-31 19:32:10,009 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-31 19:32:10,010 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-31 19:32:10,010 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-31 19:32:10,010 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-31 19:32:10,010 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-31 19:32:10,010 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-31 19:32:10,790 | INFO    | system | registry:29 | load | Registered tool: fastmcp_client
+2025-12-31 19:32:10,790 | INFO    | system | registry:29 | load | Registered tool: knowledge_service
+2025-12-31 19:32:10,790 | INFO    | system | registry:29 | load | Registered tool: knowledge_service
+2025-12-31 19:32:10,791 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 19:32:10,791 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 19:32:10,791 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 19:32:10,800 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 19:33:39,109 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 19:33:39,109 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 19:33:39,110 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 19:33:39,110 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-31 19:33:39,110 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-31 19:33:39,110 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-31 19:33:39,111 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-31 19:33:39,111 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-31 19:33:39,111 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-31 19:33:39,111 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-31 19:33:39,876 | INFO    | system | registry:29 | load | Registered tool: fastmcp_client
+2025-12-31 19:33:39,876 | INFO    | system | registry:29 | load | Registered tool: knowledge_service
+2025-12-31 19:33:39,876 | INFO    | system | registry:29 | load | Registered tool: knowledge_service
+2025-12-31 19:34:07,277 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 19:34:07,278 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 19:34:07,278 | INFO    | system | registry:23 | load | Loading platform tools
+2025-12-31 19:34:07,279 | INFO    | system | registry:29 | load | Registered tool: web_search
+2025-12-31 19:34:07,279 | INFO    | system | registry:29 | load | Registered tool: calculator
+2025-12-31 19:34:07,279 | INFO    | system | registry:29 | load | Registered tool: python_exec
+2025-12-31 19:34:07,279 | INFO    | system | registry:29 | load | Registered tool: memory_write
+2025-12-31 19:34:07,279 | INFO    | system | registry:29 | load | Registered tool: memory_read
+2025-12-31 19:34:07,280 | INFO    | system | registry:29 | load | Registered tool: vector_search
+2025-12-31 19:34:07,280 | INFO    | system | registry:29 | load | Registered tool: http_request
+2025-12-31 19:34:08,060 | INFO    | system | registry:29 | load | Registered tool: fastmcp_client
+2025-12-31 19:34:08,061 | INFO    | system | registry:29 | load | Registered tool: knowledge_service
+2025-12-31 19:34:08,061 | INFO    | system | registry:29 | load | Registered tool: knowledge_service
+2025-12-31 19:34:08,061 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 19:34:08,062 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 19:34:08,062 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 19:34:08,071 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 19:34:08,080 | ERROR   | system | policy:32 | check | Caught a PermissionError: Agent 'critic' is not allowed to use tool 'knowledge_service'
+2025-12-31 19:34:08,081 | INFO    | system | client:30 | call | Running tool 'knowledge_service'
+2025-12-31 19:45:52,999 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 19:45:53,000 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 19:45:53,000 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2025-12-31 19:46:16,141 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 19:46:16,142 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 19:46:16,142 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2025-12-31 19:46:16,143 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2025-12-31 19:46:16,143 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2025-12-31 19:46:16,143 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2025-12-31 19:46:16,144 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2025-12-31 19:46:16,144 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2025-12-31 19:46:16,144 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2025-12-31 19:46:16,144 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2025-12-31 19:46:16,901 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2025-12-31 19:46:16,901 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 19:46:16,902 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 19:46:16,902 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 19:46:16,902 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 19:46:16,902 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 19:46:16,911 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 19:46:16,921 | ERROR   | system | policy:32 | check | Caught a PermissionError: Agent 'critic' is not allowed to use tool 'knowledge_service'
+2025-12-31 19:49:24,084 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 19:49:24,084 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 19:49:24,085 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2025-12-31 19:49:24,085 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2025-12-31 19:49:24,085 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2025-12-31 19:49:24,085 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2025-12-31 19:49:24,086 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2025-12-31 19:49:24,086 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2025-12-31 19:49:24,086 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2025-12-31 19:49:24,086 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2025-12-31 19:49:24,845 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2025-12-31 19:49:24,845 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 19:49:24,845 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 19:49:24,845 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 19:49:24,846 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 19:49:24,846 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 19:49:24,855 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 19:49:24,864 | ERROR   | system | policy:32 | check | Caught a PermissionError: Agent 'critic' is not allowed to use tool 'knowledge_service'
+2025-12-31 19:49:24,864 | WARNING | system | client:37 | call | Not allwed to run the tool: knowledge_service... Permission denied ...
+2025-12-31 19:50:35,695 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 19:50:35,695 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 19:50:35,696 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2025-12-31 19:50:35,696 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2025-12-31 19:50:35,696 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2025-12-31 19:50:35,696 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2025-12-31 19:50:35,697 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2025-12-31 19:50:35,697 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2025-12-31 19:50:35,697 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2025-12-31 19:50:35,697 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2025-12-31 19:50:36,472 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2025-12-31 19:50:36,472 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 19:50:36,473 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 19:50:36,473 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 19:50:36,473 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 19:50:36,473 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 19:50:36,483 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 19:50:36,492 | ERROR   | system | policy:32 | check | Caught a PermissionError: Agent 'critic' is not allowed to use tool 'knowledge_service'
+2025-12-31 19:50:36,492 | WARNING | system | client:37 | call | 'critic' is not allwed to run the tool: knowledge_service... Permission denied ...
+2025-12-31 19:51:34,531 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 19:51:34,532 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 19:51:34,532 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2025-12-31 19:51:34,532 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2025-12-31 19:51:34,532 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2025-12-31 19:51:34,532 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2025-12-31 19:51:34,533 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2025-12-31 19:51:34,533 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2025-12-31 19:51:34,533 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2025-12-31 19:51:34,533 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2025-12-31 19:51:35,314 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2025-12-31 19:51:35,314 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 19:51:35,315 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 19:51:35,315 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 19:51:35,315 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 19:51:35,315 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 19:51:35,325 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 19:51:35,334 | ERROR   | system | policy:32 | check | Caught a PermissionError: Agent 'critic' is not allowed to use tool 'knowledge_service'
+2025-12-31 19:51:35,334 | WARNING | system | client:37 | call | 'critic' is not allwed to run the tool 'knowledge_service' ... Permission denied ...
+2025-12-31 19:57:29,223 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 19:57:29,223 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 19:57:29,224 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2025-12-31 19:57:29,224 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2025-12-31 19:57:29,224 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2025-12-31 19:57:29,224 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2025-12-31 19:57:29,225 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2025-12-31 19:57:29,225 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2025-12-31 19:57:29,225 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2025-12-31 19:57:29,225 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2025-12-31 19:57:29,986 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2025-12-31 19:57:29,986 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 19:57:29,986 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 19:57:29,986 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 19:57:29,987 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 19:57:29,987 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 19:57:29,996 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 19:57:30,005 | ERROR   | system | policy:32 | check | Caught a PermissionError: Agent 'critic' is not allowed to use tool 'knowledge_service'
+2025-12-31 19:57:30,006 | WARNING | system | client:37 | call | 'critic' is not allwed to run the tool 'knowledge_service' ... Permission denied ...
+2025-12-31 19:59:11,930 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 19:59:11,931 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 19:59:11,931 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2025-12-31 19:59:11,931 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2025-12-31 19:59:11,931 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2025-12-31 19:59:11,932 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2025-12-31 19:59:11,932 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2025-12-31 19:59:11,932 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2025-12-31 19:59:11,932 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2025-12-31 19:59:11,933 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2025-12-31 19:59:12,692 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2025-12-31 19:59:12,692 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 19:59:12,692 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 19:59:12,693 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 19:59:12,693 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 19:59:12,693 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 19:59:12,702 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 19:59:12,711 | ERROR   | system | policy:32 | check | Caught a PermissionError: Agent 'critic' is not allowed to use tool 'knowledge_service'
+2025-12-31 19:59:12,711 | WARNING | system | client:37 | call | 'critic' is not allwed to run the tool 'knowledge_service' ... Permission denied ...
+2025-12-31 19:59:36,747 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 19:59:36,748 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 19:59:36,748 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2025-12-31 19:59:36,748 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2025-12-31 19:59:36,748 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2025-12-31 19:59:36,748 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2025-12-31 19:59:36,749 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2025-12-31 19:59:36,749 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2025-12-31 19:59:36,749 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2025-12-31 19:59:36,749 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2025-12-31 19:59:37,518 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2025-12-31 19:59:37,518 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 19:59:37,519 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 19:59:37,519 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 19:59:37,519 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 19:59:37,519 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 19:59:37,529 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 19:59:37,538 | ERROR   | system | policy:32 | check | Caught a PermissionError: Agent 'critic' is not allowed to use tool 'knowledge_service'
+2025-12-31 19:59:37,538 | WARNING | system | client:37 | call | 'critic' is not allwed to run the tool 'knowledge_service' ... Permission denied ...
+2025-12-31 20:01:16,823 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 20:01:16,824 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 20:01:16,824 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2025-12-31 20:01:16,825 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2025-12-31 20:01:16,825 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2025-12-31 20:01:16,825 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2025-12-31 20:01:16,826 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2025-12-31 20:01:16,826 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2025-12-31 20:01:16,826 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2025-12-31 20:01:16,826 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2025-12-31 20:01:17,583 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2025-12-31 20:01:17,583 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:01:17,584 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:01:17,584 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 20:01:17,584 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 20:01:17,585 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 20:01:17,594 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 20:01:17,603 | ERROR   | system | policy:32 | check | Caught a PermissionError: Agent 'critic' is not allowed to use tool 'knowledge_service'
+2025-12-31 20:01:17,603 | WARNING | system | client:37 | call | 'critic' is not allwed to run the tool 'knowledge_service' ... Permission denied ...
+2025-12-31 20:01:30,326 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 20:01:30,327 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 20:01:30,327 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2025-12-31 20:01:30,327 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2025-12-31 20:01:30,327 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2025-12-31 20:01:30,328 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2025-12-31 20:01:30,328 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2025-12-31 20:01:30,328 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2025-12-31 20:01:30,328 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2025-12-31 20:01:30,328 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2025-12-31 20:01:31,094 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2025-12-31 20:01:31,094 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:01:31,094 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:01:31,094 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 20:01:31,095 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 20:01:31,095 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 20:01:31,105 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 20:01:31,114 | ERROR   | system | policy:32 | check | Caught a PermissionError: Agent 'critic' is not allowed to use tool 'knowledge_service'
+2025-12-31 20:01:31,114 | WARNING | system | client:37 | call | 'critic' is not allwed to run the tool 'knowledge_service' ... Permission denied ...
+2025-12-31 20:04:23,187 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 20:04:23,187 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 20:04:23,188 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2025-12-31 20:04:23,188 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2025-12-31 20:04:23,188 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2025-12-31 20:04:23,188 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2025-12-31 20:04:23,189 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2025-12-31 20:04:23,189 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2025-12-31 20:04:23,189 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2025-12-31 20:04:23,189 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2025-12-31 20:04:23,950 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2025-12-31 20:04:23,950 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:04:23,950 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:04:23,950 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 20:04:23,951 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 20:04:23,951 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 20:04:23,960 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 20:04:23,970 | ERROR   | system | policy:32 | check | Caught a PermissionError: Agent 'critic' is not allowed to use tool 'knowledge_service'
+2025-12-31 20:04:23,970 | WARNING | system | client:37 | call | 'critic' is not allwed to run the tool 'knowledge_service' ... Permission denied ...
+2025-12-31 20:06:12,832 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 20:06:12,833 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 20:06:12,833 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2025-12-31 20:06:12,833 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2025-12-31 20:06:12,834 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2025-12-31 20:06:12,834 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2025-12-31 20:06:12,834 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2025-12-31 20:06:12,834 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2025-12-31 20:06:12,834 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2025-12-31 20:06:12,835 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2025-12-31 20:06:13,597 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2025-12-31 20:06:13,597 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:06:13,598 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:06:13,598 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 20:06:13,598 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 20:06:13,598 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 20:06:13,607 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 20:06:13,617 | ERROR   | system | policy:32 | check | Caught a PermissionError: Agent 'critic' is not allowed to use tool 'knowledge_service'
+2025-12-31 20:06:13,617 | WARNING | system | client:37 | call | 'critic' is not allwed to run the tool 'knowledge_service' ... Permission denied ...
+2025-12-31 20:07:41,687 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 20:07:41,688 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 20:07:41,688 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2025-12-31 20:07:41,688 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2025-12-31 20:07:41,689 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2025-12-31 20:07:41,689 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2025-12-31 20:07:41,689 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2025-12-31 20:07:41,689 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2025-12-31 20:07:41,689 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2025-12-31 20:07:41,690 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2025-12-31 20:07:42,451 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2025-12-31 20:07:42,451 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:07:42,452 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:07:42,452 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 20:07:42,452 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 20:07:42,452 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 20:07:42,462 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 20:07:42,471 | ERROR   | system | policy:32 | check | Caught a PermissionError: Agent 'critic' is not allowed to use tool 'knowledge_service'
+2025-12-31 20:07:42,471 | WARNING | system | client:37 | call | 'critic' is not allwed to run the tool 'knowledge_service' ... Permission denied ...
+2025-12-31 20:08:57,059 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 20:08:57,060 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 20:08:57,060 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2025-12-31 20:08:57,060 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2025-12-31 20:08:57,060 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2025-12-31 20:08:57,061 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2025-12-31 20:08:57,061 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2025-12-31 20:08:57,061 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2025-12-31 20:08:57,061 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2025-12-31 20:08:57,061 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2025-12-31 20:08:57,833 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2025-12-31 20:08:57,833 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:08:57,834 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:08:57,834 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 20:08:57,834 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 20:08:57,834 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 20:08:57,844 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 20:08:57,853 | ERROR   | system | policy:32 | check | Caught a PermissionError: Agent 'critic' is not allowed to use tool 'knowledge_service'
+2025-12-31 20:08:57,853 | WARNING | system | client:37 | call | 'critic' is not allwed to run the tool 'knowledge_service' ... Permission denied ...
+2025-12-31 20:09:30,847 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 20:09:30,848 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 20:09:30,848 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2025-12-31 20:09:30,848 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2025-12-31 20:09:30,848 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2025-12-31 20:09:30,848 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2025-12-31 20:09:30,849 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2025-12-31 20:09:30,849 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2025-12-31 20:09:30,849 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2025-12-31 20:09:30,849 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2025-12-31 20:09:31,611 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2025-12-31 20:09:31,611 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:09:31,612 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:09:31,612 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 20:09:31,612 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 20:09:31,612 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 20:09:31,622 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 20:09:31,631 | ERROR   | system | policy:32 | check | Caught a PermissionError: Agent 'critic' is not allowed to use tool 'knowledge_service'
+2025-12-31 20:09:31,632 | WARNING | system | client:37 | call | 'critic' is not allwed to run the tool 'knowledge_service' ... Permission denied ...
+2025-12-31 20:11:13,279 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 20:11:13,280 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 20:11:13,280 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2025-12-31 20:11:13,280 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2025-12-31 20:11:13,281 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2025-12-31 20:11:13,281 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2025-12-31 20:11:13,281 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2025-12-31 20:11:13,281 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2025-12-31 20:11:13,281 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2025-12-31 20:11:13,282 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2025-12-31 20:11:14,041 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2025-12-31 20:11:14,041 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:11:14,041 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:11:14,042 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 20:11:14,042 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 20:11:14,042 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 20:11:14,052 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 20:11:14,061 | ERROR   | system | policy:32 | check | Caught a PermissionError: Agent 'critic' is not allowed to use tool 'knowledge_service'
+2025-12-31 20:11:14,061 | WARNING | system | client:37 | call | 'critic' is not allwed to run the tool 'knowledge_service' ... Permission denied ...
+2025-12-31 20:11:36,712 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 20:11:36,713 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 20:11:36,713 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2025-12-31 20:11:36,713 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2025-12-31 20:11:36,713 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2025-12-31 20:11:36,714 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2025-12-31 20:11:36,714 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2025-12-31 20:11:36,714 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2025-12-31 20:11:36,714 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2025-12-31 20:11:36,714 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2025-12-31 20:11:37,479 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2025-12-31 20:11:37,479 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:11:37,479 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:11:37,479 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 20:11:37,480 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 20:11:37,480 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 20:11:37,489 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 20:11:37,498 | ERROR   | system | policy:32 | check | Caught a PermissionError: Agent 'critic' is not allowed to use tool 'knowledge_service'
+2025-12-31 20:11:37,498 | WARNING | system | client:37 | call | 'critic' is not allwed to run the tool 'knowledge_service' ... Permission denied ...
+2025-12-31 20:11:59,536 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 20:11:59,537 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 20:11:59,537 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2025-12-31 20:11:59,538 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2025-12-31 20:11:59,538 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2025-12-31 20:11:59,538 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2025-12-31 20:11:59,539 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2025-12-31 20:11:59,539 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2025-12-31 20:11:59,539 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2025-12-31 20:11:59,539 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2025-12-31 20:12:00,314 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2025-12-31 20:12:00,314 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:12:00,315 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:12:00,315 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 20:12:00,315 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 20:12:00,315 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 20:12:00,325 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 20:12:00,334 | ERROR   | system | policy:32 | check | Caught a PermissionError: Agent 'critic' is not allowed to use tool 'knowledge_service'
+2025-12-31 20:12:00,334 | WARNING | system | client:37 | call | 'critic' is not allwed to run the tool 'knowledge_service' ... Permission denied ...
+2025-12-31 20:12:16,740 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 20:12:16,741 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 20:12:16,741 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2025-12-31 20:12:16,741 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2025-12-31 20:12:16,741 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2025-12-31 20:12:16,742 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2025-12-31 20:12:16,742 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2025-12-31 20:12:16,742 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2025-12-31 20:12:16,742 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2025-12-31 20:12:16,742 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2025-12-31 20:12:17,496 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2025-12-31 20:12:17,496 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:12:17,497 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:12:17,497 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 20:12:17,497 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 20:12:17,497 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 20:12:17,507 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 20:12:17,516 | ERROR   | system | policy:32 | check | Caught a PermissionError: Agent 'critic' is not allowed to use tool 'knowledge_service'
+2025-12-31 20:12:17,516 | WARNING | system | client:37 | call | 'critic' is not allwed to run the tool 'knowledge_service' ... Permission denied ...
+2025-12-31 20:14:52,032 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 20:14:52,033 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 20:14:52,033 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2025-12-31 20:14:52,034 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2025-12-31 20:14:52,034 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2025-12-31 20:14:52,034 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2025-12-31 20:14:52,034 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2025-12-31 20:14:52,035 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2025-12-31 20:14:52,035 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2025-12-31 20:14:52,035 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2025-12-31 20:14:52,876 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2025-12-31 20:14:52,876 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:14:52,876 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:14:52,877 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 20:14:52,877 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 20:14:52,877 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 20:14:52,886 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 20:14:52,896 | ERROR   | system | policy:32 | check | Caught a PermissionError: Agent 'critic' is not allowed to use tool 'knowledge_service'
+2025-12-31 20:14:52,896 | WARNING | system | client:37 | call | 'critic' is not allwed to run the tool 'knowledge_service' ... Permission denied ...
+2025-12-31 20:15:13,979 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 20:15:13,980 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 20:15:13,980 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2025-12-31 20:15:13,981 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2025-12-31 20:15:13,981 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2025-12-31 20:15:13,981 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2025-12-31 20:15:13,982 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2025-12-31 20:15:13,982 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2025-12-31 20:15:13,982 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2025-12-31 20:15:13,982 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2025-12-31 20:15:14,739 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2025-12-31 20:15:14,740 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:15:14,740 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:15:14,740 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 20:15:14,741 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 20:15:14,741 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 20:15:14,750 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 20:15:14,759 | ERROR   | system | policy:32 | check | Caught a PermissionError: Agent 'critic' is not allowed to use tool 'knowledge_service'
+2025-12-31 20:15:14,759 | WARNING | system | client:37 | call | 'critic' is not allwed to run the tool 'knowledge_service' ... Permission denied ...
+2025-12-31 20:31:33,620 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 20:31:33,635 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 20:31:33,635 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2025-12-31 20:31:33,636 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2025-12-31 20:31:33,636 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2025-12-31 20:31:33,636 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2025-12-31 20:31:33,636 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2025-12-31 20:31:33,636 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2025-12-31 20:31:33,637 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2025-12-31 20:31:33,637 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2025-12-31 20:31:34,642 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2025-12-31 20:31:34,642 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:31:34,643 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:31:34,643 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 20:31:34,643 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 20:31:34,644 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 20:31:34,685 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 20:31:34,694 | ERROR   | system | policy:32 | check | Caught a PermissionError: Agent 'critic' is not allowed to use tool 'knowledge_service'
+2025-12-31 20:31:34,694 | WARNING | system | client:37 | call | 'critic' is not allwed to run the tool 'knowledge_service' ... Permission denied ...
+2025-12-31 20:32:07,566 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 20:32:07,567 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 20:32:07,567 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2025-12-31 20:32:07,568 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2025-12-31 20:32:07,568 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2025-12-31 20:32:07,568 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2025-12-31 20:32:07,569 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2025-12-31 20:32:07,569 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2025-12-31 20:32:07,569 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2025-12-31 20:32:07,569 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2025-12-31 20:32:08,326 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2025-12-31 20:32:08,326 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:32:08,326 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:32:08,327 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 20:32:08,327 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 20:32:08,327 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 20:32:08,336 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 20:32:08,346 | ERROR   | system | policy:32 | check | Caught a PermissionError: Agent 'critic' is not allowed to use tool 'knowledge_service'
+2025-12-31 20:32:08,346 | WARNING | system | client:37 | call | 'critic' is not allwed to run the tool 'knowledge_service' ... Permission denied ...
+2025-12-31 20:32:58,990 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 20:32:58,991 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 20:32:58,991 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2025-12-31 20:32:58,991 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2025-12-31 20:32:58,991 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2025-12-31 20:32:58,992 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2025-12-31 20:32:58,992 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2025-12-31 20:32:58,992 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2025-12-31 20:32:58,992 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2025-12-31 20:32:58,992 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2025-12-31 20:32:59,753 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2025-12-31 20:32:59,753 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:32:59,754 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:32:59,754 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 20:32:59,754 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 20:32:59,754 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 20:32:59,763 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 20:32:59,773 | ERROR   | system | policy:32 | check | Caught a PermissionError: Agent 'critic' is not allowed to use tool 'knowledge_service'
+2025-12-31 20:32:59,773 | WARNING | system | client:37 | call | 'critic' is not allwed to run the tool 'knowledge_service' ... Permission denied ...
+2025-12-31 20:33:23,910 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 20:33:23,911 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 20:33:23,911 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2025-12-31 20:33:23,912 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2025-12-31 20:33:23,912 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2025-12-31 20:33:23,912 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2025-12-31 20:33:23,913 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2025-12-31 20:33:23,913 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2025-12-31 20:33:23,913 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2025-12-31 20:33:23,913 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2025-12-31 20:33:24,676 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2025-12-31 20:33:24,676 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:33:24,677 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:33:24,677 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 20:33:24,677 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 20:33:24,677 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 20:33:24,687 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 20:33:24,696 | ERROR   | system | policy:32 | check | Caught a PermissionError: Agent 'critic' is not allowed to use tool 'knowledge_service'
+2025-12-31 20:33:24,696 | WARNING | system | client:37 | call | 'critic' is not allwed to run the tool 'knowledge_service' ... Permission denied ...
+2025-12-31 20:43:39,593 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 20:43:39,594 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 20:43:39,594 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2025-12-31 20:43:39,594 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2025-12-31 20:43:39,595 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2025-12-31 20:43:39,595 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2025-12-31 20:43:39,595 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2025-12-31 20:43:39,595 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2025-12-31 20:43:39,595 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2025-12-31 20:43:39,596 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2025-12-31 20:43:40,365 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2025-12-31 20:43:40,365 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:43:40,366 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:43:40,366 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 20:43:40,366 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 20:43:40,367 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 20:43:40,376 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 20:43:40,385 | ERROR   | system | policy:32 | check | Caught a PermissionError: Agent 'critic' is not allowed to use tool 'knowledge_service'
+2025-12-31 20:43:40,385 | WARNING | system | client:37 | call | 'critic' is not allwed to run the tool 'knowledge_service' ... Permission denied ...
+2025-12-31 20:44:12,454 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 20:44:12,455 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 20:44:12,455 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2025-12-31 20:44:12,456 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2025-12-31 20:44:12,456 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2025-12-31 20:44:12,456 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2025-12-31 20:44:12,456 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2025-12-31 20:44:12,456 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2025-12-31 20:44:12,457 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2025-12-31 20:44:12,457 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2025-12-31 20:44:13,216 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2025-12-31 20:44:13,216 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:44:13,217 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:44:13,217 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 20:44:13,217 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 20:44:13,217 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 20:44:13,227 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 20:44:13,236 | ERROR   | system | policy:32 | check | Caught a PermissionError: Agent 'critic' is not allowed to use tool 'knowledge_service'
+2025-12-31 20:44:13,236 | WARNING | system | client:37 | call | 'critic' is not allwed to run the tool 'knowledge_service' ... Permission denied ...
+2025-12-31 20:44:43,989 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 20:44:43,990 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 20:44:43,990 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2025-12-31 20:44:43,991 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2025-12-31 20:44:43,991 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2025-12-31 20:44:43,991 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2025-12-31 20:44:43,992 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2025-12-31 20:44:43,992 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2025-12-31 20:44:43,992 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2025-12-31 20:44:43,992 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2025-12-31 20:44:44,749 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2025-12-31 20:44:44,750 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:44:44,750 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:44:44,750 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 20:44:44,751 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 20:44:44,751 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 20:44:44,760 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 20:44:44,770 | ERROR   | system | policy:32 | check | Caught a PermissionError: Agent 'critic' is not allowed to use tool 'knowledge_service'
+2025-12-31 20:44:44,770 | WARNING | system | client:37 | call | 'critic' is not allwed to run the tool 'knowledge_service' ... Permission denied ...
+2025-12-31 20:47:37,195 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 20:47:37,196 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 20:47:37,196 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2025-12-31 20:47:37,197 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2025-12-31 20:47:37,197 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2025-12-31 20:47:37,197 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2025-12-31 20:47:37,197 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2025-12-31 20:47:37,197 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2025-12-31 20:47:37,198 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2025-12-31 20:47:37,198 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2025-12-31 20:47:37,954 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2025-12-31 20:47:37,954 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:47:37,955 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 20:47:37,955 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 20:47:37,955 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 20:47:37,955 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 20:47:37,965 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 20:47:37,974 | ERROR   | system | policy:32 | check | Caught a PermissionError: Agent 'critic' is not allowed to use tool 'knowledge_service'
+2025-12-31 20:47:37,974 | WARNING | system | client:37 | call | 'critic' is not allwed to run the tool 'knowledge_service' ... Permission denied ...
+2025-12-31 21:03:12,576 | INFO    | system | platform_runtime:97 | initialize | Initializing PlatformRuntime
+2025-12-31 21:03:12,577 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2025-12-31 21:03:12,577 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2025-12-31 21:03:12,578 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2025-12-31 21:03:12,578 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2025-12-31 21:03:12,578 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2025-12-31 21:03:12,578 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2025-12-31 21:03:12,579 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2025-12-31 21:03:12,579 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2025-12-31 21:03:12,579 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2025-12-31 21:03:13,341 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2025-12-31 21:03:13,341 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 21:03:13,342 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2025-12-31 21:03:13,342 | INFO    | system | platform_runtime:135 | initialize | ToolClient initialized
+2025-12-31 21:03:13,342 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2025-12-31 21:03:13,342 | INFO    | system | platform_runtime:174 | initialize | PlatformRuntime initialized successfully
+2025-12-31 21:03:13,352 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2025-12-31 21:03:13,362 | ERROR   | system | policy:32 | check | Caught a PermissionError: Agent 'critic' is not allowed to use tool 'knowledge_service'
+2025-12-31 21:03:13,362 | WARNING | system | client:37 | call | 'critic' is not allwed to run the tool 'knowledge_service' ... Permission denied ...
+2026-01-01 01:48:28,793 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 01:50:52,721 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 01:51:52,854 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 01:52:47,416 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 01:55:20,272 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 01:56:23,182 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 02:04:15,503 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 02:07:49,089 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 02:07:49,089 | INFO    | system | llm_manager:134 | __init__ | Bootstrapping LLM ...
+2026-01-01 02:07:49,089 | INFO    | system | llm_manager:135 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 02:07:49,089 | INFO    | system | llm_manager:136 | __init__ |  Provider: None
+2026-01-01 02:07:49,089 | INFO    | system | llm_manager:137 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 02:07:49,089 | INFO    | system | llm_manager:138 | __init__ |  Temperature: 0.2
+2026-01-01 02:07:49,089 | INFO    | system | llm_manager:139 | __init__ |  Max_Tokens: 4096
+2026-01-01 02:08:30,004 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 02:08:30,004 | INFO    | system | llm_manager:134 | __init__ | Bootstrapping LLM ...
+2026-01-01 02:08:30,004 | INFO    | system | llm_manager:135 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 02:08:30,004 | INFO    | system | llm_manager:136 | __init__ |  Provider: None
+2026-01-01 02:08:30,004 | INFO    | system | llm_manager:137 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 02:08:30,004 | INFO    | system | llm_manager:138 | __init__ |  Temperature: 0.2
+2026-01-01 02:08:30,004 | INFO    | system | llm_manager:139 | __init__ |  Max_Tokens: 4096
+2026-01-01 02:09:56,852 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 02:09:56,852 | INFO    | system | llm_manager:134 | __init__ | Bootstrapping LLM ...
+2026-01-01 02:09:56,852 | INFO    | system | llm_manager:135 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 02:09:56,852 | INFO    | system | llm_manager:136 | __init__ |  Provider: None
+2026-01-01 02:09:56,852 | INFO    | system | llm_manager:137 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 02:09:56,852 | INFO    | system | llm_manager:138 | __init__ |  Temperature: 0.2
+2026-01-01 02:09:56,852 | INFO    | system | llm_manager:139 | __init__ |  Max_Tokens: 4096
+2026-01-01 02:10:32,631 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 02:10:32,631 | INFO    | system | llm_manager:134 | __init__ | Bootstrapping LLM ...
+2026-01-01 02:10:32,631 | INFO    | system | llm_manager:135 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 02:10:32,631 | INFO    | system | llm_manager:136 | __init__ |  Provider: local
+2026-01-01 02:10:32,631 | INFO    | system | llm_manager:137 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 02:10:32,631 | INFO    | system | llm_manager:138 | __init__ |  Temperature: 0.2
+2026-01-01 02:10:32,631 | INFO    | system | llm_manager:139 | __init__ |  Max_Tokens: 4096
+2026-01-01 02:10:43,159 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 02:10:43,159 | INFO    | system | llm_manager:134 | __init__ | Bootstrapping LLM ...
+2026-01-01 02:10:43,160 | INFO    | system | llm_manager:135 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 02:10:43,160 | INFO    | system | llm_manager:136 | __init__ |  Provider: local
+2026-01-01 02:10:43,160 | INFO    | system | llm_manager:137 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 02:10:43,160 | INFO    | system | llm_manager:138 | __init__ |  Temperature: 0.2
+2026-01-01 02:10:43,160 | INFO    | system | llm_manager:139 | __init__ |  Max_Tokens: 4096
+2026-01-01 02:17:26,218 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 02:17:26,218 | INFO    | system | llm_manager:134 | __init__ | Bootstrapping LLM ...
+2026-01-01 02:17:26,218 | INFO    | system | llm_manager:135 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 02:17:26,218 | INFO    | system | llm_manager:136 | __init__ |  Provider: local
+2026-01-01 02:17:26,218 | INFO    | system | llm_manager:137 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 02:17:26,218 | INFO    | system | llm_manager:138 | __init__ |  Temperature: 0.2
+2026-01-01 02:17:26,218 | INFO    | system | llm_manager:139 | __init__ |  Max_Tokens: 4096
+2026-01-01 02:51:07,504 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 02:51:07,514 | INFO    | system | llm_manager:135 | __init__ | Bootstrapping LLM ...
+2026-01-01 02:51:07,515 | INFO    | system | llm_manager:136 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 02:51:07,515 | INFO    | system | llm_manager:137 | __init__ |  Provider: local
+2026-01-01 02:51:07,515 | INFO    | system | llm_manager:138 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 02:51:07,515 | INFO    | system | llm_manager:139 | __init__ |  Temperature: 0.2
+2026-01-01 02:51:07,515 | INFO    | system | llm_manager:140 | __init__ |  Max_Tokens: 4096
+2026-01-01 02:59:24,240 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 02:59:24,256 | INFO    | system | llm_manager:196 | __init__ | Bootstrapping LLM ...
+2026-01-01 02:59:24,256 | INFO    | system | llm_manager:197 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 02:59:24,256 | INFO    | system | llm_manager:198 | __init__ |  Provider: local
+2026-01-01 02:59:24,256 | INFO    | system | llm_manager:199 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 02:59:24,256 | INFO    | system | llm_manager:200 | __init__ |  Temperature: 0.2
+2026-01-01 02:59:24,256 | INFO    | system | llm_manager:201 | __init__ |  Max_Tokens: 4096
+2026-01-01 03:04:07,752 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 03:04:07,752 | INFO    | system | llm_manager:229 | __init__ | Bootstrapping LLM ...
+2026-01-01 03:04:07,752 | INFO    | system | llm_manager:230 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 03:04:07,752 | INFO    | system | llm_manager:231 | __init__ |  Provider: local
+2026-01-01 03:04:07,752 | INFO    | system | llm_manager:232 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 03:04:07,752 | INFO    | system | llm_manager:233 | __init__ |  Temperature: 0.2
+2026-01-01 03:04:07,752 | INFO    | system | llm_manager:234 | __init__ |  Max_Tokens: 4096
+2026-01-01 03:05:55,653 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 03:05:55,654 | INFO    | system | llm_manager:229 | __init__ | Bootstrapping LLM ...
+2026-01-01 03:05:55,654 | INFO    | system | llm_manager:230 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 03:05:55,654 | INFO    | system | llm_manager:231 | __init__ |  Provider: local
+2026-01-01 03:05:55,654 | INFO    | system | llm_manager:232 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 03:05:55,654 | INFO    | system | llm_manager:233 | __init__ |  Temperature: 0.2
+2026-01-01 03:05:55,654 | INFO    | system | llm_manager:234 | __init__ |  Max_Tokens: 4096
+2026-01-01 03:11:58,369 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 03:11:58,403 | INFO    | system | llm_manager:253 | __init__ | Bootstrapping LLM ...
+2026-01-01 03:11:58,403 | INFO    | system | llm_manager:254 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 03:11:58,403 | INFO    | system | llm_manager:255 | __init__ |  Provider: local
+2026-01-01 03:11:58,403 | INFO    | system | llm_manager:256 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 03:11:58,403 | INFO    | system | llm_manager:257 | __init__ |  Temperature: 0.2
+2026-01-01 03:11:58,403 | INFO    | system | llm_manager:258 | __init__ |  Max_Tokens: 4096
+2026-01-01 03:24:59,429 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 03:24:59,465 | INFO    | system | llm_manager:253 | __init__ | Bootstrapping LLM ...
+2026-01-01 03:24:59,466 | INFO    | system | llm_manager:254 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 03:24:59,466 | INFO    | system | llm_manager:255 | __init__ |  Provider: local
+2026-01-01 03:24:59,466 | INFO    | system | llm_manager:256 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 03:24:59,466 | INFO    | system | llm_manager:257 | __init__ |  Temperature: 0.2
+2026-01-01 03:24:59,466 | INFO    | system | llm_manager:258 | __init__ |  Max_Tokens: 4096
+2026-01-01 03:24:59,591 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2026-01-01 03:24:59,591 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2026-01-01 03:24:59,650 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2026-01-01 03:24:59,651 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2026-01-01 03:24:59,682 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2026-01-01 03:24:59,684 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2026-01-01 03:24:59,684 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2026-01-01 03:24:59,684 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2026-01-01 03:24:59,685 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2026-01-01 03:25:04,180 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2026-01-01 03:25:04,180 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 03:25:04,214 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 03:25:04,226 | INFO    | system | platform_runtime:142 | initialize | ToolClient initialized
+2026-01-01 03:27:35,047 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 03:27:35,047 | INFO    | system | llm_manager:253 | __init__ | Bootstrapping LLM ...
+2026-01-01 03:27:35,047 | INFO    | system | llm_manager:254 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 03:27:35,047 | INFO    | system | llm_manager:255 | __init__ |  Provider: local
+2026-01-01 03:27:35,047 | INFO    | system | llm_manager:256 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 03:27:35,047 | INFO    | system | llm_manager:257 | __init__ |  Temperature: 0.2
+2026-01-01 03:27:35,047 | INFO    | system | llm_manager:258 | __init__ |  Max_Tokens: 4096
+2026-01-01 03:27:35,051 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2026-01-01 03:27:35,051 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2026-01-01 03:27:35,051 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2026-01-01 03:27:35,052 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2026-01-01 03:27:35,052 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2026-01-01 03:27:35,052 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2026-01-01 03:27:35,052 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2026-01-01 03:27:35,053 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2026-01-01 03:27:35,053 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2026-01-01 03:27:35,980 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2026-01-01 03:27:35,980 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 03:27:35,980 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 03:27:35,980 | INFO    | system | platform_runtime:142 | initialize | ToolClient initialized
+2026-01-01 03:29:01,004 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 03:29:01,004 | INFO    | system | llm_manager:253 | __init__ | Bootstrapping LLM ...
+2026-01-01 03:29:01,004 | INFO    | system | llm_manager:254 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 03:29:01,004 | INFO    | system | llm_manager:255 | __init__ |  Provider: local
+2026-01-01 03:29:01,004 | INFO    | system | llm_manager:256 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 03:29:01,004 | INFO    | system | llm_manager:257 | __init__ |  Temperature: 0.2
+2026-01-01 03:29:01,004 | INFO    | system | llm_manager:258 | __init__ |  Max_Tokens: 4096
+2026-01-01 03:29:01,008 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2026-01-01 03:29:01,008 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2026-01-01 03:29:01,009 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2026-01-01 03:29:01,009 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2026-01-01 03:29:01,009 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2026-01-01 03:29:01,009 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2026-01-01 03:29:01,009 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2026-01-01 03:29:01,009 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2026-01-01 03:29:01,010 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2026-01-01 03:29:01,797 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2026-01-01 03:29:01,797 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 03:29:01,798 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 03:29:01,798 | INFO    | system | platform_runtime:142 | initialize | ToolClient initialized
+2026-01-01 09:06:46,046 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 09:06:46,075 | INFO    | system | llm_manager:253 | __init__ | Bootstrapping LLM ...
+2026-01-01 09:06:46,076 | INFO    | system | llm_manager:254 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 09:06:46,076 | INFO    | system | llm_manager:255 | __init__ |  Provider: local
+2026-01-01 09:06:46,076 | INFO    | system | llm_manager:256 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 09:06:46,076 | INFO    | system | llm_manager:257 | __init__ |  Temperature: 0.2
+2026-01-01 09:06:46,076 | INFO    | system | llm_manager:258 | __init__ |  Max_Tokens: 4096
+2026-01-01 09:06:46,080 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2026-01-01 09:06:46,080 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2026-01-01 09:06:46,080 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2026-01-01 09:06:46,081 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2026-01-01 09:06:46,081 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2026-01-01 09:06:46,081 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2026-01-01 09:06:46,081 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2026-01-01 09:06:46,081 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2026-01-01 09:06:46,082 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2026-01-01 09:06:47,105 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2026-01-01 09:06:47,105 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 09:06:47,106 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 09:06:47,106 | INFO    | system | platform_runtime:142 | initialize | ToolClient initialized
+2026-01-01 09:08:11,370 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 09:08:11,370 | INFO    | system | llm_manager:253 | __init__ | Bootstrapping LLM ...
+2026-01-01 09:08:11,370 | INFO    | system | llm_manager:254 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 09:08:11,370 | INFO    | system | llm_manager:255 | __init__ |  Provider: local
+2026-01-01 09:08:11,370 | INFO    | system | llm_manager:256 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 09:08:11,370 | INFO    | system | llm_manager:257 | __init__ |  Temperature: 0.2
+2026-01-01 09:08:11,370 | INFO    | system | llm_manager:258 | __init__ |  Max_Tokens: 4096
+2026-01-01 09:08:11,390 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2026-01-01 09:08:11,390 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2026-01-01 09:08:11,391 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2026-01-01 09:08:11,391 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2026-01-01 09:08:11,391 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2026-01-01 09:08:11,391 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2026-01-01 09:08:11,391 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2026-01-01 09:08:11,392 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2026-01-01 09:08:11,392 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2026-01-01 09:08:12,156 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2026-01-01 09:08:12,156 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 09:08:12,156 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 09:08:12,157 | INFO    | system | platform_runtime:142 | initialize | ToolClient initialized
+2026-01-01 09:08:12,157 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2026-01-01 09:08:12,157 | INFO    | system | platform_runtime:185 | initialize | PlatformRuntime initialized successfully
+2026-01-01 09:08:12,476 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2026-01-01 09:12:29,156 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 09:12:29,156 | INFO    | system | llm_manager:253 | __init__ | Bootstrapping LLM ...
+2026-01-01 09:12:29,156 | INFO    | system | llm_manager:254 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 09:12:29,156 | INFO    | system | llm_manager:255 | __init__ |  Provider: local
+2026-01-01 09:12:29,157 | INFO    | system | llm_manager:256 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 09:12:29,157 | INFO    | system | llm_manager:257 | __init__ |  Temperature: 0.2
+2026-01-01 09:12:29,157 | INFO    | system | llm_manager:258 | __init__ |  Max_Tokens: 4096
+2026-01-01 09:12:29,160 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2026-01-01 09:12:29,161 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2026-01-01 09:12:29,161 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2026-01-01 09:12:29,161 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2026-01-01 09:12:29,161 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2026-01-01 09:12:29,162 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2026-01-01 09:12:29,162 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2026-01-01 09:12:29,162 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2026-01-01 09:12:29,162 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2026-01-01 09:12:29,933 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2026-01-01 09:12:29,934 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 09:12:29,934 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 09:12:29,934 | INFO    | system | platform_runtime:142 | initialize | ToolClient initialized
+2026-01-01 09:12:29,934 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2026-01-01 09:12:29,934 | INFO    | system | platform_runtime:185 | initialize | PlatformRuntime initialized successfully
+2026-01-01 09:12:29,944 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2026-01-01 09:20:26,966 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 09:20:27,188 | INFO    | system | llm_manager:253 | __init__ | Bootstrapping LLM ...
+2026-01-01 09:20:27,198 | INFO    | system | llm_manager:254 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 09:20:27,198 | INFO    | system | llm_manager:255 | __init__ |  Provider: local
+2026-01-01 09:20:27,198 | INFO    | system | llm_manager:256 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 09:20:27,198 | INFO    | system | llm_manager:257 | __init__ |  Temperature: 0.2
+2026-01-01 09:20:27,198 | INFO    | system | llm_manager:258 | __init__ |  Max_Tokens: 4096
+2026-01-01 09:20:27,218 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2026-01-01 09:20:27,218 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2026-01-01 09:20:27,219 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2026-01-01 09:20:27,220 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2026-01-01 09:20:27,220 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2026-01-01 09:20:27,221 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2026-01-01 09:20:27,221 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2026-01-01 09:20:27,222 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2026-01-01 09:20:27,223 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2026-01-01 09:20:28,120 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2026-01-01 09:20:28,120 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 09:20:28,121 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 09:20:28,121 | INFO    | system | platform_runtime:142 | initialize | ToolClient initialized
+2026-01-01 09:20:28,121 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2026-01-01 09:20:28,121 | INFO    | system | platform_runtime:185 | initialize | PlatformRuntime initialized successfully
+2026-01-01 09:20:28,131 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2026-01-01 09:25:56,537 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 09:25:56,538 | INFO    | system | llm_manager:253 | __init__ | Bootstrapping LLM ...
+2026-01-01 09:25:56,538 | INFO    | system | llm_manager:254 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 09:25:56,538 | INFO    | system | llm_manager:255 | __init__ |  Provider: local
+2026-01-01 09:25:56,538 | INFO    | system | llm_manager:256 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 09:25:56,538 | INFO    | system | llm_manager:257 | __init__ |  Temperature: 0.2
+2026-01-01 09:25:56,538 | INFO    | system | llm_manager:258 | __init__ |  Max_Tokens: 4096
+2026-01-01 09:25:56,541 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2026-01-01 09:25:56,542 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2026-01-01 09:25:56,542 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2026-01-01 09:25:56,542 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2026-01-01 09:25:56,542 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2026-01-01 09:25:56,543 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2026-01-01 09:25:56,543 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2026-01-01 09:25:56,543 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2026-01-01 09:25:56,543 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2026-01-01 09:25:57,313 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2026-01-01 09:25:57,313 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 09:25:57,313 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 09:25:57,313 | INFO    | system | platform_runtime:142 | initialize | ToolClient initialized
+2026-01-01 09:25:57,314 | INFO    | system | workspace_hub:60 | __init__ | WorkspaceHub initialized at workspaces
+2026-01-01 09:25:57,314 | INFO    | system | platform_runtime:185 | initialize | PlatformRuntime initialized successfully
+2026-01-01 09:25:57,323 | INFO    | system | workspace_hub:101 | get_runtime | Runtime loaded for workspace: research_assistant
+2026-01-01 10:01:28,672 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 10:01:28,685 | INFO    | system | llm_manager:265 | __init__ | Bootstrapping LLM ...
+2026-01-01 10:01:28,685 | INFO    | system | llm_manager:266 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 10:01:28,685 | INFO    | system | llm_manager:267 | __init__ |  Provider: local
+2026-01-01 10:01:28,685 | INFO    | system | llm_manager:268 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 10:01:28,685 | INFO    | system | llm_manager:269 | __init__ |  Temperature: 0.2
+2026-01-01 10:01:28,685 | INFO    | system | llm_manager:270 | __init__ |  Max_Tokens: 4096
+2026-01-01 10:02:59,718 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 10:02:59,744 | INFO    | system | llm_manager:265 | __init__ | Bootstrapping LLM ...
+2026-01-01 10:02:59,744 | INFO    | system | llm_manager:266 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 10:02:59,744 | INFO    | system | llm_manager:267 | __init__ |  Provider: local
+2026-01-01 10:02:59,744 | INFO    | system | llm_manager:268 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 10:02:59,744 | INFO    | system | llm_manager:269 | __init__ |  Temperature: 0.2
+2026-01-01 10:02:59,744 | INFO    | system | llm_manager:270 | __init__ |  Max_Tokens: 4096
+2026-01-01 10:03:40,104 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 10:03:40,104 | INFO    | system | llm_manager:265 | __init__ | Bootstrapping LLM ...
+2026-01-01 10:03:40,104 | INFO    | system | llm_manager:266 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 10:03:40,104 | INFO    | system | llm_manager:267 | __init__ |  Provider: local
+2026-01-01 10:03:40,104 | INFO    | system | llm_manager:268 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 10:03:40,104 | INFO    | system | llm_manager:269 | __init__ |  Temperature: 0.2
+2026-01-01 10:03:40,104 | INFO    | system | llm_manager:270 | __init__ |  Max_Tokens: 4096
+2026-01-01 10:04:33,761 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 10:04:33,761 | INFO    | system | llm_manager:265 | __init__ | Bootstrapping LLM ...
+2026-01-01 10:04:33,761 | INFO    | system | llm_manager:266 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 10:04:33,761 | INFO    | system | llm_manager:267 | __init__ |  Provider: local
+2026-01-01 10:04:33,761 | INFO    | system | llm_manager:268 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 10:04:33,761 | INFO    | system | llm_manager:269 | __init__ |  Temperature: 0.2
+2026-01-01 10:04:33,761 | INFO    | system | llm_manager:270 | __init__ |  Max_Tokens: 4096
+2026-01-01 10:06:27,716 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 10:06:27,716 | INFO    | system | llm_manager:266 | __init__ | Bootstrapping LLM ...
+2026-01-01 10:06:27,716 | INFO    | system | llm_manager:267 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 10:06:27,716 | INFO    | system | llm_manager:268 | __init__ |  Provider: local
+2026-01-01 10:06:27,716 | INFO    | system | llm_manager:269 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 10:06:27,716 | INFO    | system | llm_manager:270 | __init__ |  Temperature: 0.2
+2026-01-01 10:06:27,716 | INFO    | system | llm_manager:271 | __init__ |  Max_Tokens: 4096
+2026-01-01 10:12:05,271 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 10:12:05,271 | INFO    | system | llm_manager:239 | __init__ | Bootstrapping LLM ...
+2026-01-01 10:12:05,271 | INFO    | system | llm_manager:240 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 10:12:05,271 | INFO    | system | llm_manager:241 | __init__ |  Provider: local
+2026-01-01 10:12:05,271 | INFO    | system | llm_manager:242 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 10:12:05,271 | INFO    | system | llm_manager:243 | __init__ |  Temperature: 0.2
+2026-01-01 10:12:05,271 | INFO    | system | llm_manager:244 | __init__ |  Max_Tokens: 4096
+2026-01-01 10:12:05,275 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2026-01-01 10:12:05,275 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2026-01-01 10:12:05,275 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2026-01-01 10:12:05,275 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2026-01-01 10:12:05,275 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2026-01-01 10:12:05,276 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2026-01-01 10:12:05,276 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2026-01-01 10:12:05,276 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2026-01-01 10:12:05,276 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2026-01-01 10:12:06,612 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2026-01-01 10:12:06,612 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 10:12:06,613 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 10:12:06,613 | INFO    | system | platform_runtime:142 | initialize | ToolClient initialized
+2026-01-01 10:15:56,162 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 10:15:56,167 | INFO    | system | llm_manager:239 | __init__ | Bootstrapping LLM ...
+2026-01-01 10:15:56,167 | INFO    | system | llm_manager:240 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 10:15:56,167 | INFO    | system | llm_manager:241 | __init__ |  Provider: local
+2026-01-01 10:15:56,167 | INFO    | system | llm_manager:242 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 10:15:56,167 | INFO    | system | llm_manager:243 | __init__ |  Temperature: 0.2
+2026-01-01 10:15:56,167 | INFO    | system | llm_manager:244 | __init__ |  Max_Tokens: 4096
+2026-01-01 10:15:56,187 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2026-01-01 10:15:56,187 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2026-01-01 10:15:56,188 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2026-01-01 10:15:56,188 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2026-01-01 10:15:56,188 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2026-01-01 10:15:56,188 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2026-01-01 10:15:56,188 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2026-01-01 10:15:56,189 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2026-01-01 10:15:56,189 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2026-01-01 10:15:56,967 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2026-01-01 10:15:56,967 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 10:15:56,968 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 10:15:56,968 | INFO    | system | platform_runtime:142 | initialize | ToolClient initialized
+2026-01-01 10:16:09,949 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 10:16:09,949 | INFO    | system | llm_manager:239 | __init__ | Bootstrapping LLM ...
+2026-01-01 10:16:09,949 | INFO    | system | llm_manager:240 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 10:16:09,949 | INFO    | system | llm_manager:241 | __init__ |  Provider: local
+2026-01-01 10:16:09,949 | INFO    | system | llm_manager:242 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 10:16:09,949 | INFO    | system | llm_manager:243 | __init__ |  Temperature: 0.2
+2026-01-01 10:16:09,949 | INFO    | system | llm_manager:244 | __init__ |  Max_Tokens: 4096
+2026-01-01 10:16:09,953 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2026-01-01 10:16:09,953 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2026-01-01 10:16:09,953 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2026-01-01 10:16:09,954 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2026-01-01 10:16:09,954 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2026-01-01 10:16:09,954 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2026-01-01 10:16:09,954 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2026-01-01 10:16:09,954 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2026-01-01 10:16:09,955 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2026-01-01 10:16:10,727 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2026-01-01 10:16:10,728 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 10:16:10,728 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 10:16:10,728 | INFO    | system | platform_runtime:142 | initialize | ToolClient initialized
+2026-01-01 10:18:05,453 | INFO    | system | platform_runtime:100 | initialize | Initializing PlatformRuntime
+2026-01-01 10:18:05,453 | INFO    | system | llm_manager:239 | __init__ | Bootstrapping LLM ...
+2026-01-01 10:18:05,453 | INFO    | system | llm_manager:240 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 10:18:05,453 | INFO    | system | llm_manager:241 | __init__ |  Provider: local
+2026-01-01 10:18:05,453 | INFO    | system | llm_manager:242 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 10:18:05,453 | INFO    | system | llm_manager:243 | __init__ |  Temperature: 0.2
+2026-01-01 10:18:05,453 | INFO    | system | llm_manager:244 | __init__ |  Max_Tokens: 4096
+2026-01-01 10:18:05,474 | INFO    | system | embedding_factory:44 | build | Initialized embedding store 'postgres' with params: {'dsn': 'postgresql://username:password@localhost:5432/agentic_embeddings', 'persist_directory': './data/postgres', 'collections': ['embedding1', 'embedding2'], 'embedding_model': 'nomic-embed-text', 'dims': 768}
+2026-01-01 10:18:05,474 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2026-01-01 10:18:05,474 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2026-01-01 10:18:05,474 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2026-01-01 10:18:05,475 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2026-01-01 10:18:05,475 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2026-01-01 10:18:05,475 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2026-01-01 10:18:05,475 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2026-01-01 10:18:05,475 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2026-01-01 10:18:06,250 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2026-01-01 10:18:06,251 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 10:18:06,251 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 10:18:06,251 | INFO    | system | platform_runtime:142 | initialize | ToolClient initialized
+2026-01-01 15:08:01,360 | INFO    | system | platform:97 | initialize | Initializing PlatformRuntime
+2026-01-01 15:08:01,379 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2026-01-01 15:10:49,817 | INFO    | system | platform:100 | initialize | Initializing PlatformRuntime
+2026-01-01 15:10:49,817 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2026-01-01 15:12:22,206 | INFO    | system | platform:99 | initialize | Initializing PlatformRuntime
+2026-01-01 15:12:22,206 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2026-01-01 15:12:22,206 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2026-01-01 15:12:22,207 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2026-01-01 15:12:22,207 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2026-01-01 15:14:46,412 | INFO    | system | platform:97 | initialize | Initializing PlatformRuntime
+2026-01-01 15:14:46,412 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2026-01-01 15:14:46,412 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2026-01-01 15:14:46,412 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2026-01-01 15:14:46,412 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2026-01-01 15:14:46,429 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2026-01-01 15:14:46,429 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2026-01-01 15:15:46,102 | INFO    | system | platform:97 | initialize | Initializing PlatformRuntime
+2026-01-01 15:15:46,102 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2026-01-01 15:15:46,102 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2026-01-01 15:15:46,103 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2026-01-01 15:15:46,103 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2026-01-01 15:15:46,103 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2026-01-01 15:15:46,103 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2026-01-01 15:15:46,104 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2026-01-01 15:15:46,105 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2026-01-01 15:15:47,098 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2026-01-01 15:15:47,098 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 15:15:47,099 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 15:15:47,099 | INFO    | system | platform:115 | initialize | ToolClient initialized
+2026-01-01 15:16:48,327 | INFO    | system | platform:97 | initialize | Initializing PlatformRuntime
+2026-01-01 15:16:48,327 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2026-01-01 15:16:48,328 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2026-01-01 15:16:48,328 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2026-01-01 15:16:48,328 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2026-01-01 15:16:48,330 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2026-01-01 15:16:48,330 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2026-01-01 15:16:48,330 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2026-01-01 15:16:48,331 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2026-01-01 15:16:49,095 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2026-01-01 15:16:49,095 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 15:16:49,096 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 15:16:49,096 | INFO    | system | platform:115 | initialize | ToolClient initialized
+2026-01-01 15:17:26,807 | INFO    | system | platform:97 | initialize | Initializing PlatformRuntime
+2026-01-01 15:17:26,807 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2026-01-01 15:17:26,807 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2026-01-01 15:17:26,807 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2026-01-01 15:17:26,808 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2026-01-01 15:17:26,808 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2026-01-01 15:17:26,808 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2026-01-01 15:17:26,808 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2026-01-01 15:17:26,809 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2026-01-01 15:17:27,671 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2026-01-01 15:17:27,671 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 15:17:27,671 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 15:17:27,672 | INFO    | system | platform:115 | initialize | ToolClient initialized
+2026-01-01 15:17:59,151 | INFO    | system | platform:97 | initialize | Initializing PlatformRuntime
+2026-01-01 15:17:59,151 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2026-01-01 15:17:59,151 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2026-01-01 15:17:59,152 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2026-01-01 15:17:59,152 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2026-01-01 15:17:59,152 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2026-01-01 15:17:59,152 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2026-01-01 15:17:59,152 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2026-01-01 15:17:59,153 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2026-01-01 15:17:59,924 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2026-01-01 15:17:59,925 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 15:17:59,926 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 15:17:59,926 | INFO    | system | platform:115 | initialize | ToolClient initialized
+2026-01-01 15:18:40,384 | INFO    | system | platform:97 | initialize | Initializing PlatformRuntime
+2026-01-01 15:18:40,384 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2026-01-01 15:18:40,385 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2026-01-01 15:18:40,385 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2026-01-01 15:18:40,385 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2026-01-01 15:18:40,385 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2026-01-01 15:18:40,385 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2026-01-01 15:18:40,386 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2026-01-01 15:18:40,386 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2026-01-01 15:18:41,145 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2026-01-01 15:18:41,145 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 15:18:41,145 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 15:18:41,146 | INFO    | system | platform:115 | initialize | ToolClient initialized
+2026-01-01 15:34:58,702 | INFO    | system | platform:97 | initialize | Bootstrapping this Agentic Platform
+2026-01-01 15:34:58,702 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2026-01-01 15:34:58,702 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2026-01-01 15:34:58,703 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2026-01-01 15:34:58,703 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2026-01-01 15:34:58,703 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2026-01-01 15:34:58,703 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2026-01-01 15:34:58,703 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2026-01-01 15:34:58,704 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2026-01-01 15:34:59,469 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2026-01-01 15:34:59,469 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 15:34:59,470 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 15:34:59,470 | INFO    | system | platform:115 | initialize | ToolClient initialized
+2026-01-01 15:34:59,470 | INFO    | system | model_manager:252 | __init__ | Bootstrapping LLM ...
+2026-01-01 15:34:59,470 | INFO    | system | model_manager:253 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 15:34:59,470 | INFO    | system | model_manager:254 | __init__ |  Provider: local
+2026-01-01 15:34:59,470 | INFO    | system | model_manager:255 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 15:34:59,470 | INFO    | system | model_manager:256 | __init__ |  Temperature: 0.2
+2026-01-01 15:34:59,470 | INFO    | system | model_manager:257 | __init__ |  Max_Tokens: (4096,)
+2026-01-01 15:36:07,336 | INFO    | system | platform:97 | initialize | Bootstrapping this Agentic Platform
+2026-01-01 15:36:07,336 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2026-01-01 15:36:07,336 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2026-01-01 15:36:07,336 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2026-01-01 15:36:07,337 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2026-01-01 15:36:07,337 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2026-01-01 15:36:07,337 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2026-01-01 15:36:07,337 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2026-01-01 15:36:07,338 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2026-01-01 15:36:08,098 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2026-01-01 15:36:08,098 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 15:36:08,099 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 15:36:08,099 | INFO    | system | platform:115 | initialize | ToolClient initialized
+2026-01-01 15:36:08,099 | INFO    | system | model_manager:252 | __init__ | Bootstrapping LLM ...
+2026-01-01 15:36:08,099 | INFO    | system | model_manager:253 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 15:36:08,099 | INFO    | system | model_manager:254 | __init__ |  Provider: local
+2026-01-01 15:36:08,099 | INFO    | system | model_manager:255 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 15:36:08,099 | INFO    | system | model_manager:256 | __init__ |  Temperature: 0.2
+2026-01-01 15:36:08,099 | INFO    | system | model_manager:257 | __init__ |  Max_Tokens: (4096,)
+2026-01-01 15:44:26,854 | INFO    | system | platform:97 | initialize | Bootstrapping this Agentic Platform
+2026-01-01 15:44:26,854 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2026-01-01 15:44:26,855 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2026-01-01 15:44:26,855 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2026-01-01 15:44:26,855 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2026-01-01 15:44:26,855 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2026-01-01 15:44:26,855 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2026-01-01 15:44:26,856 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2026-01-01 15:44:26,871 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2026-01-01 15:44:27,644 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2026-01-01 15:44:27,645 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 15:44:27,645 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 15:44:27,645 | INFO    | system | platform:115 | initialize | ToolClient initialized
+2026-01-01 15:44:27,645 | INFO    | system | model_manager:252 | __init__ | Bootstrapping LLM ...
+2026-01-01 15:44:27,645 | INFO    | system | model_manager:253 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 15:44:27,645 | INFO    | system | model_manager:254 | __init__ |  Provider: local
+2026-01-01 15:44:27,645 | INFO    | system | model_manager:255 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 15:44:27,645 | INFO    | system | model_manager:256 | __init__ |  Temperature: 0.2
+2026-01-01 15:44:27,646 | INFO    | system | model_manager:257 | __init__ |  Max_Tokens: (4096,)
+2026-01-01 15:45:54,601 | INFO    | system | platform:97 | initialize | Bootstrapping this Agentic Platform
+2026-01-01 15:45:54,601 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2026-01-01 15:45:54,601 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2026-01-01 15:45:54,602 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2026-01-01 15:45:54,602 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2026-01-01 15:45:54,602 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2026-01-01 15:45:54,602 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2026-01-01 15:45:54,602 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2026-01-01 15:45:54,603 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2026-01-01 15:45:55,370 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2026-01-01 15:45:55,370 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 15:45:55,370 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 15:45:55,371 | INFO    | system | platform:115 | initialize | ToolClient initialized
+2026-01-01 15:45:55,371 | INFO    | system | model_manager:252 | __init__ | Bootstrapping LLM ...
+2026-01-01 15:45:55,371 | INFO    | system | model_manager:253 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 15:45:55,371 | INFO    | system | model_manager:254 | __init__ |  Provider: local
+2026-01-01 15:45:55,371 | INFO    | system | model_manager:255 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 15:45:55,371 | INFO    | system | model_manager:256 | __init__ |  Temperature: 0.2
+2026-01-01 15:45:55,371 | INFO    | system | model_manager:257 | __init__ |  Max_Tokens: (4096,)
+2026-01-01 15:51:46,009 | INFO    | system | platform:97 | initialize | Bootstrapping this Agentic Platform
+2026-01-01 15:51:46,009 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2026-01-01 15:51:46,010 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2026-01-01 15:51:46,010 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2026-01-01 15:51:46,010 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2026-01-01 15:51:46,010 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2026-01-01 15:51:46,010 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2026-01-01 15:51:46,011 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2026-01-01 15:51:46,011 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2026-01-01 15:51:46,774 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2026-01-01 15:51:46,775 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 15:51:46,775 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 15:51:46,775 | INFO    | system | platform:115 | initialize | ToolClient initialized
+2026-01-01 15:51:46,775 | INFO    | system | model_manager:252 | __init__ | Bootstrapping LLM ...
+2026-01-01 15:51:46,775 | INFO    | system | model_manager:253 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 15:51:46,775 | INFO    | system | model_manager:254 | __init__ |  Provider: local
+2026-01-01 15:51:46,775 | INFO    | system | model_manager:255 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 15:51:46,775 | INFO    | system | model_manager:256 | __init__ |  Temperature: 0.2
+2026-01-01 15:51:46,775 | INFO    | system | model_manager:257 | __init__ |  Max_Tokens: (4096,)
+2026-01-01 15:51:46,778 | INFO    | system | memory_manager:60 | __init__ | Bootstrapping LLM ...
+2026-01-01 15:51:46,778 | INFO    | system | memory_manager:61 | __init__ |  Data Source Name: postgresql://username:password@localhost:5432/agentic_embeddings
+2026-01-01 15:51:46,778 | INFO    | system | memory_manager:62 | __init__ |  Persisten Directory: ./data/postgres
+2026-01-01 15:51:46,778 | INFO    | system | memory_manager:63 | __init__ |  Collections: ['embedding1', 'embedding2']
+2026-01-01 15:51:46,778 | INFO    | system | memory_manager:64 | __init__ |  Embedding Model: nomic-embed-text
+2026-01-01 15:51:46,778 | INFO    | system | memory_manager:65 | __init__ |  Dim: (768,)
+2026-01-01 17:02:01,227 | INFO    | system | platform:97 | initialize | Bootstrapping this Agentic Platform
+2026-01-01 17:02:01,227 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2026-01-01 17:02:01,227 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2026-01-01 17:02:01,227 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2026-01-01 17:02:01,227 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2026-01-01 17:02:01,228 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2026-01-01 17:02:01,228 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2026-01-01 17:02:01,228 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2026-01-01 17:02:01,244 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2026-01-01 17:02:02,003 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2026-01-01 17:02:02,003 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 17:02:02,003 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 17:02:02,003 | INFO    | system | platform:115 | initialize | ToolClient initialized
+2026-01-01 17:02:26,627 | INFO    | system | platform:97 | initialize | Bootstrapping this Agentic Platform
+2026-01-01 17:02:26,627 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2026-01-01 17:02:26,627 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2026-01-01 17:02:26,627 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2026-01-01 17:02:26,628 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2026-01-01 17:02:26,628 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2026-01-01 17:02:26,628 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2026-01-01 17:02:26,628 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2026-01-01 17:02:26,644 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2026-01-01 17:02:27,401 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2026-01-01 17:02:27,401 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 17:02:27,402 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 17:02:27,402 | INFO    | system | platform:115 | initialize | ToolClient initialized
+2026-01-01 17:02:39,406 | INFO    | system | platform:97 | initialize | Bootstrapping this Agentic Platform
+2026-01-01 17:02:39,406 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2026-01-01 17:02:39,406 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2026-01-01 17:02:39,406 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2026-01-01 17:02:39,407 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2026-01-01 17:02:39,407 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2026-01-01 17:02:39,407 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2026-01-01 17:02:39,407 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2026-01-01 17:02:39,423 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2026-01-01 17:02:40,178 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2026-01-01 17:02:40,178 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 17:02:40,179 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 17:02:40,179 | INFO    | system | platform:115 | initialize | ToolClient initialized
+2026-01-01 17:03:09,589 | INFO    | system | platform:97 | initialize | Bootstrapping this Agentic Platform
+2026-01-01 17:03:09,589 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2026-01-01 17:03:09,589 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2026-01-01 17:03:09,590 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2026-01-01 17:03:09,590 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2026-01-01 17:03:09,590 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2026-01-01 17:03:09,590 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2026-01-01 17:03:09,590 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2026-01-01 17:03:09,606 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2026-01-01 17:03:10,363 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2026-01-01 17:03:10,363 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 17:03:10,364 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 17:03:10,364 | INFO    | system | platform:115 | initialize | ToolClient initialized
+2026-01-01 17:03:10,364 | INFO    | system | model_manager:252 | __init__ | Bootstrapping LLM ...
+2026-01-01 17:03:10,364 | INFO    | system | model_manager:253 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 17:03:10,364 | INFO    | system | model_manager:254 | __init__ |  Provider: local
+2026-01-01 17:03:10,364 | INFO    | system | model_manager:255 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 17:03:10,364 | INFO    | system | model_manager:256 | __init__ |  Temperature: 0.2
+2026-01-01 17:03:10,364 | INFO    | system | model_manager:257 | __init__ |  Max_Tokens: (4096,)
+2026-01-01 17:03:10,367 | INFO    | system | memory_manager:60 | __init__ | Bootstrapping LLM ...
+2026-01-01 17:03:10,367 | INFO    | system | memory_manager:61 | __init__ |  Data Source Name: postgresql://username:password@localhost:5432/agentic_embeddings
+2026-01-01 17:03:10,367 | INFO    | system | memory_manager:62 | __init__ |  Persisten Directory: ./data/postgres
+2026-01-01 17:03:10,367 | INFO    | system | memory_manager:63 | __init__ |  Collections: ['embedding1', 'embedding2']
+2026-01-01 17:03:10,367 | INFO    | system | memory_manager:64 | __init__ |  Embedding Model: nomic-embed-text
+2026-01-01 17:03:10,367 | INFO    | system | memory_manager:65 | __init__ |  Dim: (768,)
+2026-01-01 17:03:35,439 | INFO    | system | platform:97 | initialize | Bootstrapping this Agentic Platform
+2026-01-01 17:03:35,439 | INFO    | system | tool_registry:27 | load | Loading platform tools
+2026-01-01 17:03:35,439 | INFO    | system | tool_registry:33 | load | Registered tool: web_search
+2026-01-01 17:03:35,439 | INFO    | system | tool_registry:33 | load | Registered tool: calculator
+2026-01-01 17:03:35,440 | INFO    | system | tool_registry:33 | load | Registered tool: python_exec
+2026-01-01 17:03:35,440 | INFO    | system | tool_registry:33 | load | Registered tool: memory_write
+2026-01-01 17:03:35,440 | INFO    | system | tool_registry:33 | load | Registered tool: memory_read
+2026-01-01 17:03:35,440 | INFO    | system | tool_registry:33 | load | Registered tool: vector_search
+2026-01-01 17:03:35,441 | INFO    | system | tool_registry:33 | load | Registered tool: http_request
+2026-01-01 17:03:36,234 | INFO    | system | tool_registry:33 | load | Registered tool: fastmcp_client
+2026-01-01 17:03:36,234 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 17:03:36,235 | INFO    | system | tool_registry:33 | load | Registered tool: knowledge_service
+2026-01-01 17:03:36,235 | INFO    | system | platform:115 | initialize | ToolClient initialized
+2026-01-01 17:03:36,235 | INFO    | system | model_manager:252 | __init__ | Bootstrapping LLM ...
+2026-01-01 17:03:36,235 | INFO    | system | model_manager:253 | __init__ |  Model Name: qwen2.5-coder:3b
+2026-01-01 17:03:36,235 | INFO    | system | model_manager:254 | __init__ |  Provider: local
+2026-01-01 17:03:36,235 | INFO    | system | model_manager:255 | __init__ |  Endpoint: http://localhost:11434/api/chat
+2026-01-01 17:03:36,235 | INFO    | system | model_manager:256 | __init__ |  Temperature: 0.2
+2026-01-01 17:03:36,235 | INFO    | system | model_manager:257 | __init__ |  Max_Tokens: (4096,)
+2026-01-01 17:03:36,238 | INFO    | system | memory_manager:60 | __init__ | Bootstrapping LLM ...
+2026-01-01 17:03:36,238 | INFO    | system | memory_manager:61 | __init__ |  Data Source Name: postgresql://username:password@localhost:5432/agentic_embeddings
+2026-01-01 17:03:36,238 | INFO    | system | memory_manager:62 | __init__ |  Persisten Directory: ./data/postgres
+2026-01-01 17:03:36,238 | INFO    | system | memory_manager:63 | __init__ |  Collections: ['embedding1', 'embedding2']
+2026-01-01 17:03:36,238 | INFO    | system | memory_manager:64 | __init__ |  Embedding Model: nomic-embed-text
+2026-01-01 17:03:36,238 | INFO    | system | memory_manager:65 | __init__ |  Dim: (768,)

@@ -1,0 +1,18 @@
+Ollama congtainer apis:
+docs: https://github.com/ollama/ollama/blob/main/docs/api.md
+
+/api/generate: Generate a response to a given prompt.
+/api/chat: Generate a chat completion (supports streaming responses).
+/api/embeddings: Generate embeddings for a given text.
+/api/pull: Pull a model from the Ollama library.
+/api/list: List local models available on the system.
+/api/show: Get information about a specific model.
+
+/api/copy / /api/delete / /api/create: Manage the lifecycle of models and
+
+
+Model and api support
+nomic-embed-text:latest
+  - does not support /api/chat and /api/generate
+qwen2.5-coder:3b
+  - does not support /api/embeddings

@@ -1,6 +1,11 @@
 {
   "context": [
     {
+      "name": "title",
+      "type": "text",
+      "text": "This is just a message."
+    },
+    {
       "name": "recent_proposals",
       "type": "memory",
       "memory_type": "episodic",
@@ -36,12 +41,12 @@
     {
       "name": "current_time",
       "type": "computed",
-      "function": "runtime.helpers.get_current_time"
+      "function": "runtime.tools.helpers.get_current_time"
     },
     {
       "name": "computed_reward",
       "type": "computed",
-      "function": "agents.optimistic.reward_estimator"
+      "function": "runtime.tools.helpers.reward_estimator"
     }
   ]
 }

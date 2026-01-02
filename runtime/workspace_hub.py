@@ -4,9 +4,7 @@ from typing import Dict
 
 from runtime.runtime_manager import RuntimeManager
 from runtime.session_manager import SessionManager
-from runtime.memory_manager import MemoryManager
-from runtime.embeddings.base import EmbeddingStore
-from llm.local_llm import LocalLLMChatModel
+from llm.model_manager import ModelManager
 from runtime.tools.client import ToolClient
 from runtime.logger import AgentLogger
 
@@ -20,10 +18,8 @@ class WorkspaceHub:
     _instance: WorkspaceHub | None = None
 
     def __new__(cls, workspaces_root: Path,
-            llm: LocalLLMChatModel,
+            model_manager: ModelManager,
             session_manager: SessionManager,
-            memory_manager: MemoryManager, 
-            embedding_store: EmbeddingStore, 
             tool_client: ToolClient,
             event_bus: EventBus):
         if cls._instance is None:
@@ -32,10 +28,8 @@ class WorkspaceHub:
         return cls._instance
 
     def __init__(self, workspaces_root: Path,
-            llm: LocalLLMChatModel,
+            model_manager: ModelManager,
             session_manager: SessionManager,
-            memory_manager: MemoryManager, 
-            embedding_store: EmbeddingStore, 
             tool_client: ToolClient,
             event_bus: EventBus
     ):
@@ -46,10 +40,8 @@ class WorkspaceHub:
         self._runtimes: Dict[str, RuntimeManager] = {}
         self._initialized = True
 
-        self.llm = llm
+        self.model_manager = model_manager
         self.session_manager = session_manager
-        self.memory_manager = memory_manager
-        self.embedding_store = embedding_store
         self.tool_client = tool_client
         self.event_bus = event_bus
 
@@ -89,10 +81,8 @@ class WorkspaceHub:
 
         runtime = RuntimeManager(
             workspace_dir, 
-            self.llm,
+            self.model_manager,
             self.session_manager, 
-            self.memory_manager, 
-            self.embedding_store, 
             self.tool_client,
             self.event_bus
         )

@@ -6,7 +6,7 @@ class HttpRequestTool(Tool):
     def __init__(self, spec: dict):
         self.name = spec["name"]
 
-    async def run(self, method: str, url: str, headers=None, body=None):
+    async def call(self, method: str, url: str, headers=None, body=None):
         async with aiohttp.ClientSession() as session:
             async with session.request(method, url, headers=headers, json=body) as resp:
                 return {

@@ -127,7 +127,65 @@
         "allowlist_required": true,
         "audit": true
       }
+    },
+    {
+      "name": "fastmcp_client",
+      "type": "integration",
+      "description": "Connect to and invoke tools exposed by a remote MCP server via FastMCP",
+      "entrypoint": "runtime.tools.fastmcp.FastMCPClientTool",
+      "capabilities": ["read", "write", "execute"],
+      "inputs": {
+        "endpoint": "string",
+        "service": "string",
+        "params": "object"
+      },
+      "outputs": {
+        "result": "object"
+      },
+      "safety": {
+        "scoped": true,
+        "audit": true,
+        "allowlist_required": true
+      }
+    },
+    {
+      "name": "knowledge_service",
+      "type": "information",
+      "description": "Retrieve relevant documents from the global knowledge base",
+      "entrypoint": "runtime.tools.fastmcp.FastMCPClientTool",
+      "capabilities": ["read"],
+      "inputs": {
+        "query": "string",
+        "namespace": "string",
+        "top_k": "number"
+      },
+      "outputs": {
+        "documents": "list[object]"
+      },
+      "safety": {
+        "scoped": false,
+        "audit": true
+      }
+    },
+    {
+      "name": "knowledge_service",
+      "type": "external",
+      "description": "Query an external knowledge service",
+      "entrypoint": "runtime.tools.external_service.ExternalServiceTool",
+      "capabilities": ["read"],
+      "inputs": {
+        "query": "string",
+        "params": "object"
+      },
+      "outputs": {
+        "response": "object"
+      },
+      "safety": {
+        "allowlist_required": true,
+        "audit": true
+      }
     }
   ]
 }
+
 

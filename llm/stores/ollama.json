@@ -1,0 +1,79 @@
+{
+  "endpoint": {
+    "base": "http://localhost:11434",
+      "type": {
+        "chat" : {
+          "api": "/api/chat",
+            "payload" : {
+                  "model" : "",
+                  "messages": [
+                    {
+                      "role": "system",
+                      "content": "You are a helpful assistant that remembers user preferences."
+                    },
+                    {
+                      "role": "user",
+                      "content": "Hello, my favorite color is blue."
+                    }
+                  ],
+                  "stream": false,
+                  "options": {
+                    "num_predict": 512
+                  }
+            },
+            "output": {
+              "created_at":"2026-01-02T04:06:13.705363124Z",
+              "message":{"role":"assistant",
+              "content":"Hello! How can I assist you today?"},
+              "done":true,
+              "done_reason":"stop",
+              "total_duration":294228884,
+              "load_duration":94715877,
+              "prompt_eval_count":9,
+              "prompt_eval_duration":32338629,
+              "eval_count":10,
+              "eval_duration":145713948
+            }
+         },
+        "generate" : {
+          "api": "/api/generate",
+            "payload" : {
+                  "model" : "",
+                  "prompt": "The sky is blue.",
+                  "stream": false,
+                  "options": {
+                    "num_predict": 512
+                  }
+            },
+            "output" : {
+              "created_at":"2026-01-02T04:06:22.430477612Z",
+              "response":"As an AI language model, I don't have access to any information.",
+              "done":true,
+              "done_reason":"stop",
+              "context":[],
+              "total_duration":1695554468,
+              "load_duration":100812557,
+              "prompt_eval_count":13,
+              "prompt_eval_duration":44144558,
+              "eval_count":68,
+              "eval_duration":1413379709
+            }
+         },
+        "embeddings" : {
+          "api": "/api/embeddings",
+            "payload" : {
+                  "model" : "",
+                  "prompt": "The sky is blue.",
+                  "stream": false,
+                  "options": {
+                    "num_predict": 512
+                  }
+            },
+            "output" : {
+              "embeddings": []
+            }
+         }
+      }
+  }
+
+}

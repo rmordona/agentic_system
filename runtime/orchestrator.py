@@ -1,4 +1,23 @@
-# orchestrator.py
+# -----------------------------------------------------------------------------
+# Project: Agentic System
+# File: runtime/orchestrator.py
+#
+# Description:
+#
+#   Orchestrator manages a single session’s execution through a LangGraph.
+#
+#    It owns session state, drives graph execution, emits lifecycle events,
+#    and integrates optional human-in-the-loop callbacks.
+#
+#    Orchestrator does NOT execute agent logic or manage memory directly.
+#    It coordinates, it does not compute.
+#   
+#
+# Author: Raymond M.O. Ordona
+# Created: 2025-12-31
+# Copyright:
+#   © 2025 Raymondn Ordona. All rights reserved.
+# -----------------------------------------------------------------------------
 
 from __future__ import annotations
 import asyncio

@@ -11,8 +11,9 @@ class ToolPolicy:
     def __init__(self, policy: Dict):
         self.policy = policy
 
+        # Bind workspace logger ONCE
         global logger
-        logger = AgentLogger.get_logger(None, "tool_policy")
+        logger = AgentLogger.get_logger(None, component="system")
 
 
     def allowed_tools_for_agent(self, agent_role: str) -> List[str]:
@@ -20,10 +21,16 @@ class ToolPolicy:
         logger.debug(f"Allowed tools for {agent_role}: {tools}")
         return tools
 
-    def check(self, agent_role: str, tool_name: str):
-        allowed = self.allowed_tools_for_agent(agent_role)
-        if tool_name not in allowed:
-            raise PermissionError(
-                f"Agent '{agent_role}' is not allowed to use tool '{tool_name}'"
-            )
+    def check(self, agent_role: str, tool_name: str) -> bool:
+        try:
+            allowed = self.allowed_tools_for_agent(agent_role)
+            if tool_name not in allowed:
+                raise PermissionError(
+                    f"Agent '{agent_role}' is not allowed to use tool '{tool_name}'"
+                )
+        except PermissionError as e:      
+            logger.error(f"Caught a PermissionError: {e}")
+            return False
+        logger.info("Still continue 2")
+        return True
 

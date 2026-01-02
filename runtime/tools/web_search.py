@@ -6,7 +6,7 @@ class WebSearchTool(Tool):
         self.name = spec["name"]
         self.description = spec["description"]
 
-    async def run(self, query: str):
+    async def call(self, query: str):
         # Stub — replace with SerpAPI / Tavily / Bing
         return {"results": [f"Result for '{query}'"]}
 

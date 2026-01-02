@@ -1,19 +1,26 @@
-# runtime/agent_registry.py
+"""
+AgentRegistry is responsible for constructing and providing SkillAgent
+instances for a workspace.
+
+Agents are instantiated with their dependencies (memory context, tools,
+etc.) and are reused per session unless explicitly recreated.
+
+AgentRegistry does NOT manage execution or routing.
+"""
+
 
 from __future__ import annotations
 from pathlib import Path
 from typing import Dict, List, Optional
 from agents.skills.agent import SkillAgent
 
-from llm.local_llm import LocalLLMChatModel
-from runtime.memory_manager import MemoryManager
-from runtime.embeddings.base import EmbeddingStore
+from llm.model_manager import ModelManager
 from runtime.tools.client import ToolClient
 from events.event_bus import EventBus
 
 from runtime.logger import AgentLogger
 
-from runtime.memory_adapters.memory_context import MemoryContext
+from runtime.runtime_context import RuntimeContext
 
  
 class AgentRegistry:
@@ -28,18 +35,14 @@ class AgentRegistry:
     def __init__(
         self, 
         workspace_path: Path,
-        llm: LocalLLMChatModel,
-        memory_manager: MemoryManager, 
-        embedding_store: EmbeddingStore, 
+        model_manager: ModelManager,
         tool_client: ToolClient,
         event_bus: EventBus,
         ):
         self.workspace_path = workspace_path
         self.workspace_name = workspace_path.name
 
-        self.llm = llm
-        self.memory_manager = memory_manager
-        self.embedding_store = embedding_store
+        self.model_manager = model_manager
         self.tool_client = tool_client
         self.event_bus = event_bus
 
@@ -83,8 +86,8 @@ class AgentRegistry:
 
             try:
                 # Create a MemoryContext for this agent
-                memory_context = MemoryContext(
-                    memory_manager=self.memory_manager,
+                runtime_context = RuntimeContext(
+                    #memory_manager=self.memory_manager,
                     namespace=f"workspace:{self.workspace_name}",
                 )
 
@@ -92,7 +95,8 @@ class AgentRegistry:
                     workspace_path=self.workspace_path,
                     skill_name=skill_name,
                     stage_meta={},          # injected later
-                    memory_context=memory_context,   # inject context instead of manager
+                    runtime_context=runtime_context,   # inject context instead of manager
+                    model_manager=self.model_manager,
                     tool_client=self.tool_client,
                     event_bus=self.event_bus
                 )

@@ -1,0 +1,31 @@
+{
+  "ollama": {
+    "endpoint": "http://localhost:11434",
+    "models": {
+      "chat": {
+        "api": "/api/chat",
+        "payload_template": {
+          "messages": [
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": ""}
+          ],
+          "stream": false,
+          "options": {"num_predict": 512}
+        }
+      },
+      "generate": {
+        "api": "/api/generate",
+        "payload_template": {
+          "prompt": "",
+          "stream": false,
+          "options": {"num_predict": 512}
+        }
+      }
+    }
+  },
+  "openai": {
+    "api_key": "...",
+    "model": "gpt-4"
+  }
+}
+

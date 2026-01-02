@@ -1,0 +1,72 @@
+{
+  "logging": {
+    "level": "INFO",
+    "base_dir": "./logs"
+  },
+  "models": {
+    "default" : "local",
+    "local": {
+      "model_name" : "qwen2.5-coder:3b",
+      "endpoint" : "http://localhost:11434/api/chat",
+      "temperature": 0.2,
+      "max_tokens": 4096
+    }
+  },
+  "stores": {
+    "default": "langgraph_inmemorystore",
+    "langgraph_inmemorystore" : {
+         dim: 1536,
+         embed: "openai:text-embedding-3-small"  
+    },
+    "oracle": {
+      "dsn": "username:password@localhost:5432/agentic_embeddings",
+      "tables": ["embedding1", "embedding2"],
+      "embedding_model": "nomic-embed-text",
+      "dims": 768
+    }
+    "chromadb": {
+      "persist_directory": "./data/chromadb",
+      "collections": ["embedding1", "embedding2"],
+      "embedding_model": "nomic-embed-text",
+      "dims": 768
+    },
+    "postgres": {
+      "dsn": "postgresql://username:password@localhost:5432/agentic_embeddings",
+      "persist_directory": "./data/postgres",
+      "collections": ["embedding1", "embedding2"],
+      "embedding_model": "nomic-embed-text", 
+      "dims": 768
+    },
+    "redis": {
+      "url": "redis://localhost:6379/0",
+      "namespace": "agentic_episodic",
+      "ttl_seconds": 86400
+    }
+   
+  },
+  "memory": {
+    "episodic": {
+      "backend": "redis",
+      "redis": {
+        "url": "redis://localhost:6379/0",
+        "namespace": "agentic_episodic",
+        "ttl_seconds": 86400
+      }
+    },
+    "semantic": {
+      "backend": "langmem",
+      "langmem": {
+        "use_embeddings": true,
+        "embedding_backend": "postgres",
+        "collections": ["default", "workspace1", "workspace2"]
+      },
+      "schemas": [
+        "ProposalMemory",
+        "CritiqueMemory",
+        "SynthesizerMemory",
+        "SemanticMemory",
+        "EpisodicMemory"
+      ]
+    }
+  }
+}

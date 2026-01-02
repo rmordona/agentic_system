@@ -1,4 +1,13 @@
-# stage_graph.py
+"""
+StageGraph defines the execution topology for agents across stages.
+
+It constructs a LangGraph where agents are nodes, stages define ordering,
+and the stage_router determines progression and termination.
+
+StageGraph does NOT execute skills or manage memory —
+it only decides *what runs next*.
+"""
+
 
 from typing import Optional, Any, Dict, List
 from langgraph.graph import StateGraph, END

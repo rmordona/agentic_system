@@ -12,7 +12,7 @@ class Tool(ABC):
     description: str
 
     @abstractmethod
-    async def run(self, **kwargs) -> Dict[str, Any]:
+    async def call(self, **kwargs) -> Dict[str, Any]:
         """
         Execute the tool.
         """

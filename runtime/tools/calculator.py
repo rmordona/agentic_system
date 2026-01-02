@@ -7,7 +7,7 @@ class CalculatorTool(Tool):
         self.name = spec["name"]
         self.description = spec["description"]
 
-    async def run(self, expression: str):
+    async def call(self, expression: str):
         node = ast.parse(expression, mode="eval")
         for n in ast.walk(node):
             if not isinstance(n, (ast.Expression, ast.BinOp, ast.Num, ast.Add, ast.Sub, ast.Mult, ast.Div)):

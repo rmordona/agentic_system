@@ -7,7 +7,7 @@ class PythonExecTool(Tool):
         self.name = spec["name"]
         self.description = spec["description"]
 
-    async def run(self, code: str):
+    async def call(self, code: str):
         proc = await asyncio.create_subprocess_exec(
             "python",
             "-c",
