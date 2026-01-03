@@ -26,7 +26,7 @@ from typing import Dict, Any
 
 from agents.skills.base_skill import BaseSkill
 from llm.model_manager import ModelManager
-from runtime.tools.client import ToolClient
+from runtime.tools.tool_client import ToolClient
 from events.event_bus import EventBus
 
 class SkillAgent(BaseSkill):

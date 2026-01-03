@@ -3,7 +3,7 @@ import asyncpg
 from langgraph.store.base import BaseStore
 from llm.stores.store_factory import StoreFactory
 
-class PostgresVectorStore(BaseStore):
+class PostgresStore(BaseStore):
     def __init__(
         self,
         dsn: str,

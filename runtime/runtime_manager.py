@@ -14,16 +14,15 @@ from runtime.reload_manager import ReloadManager
 from runtime.orchestrator import Orchestrator
 from runtime.session_manager import SessionManager
 from runtime.lifecycle import register_lifecycle_handlers
-from runtime.logger import AgentLogger
-
 from llm.model_manager import ModelManager
-#from runtime.memory_manager import MemoryManager
-#from runtime.embeddings.base import EmbeddingStore
-from runtime.tools.client import ToolClient
+from runtime.tools.tool_client import ToolClient
 
 from events.event_bus import EventBus
 
+from runtime.logger import AgentLogger
 # Initialization of logger is done at cli.py or api.py
+
+
 
 class RuntimeManager:
     """
@@ -84,7 +83,7 @@ class RuntimeManager:
 
         # 🔑 Bind workspace logger ONCE
         global logger
-        logger = AgentLogger.get_logger(self.workspace_name, component="runtime")
+        logger = AgentLogger.get_logger(component="runtime", workspace=self.workspace_name)
 
         # ---- Singletons (loaded once per workspace) ----
         # Load Workspace Configuration (workspace.json)

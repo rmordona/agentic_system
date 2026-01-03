@@ -14,13 +14,14 @@ from pathlib import Path
 from typing import Dict, List, Optional
 from agents.skills.agent import SkillAgent
 
+from runtime.runtime_context import RuntimeContext
 from llm.model_manager import ModelManager
-from runtime.tools.client import ToolClient
+from runtime.tools.tool_client import ToolClient
 from events.event_bus import EventBus
 
 from runtime.logger import AgentLogger
 
-from runtime.runtime_context import RuntimeContext
+
 
  
 class AgentRegistry:

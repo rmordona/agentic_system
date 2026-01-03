@@ -46,7 +46,7 @@
 #                       │                             │
 #                       ▼                             ▼
 #      Semantic Store (vectorized)           Episodic Store (raw logs)
-#      e.g., Redis, Chroma, Postgres         e.g., Redis, Postgres
+#      e.g., Redis, Chroma, Postgres         e.g., Redis, Postgres, In-Memory (fallback)
 #
 #
 #           chatmodels/config.json
@@ -85,8 +85,8 @@ from llm.model_manager import ModelManager
 
 # Tools
 from runtime.tools.tool_registry import ToolRegistry
-from runtime.tools.policy import ToolPolicy
-from runtime.tools.client import ToolClient
+from runtime.tools.tool_policy import ToolPolicy
+from runtime.tools.tool_client import ToolClient
 
 from events.event_bus import EventBus
 
@@ -108,7 +108,7 @@ class Platform:
     event_bus: EventBus = None
 
 
-    logger = None
+
 
     @classmethod
     def initialize(
@@ -122,37 +122,27 @@ class Platform:
         # --------------------------------------------------
         # Config
         # --------------------------------------------------
-
         parent_path = Path(__file__).parent
         config_path = parent_path / "config.json"  # runtime/config.json
 
-        print(f"Workspaces_root {workspaces_root}")
-        print(f"Parent Path: {parent_path}")
-        print(f"Loading the bootstrap configuration: {config_path}")
         config_loader = ConfigLoader(global_config_path=config_path, workspaces_root=workspaces_root)
         self.config = config_loader.load()
+
+
+        # --------------------------------------------------
+        # Initialize Logger
+        # -------------------------------------------------
+        AgentLogger.initialize()
+
+        logger = AgentLogger.get_logger(component="system")
+
+        logger.info("Bootstrapping this Agentic Platform")
 
         # --------------------------------------------------
         # Tools Config
         # --------------------------------------------------
         tool_config_path = parent_path.parent / "tools" / "config.json" # runtime/tools/config.json
         tools_policy_path = workspaces_root / "tools_policy.json" # workspaces/tools_config.json
-
-        # --------------------------------------------------
-        # Logging
-        # --------------------------------------------------
-        AgentLogger.initialize(
-            log_dir=Path(self.config["logging"]["base_dir"]),
-            log_level=self.config["logging"]["level"]
-        )
-        self.logger = AgentLogger.get_logger(
-            workspace=None,
-            component="system",
-        )
-
-        logger = self.logger
-
-        logger.info("Bootstrapping this Agentic Platform")
 
         # --------------------------------------------------
         # Tool Bootstrapping
@@ -182,21 +172,17 @@ class Platform:
 
         # Load configs
         llm_config = parent_path.parent.parent / "llm"
-        with open(llm_config / "embeddings/config.json") as f:
-            embedding_config = json.load(f)
-
-        with open(llm_config / "stores/config.json") as f:
-            stores_config = json.load(f)
-
-        with open(llm_config / "chatmodels/config.json") as f:
-            chatmodels_config = json.load(f)
+        embedding_config  = llm_config / "embeddings/config.json"
+        stores_config     = llm_config / "stores/config.json"
+        chatmodels_config = llm_config / "chatmodels/config.json"
 
         # Initialize ModelManager
         # user preference
         model_manager = ModelManager(
             chatmodel_provider="ollama",
             embedding_provider="ollama",
-            store_provider="in-memory",
+            episodic_store_provider="in-memory", # or redis
+            semantic_store_provider="postgres", #pgvector
             chatmodels_config=chatmodels_config,
             embedding_config=embedding_config,
             stores_config=stores_config,

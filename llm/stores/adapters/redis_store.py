@@ -4,7 +4,7 @@ import numpy as np
 from langgraph.store.base import BaseStore
 from llm.stores.store_factory import StoreFactory
 
-class RedisVectorStore(BaseStore):
+class RedisStore(BaseStore):
     def __init__(
         self,
         url: str,

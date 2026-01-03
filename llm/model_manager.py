@@ -48,53 +48,61 @@
 from typing import Optional, Dict, Any
 from datetime import datetime
 
-from memory.embedding_factory import EmbeddingFactory
-from memory.store_factory import StoreFactory
-from memory.memory_manager import MemoryManager
+from llm.chatmodels.chatmodel_factory import ChatModelFactory
+from llm.embeddings.embedding_factory import EmbeddingFactory
+from llm.stores.store_factory import StoreFactory
+from llm.memory_manager import MemoryManager
 from langgraph.store.memory import InMemoryStore
 
-# ChatModelFactory handles dynamic LLM selection (Ollama, OpenAI, Cohere, etc.)
-from llm.chat_model_factory import ChatModelFactory
 from runtime.logger import AgentLogger
 
+logger = AgentLogger.get_logger(component="system")
 
 class ModelManager:
     def __init__(
         self,
         chatmodel_provider: str,
         embedding_provider: str,
-        store_provider: str,
-        chatmodels_config: Dict[str, Any],
-        embedding_config: Dict[str, Any],
-        stores_config: Dict[str, Any],
+        episodic_store_provider: str,
+        semantic_store_provider: str,
+        chatmodels_config: Path,
+        embedding_config: Path,
+        stores_config: Path,
         max_tokens: int = 512
     ):
+
         # -----------------------
         # 1. Embeddings
         # -----------------------
-        self.embedding_factory = EmbeddingFactory(embedding_config)
-        self.embedding_client = self.embedding_factory.get_embedding(embedding_provider)
+        logger.info("Loading Embedding Factory")
+        EmbeddingFactory.load_config(embedding_config)
+        self.embedding_client = EmbeddingFactory.get(embedding_provider)
 
         # -----------------------
         # 2. Stores
         # -----------------------
-        self.store_factory = StoreFactory(stores_config)
-        self.semantic_store = self.store_factory.get_store(store_provider)
-        self.episodic_store = self.store_factory.get_store(store_provider)
+        logger.info("Loading Store Factory")
+        StoreFactory.load_config(stores_config)
+        self.episodic_store = StoreFactory.get_episodic(episodic_store_provide)
+        self.semantic_store = StoreFactory.get_semantic(semantic_store_provide)
 
         # -----------------------
         # 3. MemoryManager
         # -----------------------
+        logger.info("Initializing Memory Manager")
         self.memory_manager = MemoryManager(
-            store_factory=self.store_factory,
-            embedding_factory=self.embedding_factory
+            embedding_client = self.embedding,
+            episodic_store = self.episodic_store,
+            semantic_store = self.semantic_store
         )
 
         # -----------------------
         # 4. ChatModels
         # -----------------------
         # Load chatmodel config once at platform startup
+        logger.info("Loading Chat Model Factory")
         ChatModelFactory.load_config(chatmodels_config)
+
         # Then in ModelManager
         self.llm = ChatModelFactory.get(
             provider=chatmodel_provider,

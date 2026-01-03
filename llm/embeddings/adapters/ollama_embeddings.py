@@ -1,17 +1,27 @@
+# -----------------------------------------------------------------------------
+# Project: Agentic System
+# File: llm/embeddings/ollama_embeddings.py
+#
+# Description:
+#   Ollama embedding client implementation.
+#   Registers itself dynamically with EmbeddingFactory.
+#
+# Author: Raymond M.O. Ordona
+# Created: 2026-01-01
+# -----------------------------------------------------------------------------
 from typing import Dict, Any
 import requests
 import numpy as np
 
-from llm.embeddings.embedding_factory import EmbeddingFactory
 from llm.embeddings.base_client import BaseEmbeddingClient
 
 # ------------------------------
 # Ollama embedding client
 # ------------------------------
 class OllamaEmbeddingClient(BaseEmbeddingClient):
-    def __init__(self, endpoint: str, model: str):
+    def __init__(self, embed: str, endpoint: str):
         self.endpoint = endpoint
-        self.model = model
+        self.model = embed
 
     def embed_text(self, text: str) -> list[float]:
         payload = {
@@ -25,7 +35,4 @@ class OllamaEmbeddingClient(BaseEmbeddingClient):
         data = resp.json()
         return data.get("embeddings", [])
 
-
-# register dynamically
-EmbeddingFactory.register("ollama", OllamaEmbeddingClient)
 

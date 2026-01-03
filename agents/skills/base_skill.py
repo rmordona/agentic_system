@@ -30,9 +30,10 @@ from typing import Any, Dict
 from langchain_core.prompts import PromptTemplate
 from runtime.runtime_context import RuntimeContext
 from llm.model_manager import ModelManager
-from runtime.tools.client import ToolClient
+from runtime.tools.tool_client import ToolClient
 from runtime.logger import AgentLogger
 
+logger = AgentLogger.get_logger(component="system")
 
 class BaseSkill:
     """

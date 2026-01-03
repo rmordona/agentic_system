@@ -1,31 +1,117 @@
 {
-  "ollama": {
-    "endpoint": "http://localhost:11434",
-    "models": {
-      "chat": {
-        "api": "/api/chat",
-        "payload_template": {
-          "messages": [
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": ""}
-          ],
-          "stream": false,
-          "options": {"num_predict": 512}
-        }
-      },
-      "generate": {
-        "api": "/api/generate",
-        "payload_template": {
-          "prompt": "",
-          "stream": false,
-          "options": {"num_predict": 512}
-        }
+  "providers" : {
+
+    "ollama": {
+      "module" : "llm.chatmodels.adapters.ollama_chatmodel",
+      "class" : "OllamaChatModel",
+      "endpoint": "http://localhost:11434",
+      "models" : [ "qwen2:0.5b", "llama3.2" ],
+      "apis" : {
+          "chat": {
+              "uri" : "/api/chat",
+              "payload_template": {
+                "messages": [
+                  {"role": "system", "content": ""},
+                  {"role": "user", "content": ""}
+                ],
+                "stream": false,
+                "options": {"num_predict": 512}
+              },
+              "response_template" : {
+                "model" : "",
+                "created_at" : "",
+                "message" : {
+                   "role" : "assistant",
+                   "content" : ""
+                },
+                "done" : true,
+                "done_reason" : "stop",
+                "total_duration" : 0,
+                "load_duration" : 0,
+                "prompt_eval_count" : 0,
+                "prompt_eval_duration" : 0,
+                "eval_count" : 0,
+                "eval_duration" : 0
+              }
+          },
+          "generate": {
+              "uri" : "/api/generate",
+              "payload_template": {
+                "prompt": "",
+                "stream": false,
+                "options": {"num_predict": 512}
+              },
+              "response_template" : {
+                "model" : "",
+                "created_at" : "",
+                "response" : "",
+                "done" : true,
+                "done_reason" : "stop",
+                "context" :[],
+                "total_duration" : 0,
+                "load_duration" : 0,
+                "prompt_eval_count" : 0,
+                "prompt_eval_duration" : 0,
+                "eval_count" : 0,
+                "eval_duration" : 0
+              }
+          },
+          "models" : {
+            "uri" : "/api/tags",
+            "response_template" : {
+               "models" : [
+                 { "name" : "",
+                   "model" : "",
+                   "size" : ""}
+               ]
+            }
+          }
       }
+    },
+
+    "openai": {
+      "module" : "llm.chatmodels.adapters.openai_chatmodel",
+      "class" : "OpenAIChatModel",
+      "endpoint": "https://api.openai.com",
+      "api_key": "",
+      "apis" : {
+          "chat": {
+              "uri" : "/v1/chat/completions",
+              "payload_template": {
+              },
+              "response_template" : {
+              }
+          },
+          "models" : {
+            "uri" : "/v1/models",
+            "response_template" : {
+               "models" : [
+                 { "name" : "",
+                   "model" : "",
+                   "size" : ""}
+               ]
+            }
+          }
+      }
+    },
+
+    "cohere": {
+      "module" : "llm.chatmodels.adapters.cohere_chatmodel",
+      "class" : "CohereChatModel",
+      "endpoint": "https://api.cohere.ai",
+      "api_key": ""
+    },
+
+    "mistral": {
+      "endpoint": "https://api.mistral.ai",
+      "api_key": ""
+    },
+
+    "perplexity": {
+      "endpoint": "https://api.perplexity.ai",
+      "api_key": ""
     }
-  },
-  "openai": {
-    "api_key": "...",
-    "model": "gpt-4"
+
   }
 }
 

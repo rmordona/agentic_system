@@ -2,9 +2,10 @@ from __future__ import annotations
 from typing import Dict, Any
 from runtime.tools.base import Tool
 from runtime.tools.tool_registry import ToolRegistry
-from runtime.tools.policy import ToolPolicy
+from runtime.tools.tool_policy import ToolPolicy
 from runtime.logger import AgentLogger
 
+logger = AgentLogger.get_logger(component="system")
 
 class ToolClient(Tool):
     """
@@ -20,10 +21,6 @@ class ToolClient(Tool):
         self.registry = registry
         self.policy = policy
         self.agent_role = agent_role
-
-        # Bind workspace logger ONCE
-        global logger
-        logger = AgentLogger.get_logger(None, component="system")
 
     async def call(self, 
             tool_name: str, 

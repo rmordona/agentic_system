@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Dict, List
 from runtime.logger import AgentLogger
 
+logger = AgentLogger.get_logger(component="system")
 
 class ToolPolicy:
     """
@@ -10,11 +11,7 @@ class ToolPolicy:
 
     def __init__(self, policy: Dict):
         self.policy = policy
-
-        # Bind workspace logger ONCE
-        global logger
-        logger = AgentLogger.get_logger(None, component="system")
-
+        logger.info("Initializing Tool Policy")
 
     def allowed_tools_for_agent(self, agent_role: str) -> List[str]:
         tools = self.policy.get("agents", {}).get(agent_role, {}).get("tools", [])

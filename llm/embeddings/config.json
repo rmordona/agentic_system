@@ -1,18 +1,27 @@
 {
   "embedding" : {
     "default" : "ollama",
+    "ollama" : {
+        "module": "llm.embeddings.adapters.ollama_embeddings",
+        "class": "OllamaEmbeddingClient",
+        "embed" : "nomic-embed-text:latest",
+        "endpoint" : "http://localhost:11434/api/embeddings"
+    },
     "openai" : {
+        "module": "llm.embeddings.adapters.openai_embeddings",
+        "class": "OpenAIEmbeddingClient",
         "embed" : "openai:text-embedding-3-small",
-        "endpoint": ""
+        "endpoint": "",
+        "api_key": "${OPENAI_API_KEY}"
     },
     "cohere" : {
-      "embed" : "embed-v4.0",
-      "endpoint" : ""
-    },
-    "ollama" : {
-      "embed" : "nomic-embed-text:latest",
-      "endpoint" : "http://localhost:11434/api/embeddings"
+        "module": "llm.embeddings.adapters.cohere_embeddings",
+        "class": "CohereEmbeddingClient",
+        "embed" : "embed-v4.0",
+        "endpoint" : "",
+        "api_key": "${COHERE_API_KEY}"
     }
   }
 
 }
+

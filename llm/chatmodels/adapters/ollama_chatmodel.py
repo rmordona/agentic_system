@@ -6,16 +6,17 @@ import requests
 import httpx
 
 from langchain.chat_models.base import BaseChatModel
-from langchain.schema import (
+from langchain_core.messages import (
     BaseMessage,
     AIMessage,
     HumanMessage,
     SystemMessage,
+)
+
+from langchain_core.outputs.chat_result import (
     ChatGeneration,
     ChatResult,
 )
-
-from llm.chatmodels.chat_model_factory import ChatModelFactory
 
 class OllamaChatModel(BaseChatModel):
     """Production-grade Ollama chat adapter"""
@@ -122,7 +123,4 @@ class OllamaChatModel(BaseChatModel):
                         yield ChatGeneration(
                             message=AIMessage(content=token)
                         )
-
-
-ChatModelFactory.register("ollama", OllamaChatModel)
 

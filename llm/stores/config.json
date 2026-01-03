@@ -1,34 +1,44 @@
 
 {
    "stores": {
-    "default": "langgraph_inmemorystore",
-    "inmemory" : {
-         "dim": 1536,
-         "embed": "openai:text-embedding-3-small"
-    },
-    "oracle": {
-      "dsn": "username:password@localhost:5432/agentic_embeddings",
-      "tables": ["embedding1", "embedding2"],
-      "embedding_model": "nomic-embed-text",
-      "dims": 768
-    },
-    "chromadb": {
-      "persist_directory": "./data/chromadb",
-      "collections": ["embedding1", "embedding2"],
-      "embedding_model": "nomic-embed-text",
-      "dims": 768
-    },
-    "postgres": {
-      "dsn": "postgresql://username:password@localhost:5432/agentic_embeddings",
-      "persist_directory": "./data/postgres",
-      "collections": ["embedding1", "embedding2"],
-      "embedding_model": "nomic-embed-text",
-      "dims": 768
-    },
-    "redis": {
-      "url": "redis://localhost:6379/0",
-      "namespace": "agentic_episodic",
-      "ttl_seconds": 86400
-    }
+      "default": "in-memory",
+      "in-memory" : {
+          "module": "llm.stores.inmemory_store",
+          "class": "InMemoryStore",
+          "dim": 1536,
+          "embed": "openai:text-embedding-3-small"
+      },
+      "oracle": {
+        "module": "llm.stores.adapters.oracle_store",
+        "class": "OracleStore",
+        "dsn": "username:password@localhost:5432/agentic_embeddings",
+        "tables": ["embedding1", "embedding2"],
+        "embedding_model": "nomic-embed-text",
+        "dims": 768
+      },
+      "chromadb": {
+        "module": "llm.stores.adapters.chromadb_store",
+        "class": "ChromeStore",
+        "persist_directory": "./data/chromadb",
+        "collections": ["embedding1", "embedding2"],
+        "embedding_model": "nomic-embed-text",
+        "dims": 768
+      },
+      "postgres": {
+        "module": "llm.stores.adapters.postgres_store",
+        "class": "ProsgresStore",
+        "dsn": "postgresql://username:password@localhost:5432/agentic_embeddings",
+        "persist_directory": "./data/postgres",
+        "collections": ["embedding1", "embedding2"],
+        "embedding_model": "nomic-embed-text",
+        "dims": 768
+      },
+      "redis": {
+        "module": "llm.stores.adapters.redis_store",
+        "class": "RedisStore",
+        "url": "redis://localhost:6379/0",
+        "namespace": "agentic_episodic",
+        "ttl_seconds": 86400
+      }
   }
 }

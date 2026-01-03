@@ -9,6 +9,7 @@ from runtime.stage_registry import StageRegistry
 #from graph.state_graph import build_dynamic_graph
 from runtime.logger import AgentLogger
 
+logger = AgentLogger.get_logger(  component="system")
 
 class WorkspaceLoader:
     """
@@ -21,10 +22,6 @@ class WorkspaceLoader:
         self.workspace_name = workspace_path.name
         
         self.version_hash = None
-
-        # Bind workspace logger ONCE
-        global logger
-        logger = AgentLogger.get_logger(self.workspace_name, component="workspace_loader")
 
     # --------------------------------------------------
     # Load workspace.json configuration

@@ -1,7 +1,7 @@
 import chromadb
 from langgraph.store.base import BaseStore
 
-class ChromaVectorStore(BaseStore):
+class ChromaStore(BaseStore):
     def __init__(
         self,
         persist_dir: str | None = None,

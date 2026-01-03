@@ -1,11 +1,11 @@
-from langgraph.store.base import BaseStore
 import oracledb
 import numpy as np
 
+from langgraph.store.base import BaseStore
 from llm.stores.store_factory import StoreFactory
-# from llm.base_store import BaseStore
+ 
 
-class OracleVectorStore(BaseStore):
+class OracleStore(BaseStore):
     def __init__(
         self,
         dsn: str,

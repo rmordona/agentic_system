@@ -7,6 +7,8 @@ from typing import Dict
 from runtime.tools.base import Tool
 from runtime.logger import AgentLogger
 
+logger = AgentLogger.get_logger(component="system")
+
 
 class ToolRegistry:
     """
@@ -19,9 +21,6 @@ class ToolRegistry:
         self.platform_tools_path = platform_tools_path
         self._tools: Dict[str, Tool] = {}
 
-        # Bind workspace logger ONCE
-        global logger
-        logger = AgentLogger.get_logger(None, component="system")
 
     def load(self):
         logger.info("Loading platform tools")

@@ -5,10 +5,12 @@ from typing import Dict
 from runtime.runtime_manager import RuntimeManager
 from runtime.session_manager import SessionManager
 from llm.model_manager import ModelManager
-from runtime.tools.client import ToolClient
+from runtime.tools.tool_client import ToolClient
+from events.event_bus import EventBus
+
 from runtime.logger import AgentLogger
 
-from events.event_bus import EventBus
+logger = AgentLogger.get_logger(  component="system")
 
 class WorkspaceHub:
     """
@@ -44,10 +46,6 @@ class WorkspaceHub:
         self.session_manager = session_manager
         self.tool_client = tool_client
         self.event_bus = event_bus
-
-        # 🔑 Bind workspace logger ONCE
-        global logger
-        logger = AgentLogger.get_logger( workspace=None, component="system" )
 
         logger.info(f"WorkspaceHub initialized at {workspaces_root}")
 
