@@ -181,8 +181,7 @@ class Platform:
         model_manager = ModelManager(
             chatmodel_provider="ollama",
             embedding_provider="ollama",
-            episodic_store_provider="in-memory", # or redis
-            semantic_store_provider="postgres", #pgvector
+            store_provider="in-memory", # or redis
             chatmodels_config=chatmodels_config,
             embedding_config=embedding_config,
             stores_config=stores_config,

@@ -182,3 +182,21 @@
 2026-01-03 03:45:40,343 | INFO    | system:global | embedding_factory:70 | load_config | EmbeddingFactory config loaded
 2026-01-03 03:45:40,352 | INFO    | system:global | model_manager:84 | __init__ | Loading Store Factory
 2026-01-03 03:45:40,362 | INFO    | system:global | store_factory:70 | load_config | StoreFactory config loaded
+2026-01-03 09:20:39,550 | INFO    | system:global | platform:139 | initialize | Bootstrapping this Agentic Platform
+2026-01-03 09:20:39,550 | INFO    | system:global | tool_registry:26 | load | Loading platform tools
+2026-01-03 09:20:39,567 | INFO    | system:global | tool_registry:32 | load | Registered tool: web_search
+2026-01-03 09:20:39,568 | INFO    | system:global | tool_registry:32 | load | Registered tool: calculator
+2026-01-03 09:20:39,575 | INFO    | system:global | tool_registry:32 | load | Registered tool: python_exec
+2026-01-03 09:20:39,608 | INFO    | system:global | tool_registry:32 | load | Registered tool: memory_write
+2026-01-03 09:20:39,608 | INFO    | system:global | tool_registry:32 | load | Registered tool: memory_read
+2026-01-03 09:20:39,609 | INFO    | system:global | tool_registry:32 | load | Registered tool: vector_search
+2026-01-03 09:20:39,848 | INFO    | system:global | tool_registry:32 | load | Registered tool: http_request
+2026-01-03 09:20:44,106 | INFO    | system:global | tool_registry:32 | load | Registered tool: fastmcp_client
+2026-01-03 09:20:44,106 | INFO    | system:global | tool_registry:32 | load | Registered tool: knowledge_service
+2026-01-03 09:20:44,140 | INFO    | system:global | tool_registry:32 | load | Registered tool: knowledge_service
+2026-01-03 09:20:44,152 | INFO    | system:global | tool_policy:14 | __init__ | Initializing Tool Policy
+2026-01-03 09:20:44,152 | INFO    | system:global | platform:163 | initialize | ToolClient initialized
+2026-01-03 09:20:44,153 | INFO    | system:global | model_manager:77 | __init__ | Loading Embedding Factory
+2026-01-03 09:20:44,162 | INFO    | system:global | embedding_factory:70 | load_config | EmbeddingFactory config loaded
+2026-01-03 09:20:44,172 | INFO    | system:global | model_manager:84 | __init__ | Loading Store Factory
+2026-01-03 09:20:44,206 | INFO    | system:global | store_factory:70 | load_config | StoreFactory config loaded

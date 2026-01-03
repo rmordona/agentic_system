@@ -63,8 +63,7 @@ class ModelManager:
         self,
         chatmodel_provider: str,
         embedding_provider: str,
-        episodic_store_provider: str,
-        semantic_store_provider: str,
+        store_provider: str,
         chatmodels_config: Path,
         embedding_config: Path,
         stores_config: Path,
@@ -83,8 +82,7 @@ class ModelManager:
         # -----------------------
         logger.info("Loading Store Factory")
         StoreFactory.load_config(stores_config)
-        self.episodic_store = StoreFactory.get_episodic(episodic_store_provide)
-        self.semantic_store = StoreFactory.get_semantic(semantic_store_provide)
+        self.store = StoreFactory.get(store_provider) 
 
         # -----------------------
         # 3. MemoryManager
@@ -92,8 +90,7 @@ class ModelManager:
         logger.info("Initializing Memory Manager")
         self.memory_manager = MemoryManager(
             embedding_client = self.embedding,
-            episodic_store = self.episodic_store,
-            semantic_store = self.semantic_store
+            store = self.store
         )
 
         # -----------------------

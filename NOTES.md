@@ -1210,3 +1210,86 @@ Temperature	options.temperature	temperature
 
 IMPORTANT: Common interface, but no common payload.  Agents should not care how payload looks.
 Streaming	stream: true	stream: true
+
+
+
+Initial architectural design:
+
+| Memory Type             | Purpose                   | Needs vectors? | Needs ANN? |
+| ----------------------- | ------------------------- | -------------- | ---------- |
+| **Semantic**            | Concepts, facts, meanings | ✅              | ✅          |
+| **Episodic**            | Events, logs, reflections | ❌              | ❌          |
+| **Procedural** (future) | Skills, workflows         | ❌              | ❌          |
+
+- Architecturally clean, scalable, and production-ready
+- this is the right abstraction
+- this avoids overloading vector DBs
+- this scales to multi-store, multi-provider systems
+- this keeps semantic and episodic memory cleanly separated
+- this allows Redis, Postgres, and in-memory to coexist sanely
+
+| Store                 | Vector | Persistent | ANN      | Use Case            |
+| --------------------- | ------ | ---------- | -------- | ------------------- |
+| InMemorySemanticStore | ✅      | ❌          | HNSW     | Local agents        |
+| RedisSemanticStore    | ✅      | ⚠️         | HNSW     | Fast shared memory  |
+| PostgresSemanticStore | ✅      | ✅          | pgvector | Long-term memory    |
+| InMemoryEpisodicStore | ❌      | ❌          | ❌        | Session state       |
+| RedisEpisodicStore    | ❌      | ⚠️         | ❌        | Distributed session |
+| PostgresEpisodicStore | ❌      | ✅          | ❌        | Audit / logs        |
+
+
+SemanticStore (abstract)
+├── InMemorySemanticStore
+│   ├── hnswlib (ANN index)
+│   ├── cosine similarity
+│   ├── external embedding client
+│   └── non-persistent
+│
+├── RedisSemanticStore
+│   ├── Redis hashes / JSON
+│   ├── RediSearch HNSW
+│   ├── cosine similarity
+│   └── in-memory, optionally persisted
+│
+└── PostgresSemanticStore
+    ├── pgvector
+    ├── cosine / inner product
+    └── persistent
+
+EpisodicStore
+- Think of it as document storage or raw event storage.
+Stores things like:
+ - Conversation logs
+ - Raw system outputs
+ - Self-reflections or evaluations
+ - Procedural memory (step-by-step actions)
+Usually keyed by some ID or timestamp, no vector embedding required.
+Can be:
+ - In-memory for fast ephemeral session data.
+ - Redis for shared in-memory access.
+ - Postgres for persistent, long-term storage.
+Does not require HNSW or cosine similarity.
+
+SemanticStore
+- True vector database.
+- Stores embeddings + text + metadata.
+- Supports semantic search (cosine similarity, HNSW, L2, etc.).
+Can be:
+- In-memory (fast HNSW, ephemeral).
+- Redis with RedisSearch + vector extensions.
+- Postgres with pgvector for persistence.
+
+
+EpisodicStore (abstract)
+├── InMemoryEpisodicStore
+│   ├── Python dict / LangGraph InMemoryStore
+│   └── no embeddings
+│
+├── RedisEpisodicStore
+│   ├── Redis hashes / TTL
+│   └── no vector index
+│
+└── PostgresEpisodicStore
+    ├── relational tables
+    └── no pgvector
+

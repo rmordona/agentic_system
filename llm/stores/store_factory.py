@@ -35,7 +35,7 @@ import importlib
 from pathlib import Path
 from typing import Type
 
-from langgraph.store.base import BaseStore
+from llm.stores.adapters.base_store import BaseStore
 
 from runtime.logger import AgentLogger
 
