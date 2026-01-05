@@ -1293,3 +1293,9 @@ EpisodicStore (abstract)
     ├── relational tables
     └── no pgvector
 
+
+========== UI Platform ==========
+
+write me a system prompt for a full production-ready production-grade  single-page lazy-render UI platform for this agentic system. Include production-grade technology stack to be used including fastapi, uvicorn, xhttp over server-side events, security, authentication, authorization, a top bar panel to switch views, a left panel that can collapse into smaller panel, and a main panel for main views. The UI should provide  a view to use react flow for node-edge editing and observability of flows through the graph. It should offer the ability to edit nodes and edges. The react flow helps to build graphs based on workspaces (e.g. workflows are constructed based on the stages.json). Every stage in the graph should lit up in the react flow graph, including the edges. There should be a view to show the input and output prompts. It should offer a user view mode in which there is a developer view mode and a user view mode.  The developer view mode helps for agent developers to develop agents by creating workspaces. The user view mode allows users to use the workspace in production once deployed.
+All these UI components and features should live in a structured folder called 'ui_platform
+

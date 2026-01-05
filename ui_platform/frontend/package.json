@@ -1,0 +1,44 @@
+{
+  "name": "ui_platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Production-ready frontend for the Agentic System UI Platform",
+  "author": "Raymond M.O. Ordona",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview",
+    "lint": "eslint . --ext .ts,.tsx",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "@headlessui/react": "^1.9.0",
+    "@heroicons/react": "^2.0.18",
+    "@tanstack/react-query": "^5.3.0",
+    "@tanstack/react-query-devtools": "^5.3.0",
+    "@types/react": "^18.2.21",
+    "@types/react-dom": "^18.2.7",
+    "axios": "^1.6.6",
+    "clsx": "^2.1.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-flow-renderer": "^11.8.0",
+    "react-router-dom": "^6.17.0",
+    "sse.js": "^1.0.0",
+    "zustand": "^4.6.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.4.2",
+    "@types/react-router-dom": "^5.3.3",
+    "@vitejs/plugin-react": "^5.2.0",
+    "autoprefixer": "^10.4.15",
+    "eslint": "^8.46.0",
+    "eslint-config-prettier": "^9.0.0",
+    "postcss": "^8.4.35",
+    "prettier": "^3.9.1",
+    "tailwindcss": "^3.4.4",
+    "typescript": "^5.2.2",
+    "vite": "^5.2.0"
+  }
+}
