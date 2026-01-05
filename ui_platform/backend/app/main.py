@@ -3,7 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api import auth, workspaces, graphs, runs, sse
 from app.core.config import settings
 
-app = FastAPI(title="Agentic UI Platform")
+#app = FastAPI(title="Agentic UI Platform")
+
+app = FastAPI(title=settings.APP_NAME, debug=settings.DEBUG)
 
 app.add_middleware(
     CORSMiddleware,

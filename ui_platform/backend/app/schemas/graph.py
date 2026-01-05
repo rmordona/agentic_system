@@ -55,7 +55,7 @@ class GraphEdgeSchema(BaseModel):
 # Graph API Schemas
 # -----------------------------
 
-class GraphCreateRequest(BaseModel):
+class GraphCreate(BaseModel):
     """
     Request payload for creating a new graph.
     """
@@ -65,7 +65,7 @@ class GraphCreateRequest(BaseModel):
     edges: List[GraphEdgeSchema]
 
 
-class GraphUpdateRequest(BaseModel):
+class GraphUpdate(BaseModel):
     """
     Request payload for updating an existing graph.
 

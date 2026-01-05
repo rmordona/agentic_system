@@ -55,3 +55,7 @@ def get_settings() -> Settings:
     - Fast access
     """
     return Settings()
+
+# **This is the key:** instantiate a global singleton
+settings = get_settings()
+

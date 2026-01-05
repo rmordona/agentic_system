@@ -18,7 +18,7 @@ from typing import Optional, List
 from pydantic import BaseModel, Field
 
 
-class WorkspaceCreateRequest(BaseModel):
+class WorkspaceCreate(BaseModel):
     """
     Request payload for creating a workspace.
 
@@ -30,7 +30,7 @@ class WorkspaceCreateRequest(BaseModel):
     description: Optional[str] = None
 
 
-class WorkspaceUpdateRequest(BaseModel):
+class WorkspaceUpdate(BaseModel):
     """
     Request payload for updating workspace metadata.
     """

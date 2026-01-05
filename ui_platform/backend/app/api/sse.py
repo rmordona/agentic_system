@@ -13,7 +13,8 @@ Designed for React Flow live graph lighting.
 """
 
 from fastapi import APIRouter
-from fastapi.responses import EventSourceResponse
+#from fastapi.responses import EventSourceResponse
+from sse_starlette.sse import EventSourceResponse
 import asyncio
 from app.api.runs import _RUNS
 
