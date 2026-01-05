@@ -41,14 +41,14 @@ class SkillAgent(BaseSkill):
         workspace_path: Path,
         skill_name: str,
         stage_meta: dict,
-        runtime_context,        
+        runtime_context,    
         model_manager: ModelManager,
-        tool_client: ToolClient,
+        tool_client: ToolClient,  
         event_bus: EventBus = None
     ):
-        self.workspace_path = workspace_path
-        self.stage_meta = stage_meta
-        self.skill_name = skill_name
+        #self.workspace_path = workspace_path
+        #self.stage_meta = stage_meta
+        #self.skill_name = skill_name
 
         # 🔑 Delegate filesystem responsibility to BaseSkill
         super().__init__(

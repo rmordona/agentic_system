@@ -1,6 +1,18 @@
 {
   "context": [
     {
+      "name": "summary",
+      "type": "state"
+    },
+    {
+      "name": "conversation_history",
+      "type": "state"
+    },
+    {
+      "name": "category",
+      "type": "state"
+    },
+    {
       "name": "task",
       "type": "state"
     },

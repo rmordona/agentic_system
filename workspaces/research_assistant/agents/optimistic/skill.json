@@ -14,7 +14,7 @@
   },
   "tools": [
     {
-      "name": "log_synthesis",
+      "name": "log_optimistic",
       "when": "post_output"
     }
   ],

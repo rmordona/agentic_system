@@ -23,6 +23,7 @@ class BaseStore(ABC):
         value: Any,
         metadata: Optional[Dict[str, Any]] = None,
         document: Optional[Dict[str, Any]] = None,
+        reward: Optional[float] = None
     ):
         """
         Save an item in the store.
@@ -42,7 +43,7 @@ class BaseStore(ABC):
         pass
 
     @abstractmethod
-    async def query(
+    async def search(
         self,
         namespace: Tuple[str, str],
         query: str,
@@ -67,8 +68,19 @@ class BaseStore(ABC):
         pass
 
     @abstractmethod
-    async def clear(self, namespace: Optional[Tuple[str, str]] = None):
-        """
-        Clear all items, optionally within a namespace.
-        """
-        pass
+    async def delete(self, namespace: Tuple[str, str], key: str):
+        ns_key = self._make_key(namespace, key)
+        await self.redis.delete(ns_key)
+
+    @abstractmethod
+    async def clear_namespace(self, namespace: Tuple[str, str]):
+        ns_pattern = f"{self.namespace_prefix}:{namespace[0]}:{namespace[1]}:*"
+        keys = await self.redis.keys(ns_pattern)
+        if keys:
+            await self.redis.delete(*keys)
+
+    @abstractmethod
+    async def count_namespace(self, namespace: Tuple[str, str]) -> int:
+        ns_pattern = f"{self.namespace_prefix}:{namespace[0]}:{namespace[1]}:*"
+        keys = await self.redis.keys(ns_pattern)
+        return len(keys)

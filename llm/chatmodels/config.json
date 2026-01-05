@@ -1,11 +1,14 @@
 {
-  "providers" : {
+  "chatmodel_clients" : {
 
     "ollama": {
       "module" : "llm.chatmodels.adapters.ollama_chatmodel",
       "class" : "OllamaChatModel",
-      "endpoint": "http://localhost:11434",
+      "endpoint": "http://localhost:11434/api/chat",
       "models" : [ "qwen2:0.5b", "llama3.2" ],
+      "max_tokens" :  512,
+      "temperature" : 0.7,
+      "request_timeout" : 120.0, 
       "apis" : {
           "chat": {
               "uri" : "/api/chat",
@@ -74,6 +77,9 @@
       "class" : "OpenAIChatModel",
       "endpoint": "https://api.openai.com",
       "api_key": "",
+      "max_tokens" :  512,
+      "temperature" : 0.7,
+      "request_timeout" : 120.0, 
       "apis" : {
           "chat": {
               "uri" : "/v1/chat/completions",
@@ -99,17 +105,26 @@
       "module" : "llm.chatmodels.adapters.cohere_chatmodel",
       "class" : "CohereChatModel",
       "endpoint": "https://api.cohere.ai",
-      "api_key": ""
+      "api_key": "",
+      "max_tokens" :  512,
+      "temperature" : 0.7,
+      "request_timeout" : 120.0
     },
 
     "mistral": {
       "endpoint": "https://api.mistral.ai",
-      "api_key": ""
+      "api_key": "",
+      "max_tokens" :  512,
+      "temperature" : 0.7,
+      "request_timeout" : 120.0
     },
 
     "perplexity": {
       "endpoint": "https://api.perplexity.ai",
-      "api_key": ""
+      "api_key": "",
+      "max_tokens" :  512,
+      "temperature" : 0.7,
+      "request_timeout" : 120.0
     }
 
   }

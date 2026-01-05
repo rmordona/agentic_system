@@ -26,17 +26,17 @@ class RuntimeContext:
     ):
 
         self.namespace = namespace
-        self.agent = agent
         self.top_k = top_k
         self.limit = limit
 
         # Dynamically updated during Agent.run()
         self.session_id = session_id
+        self.agent = agent
         self.stage = stage
         self.task = task
 
         # A new key_namespace will be formed as store key
-        self.key_namespace = None
+        self.key_namespace: Tuple[str, str] = None
 
     # ----------------------------
     # Context scoping
@@ -46,6 +46,17 @@ class RuntimeContext:
             namespace=self.namespace,
             session_id=session_id,
             agent=self.agent,
+            stage=self.stage,
+            task=self.task,
+            top_k=self.top_k,
+            limit=self.limit
+        )
+
+    def with_agent(self, agent: str) -> "RuntimeContext":
+        return RuntimeContext(
+            namespace=self.namespace,
+            session_id=self.session_id,
+            agent=agent,
             stage=self.stage,
             task=self.task,
             top_k=self.top_k,
@@ -86,10 +97,21 @@ class RuntimeContext:
         )
 
     def generate_key_namespace(self)  -> "RuntimeContext":
+        # This Store, langgraph.store.memory import InMemoryStore, does not
+        # support structured tuples (Tuple[str, str])
+        '''
         self.key_namespace = (
                 ("session_id",  self.session_id),
                 ("agent",       self.agent),
                 ("stage",       self.stage),
                 ("namespace",   self.namespace) )
+        '''
+
+        # So let's use Tuple[str]
+        self.key_namespace = (
+                f"session_id:{self.session_id}",
+                f"agent:{self.agent}",
+                f"stage:{self.stage}",
+                f"namespace:{self.namespace}" )
         return self
 

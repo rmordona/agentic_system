@@ -20,9 +20,6 @@ from runtime.tools.tool_client import ToolClient
 from events.event_bus import EventBus
 
 from runtime.logger import AgentLogger
-# Initialization of logger is done at cli.py or api.py
-
-
 
 class RuntimeManager:
     """
@@ -33,9 +30,7 @@ class RuntimeManager:
     """
 
     # Inherit the logger
-    #llm_manager = None
-    #memory_manager = None
-    #embedding_store = None
+    model_manager = None
     tool_client = None
     event_bus = None
 
@@ -45,8 +40,6 @@ class RuntimeManager:
             workspace_path: Path,
             model_manager: ModelManager,
             session_manager: SessionManager,
-            #memory_manager: MemoryManager, 
-            #embedding_store: EmbeddingStore, 
             tool_client: ToolClient,
             event_bus: EventBus,
         ):
@@ -60,8 +53,6 @@ class RuntimeManager:
             workspace_path: Path,
             model_manager: ModelManager,
             session_manager: SessionManager,
-            #memory_manager: MemoryManager, 
-            #embedding_store: EmbeddingStore, 
             tool_client: ToolClient,
             event_bus: EventBus,
         ):
@@ -75,15 +66,13 @@ class RuntimeManager:
         self.workspace_name = workspace_path.name
 
         self.model_manager = model_manager
-        # self.memory_manager = memory_manager
-        #self.embedding_store = embedding_store
         self.tool_client = tool_client
 
         self.event_bus = event_bus
 
-        # 🔑 Bind workspace logger ONCE
         global logger
-        logger = AgentLogger.get_logger(component="runtime", workspace=self.workspace_name)
+        #logger = AgentLogger.get_logger( component="runtime", workspace = self.workspace_name )
+        logger = AgentLogger.get_logger( component="system" )
 
         # ---- Singletons (loaded once per workspace) ----
         # Load Workspace Configuration (workspace.json)
@@ -93,8 +82,6 @@ class RuntimeManager:
         self.agent_registry = AgentRegistry(
             workspace_path,
             model_manager=self.model_manager,
-            #memory_manager=self.memory_manager,
-            #embedding_store=self.embedding_store,
             tool_client=self.tool_client,
             event_bus=self.event_bus
         )
@@ -105,9 +92,10 @@ class RuntimeManager:
         self.stage_registry.load_stages()
         logger.info(f"Stages loaded: {self.stage_registry.list_stages()}")
 
+        logger.info(f"Initializing runtime graph for workspace '{self.workspace_name}'")
         self.graph_manager = GraphManager(workspace_path, self.agent_registry, self.stage_registry)
         self.graph_manager.build()
-        logger.info("Execution graph built successfully")
+        logger.info("Execution graph built successfully for '{self.workspace_name}'")
 
         self.reload_manager = ReloadManager(
             workspace_loaders={self.workspace_name: self.workspace_meta},
@@ -118,8 +106,6 @@ class RuntimeManager:
         self.reload_manager.start_periodic_reload()
         logger.info("Hot-reload enabled for skills/context")
 
-        #self.event_bus = EventBus()
-       # logger.info("Event Bus loaded")
 
         # ---- Per-session storage ----
         self._orchestrators: Dict[str, Orchestrator] = {}
@@ -171,6 +157,9 @@ class RuntimeManager:
         - Injects user message into session state
         - Runs orchestrator
         """
+
+        logger.info("Entering User Session")
+
         # 1. Create or fetch session
         if session_id and session_id in self._orchestrators:
             orchestrator = self.get_orchestrator(session_id)
@@ -182,6 +171,7 @@ class RuntimeManager:
         initial_state = {
             "session_id": session_id,
             "task": user_message,
+            "agent" : None,
             "stage": self.stage_registry.first_stage(),
             "done": False,
             "history_agents": [],
@@ -191,10 +181,9 @@ class RuntimeManager:
             "decision": {},
         }
 
-        if verbose:
-            logger.info(f"Running session {session_id} with user message: {user_message}")
+        logger.info(f"Running session {session_id} with user message: {user_message}")
 
-
+        logger.info("Orchestrator running")
         # 3. Run orchestrator
         result = await orchestrator.run(initial_state)
         return result

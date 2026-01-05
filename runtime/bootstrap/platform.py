@@ -166,58 +166,22 @@ class Platform:
         # Event Bus
         # --------------------------------------------------
         self.event_bus = EventBus()
+
+
         # --------------------------------------------------
         # LLM Model bootstrap
         # --------------------------------------------------
-
-        # Load configs
-        llm_config = parent_path.parent.parent / "llm"
-        embedding_config  = llm_config / "embeddings/config.json"
-        stores_config     = llm_config / "stores/config.json"
-        chatmodels_config = llm_config / "chatmodels/config.json"
-
-        # Initialize ModelManager
-        # user preference
-        model_manager = ModelManager(
-            chatmodel_provider="ollama",
-            embedding_provider="ollama",
-            store_provider="in-memory", # or redis
-            chatmodels_config=chatmodels_config,
-            embedding_config=embedding_config,
-            stores_config=stores_config,
-            max_tokens=1024
+        self.model_manager = ModelManager(
+            chatmodel_provider="ollama:qwen2:0.5b",
+            embedding_provider="ollama:nomic-embed-text:latest",
+            store_provider="in-memory-ollama",  
+            llm_config = parent_path.parent.parent / "llm",
         )
-
-
-        # --------------------------------------------------
-        # Embedding store
-        # --------------------------------------------------
-        #embedding_config = self.config.get("embeddings", {})
-        #self.embedding_store = EmbeddingFactory.build(config=embedding_config, logger=self.logger)
 
         # --------------------------------------------------
         # Session Bootstrapping
         # --------------------------------------------------
         self.session_manager = SessionManager()
-
-        # --------------------------------------------------
-        # Memory Manager
-        # --------------------------------------------------
-        '''
-        episodic_adapter = MemoryFactory.get_episodic_adapter(
-            cls.config["memory"]["episodic"]
-        )
-        semantic_adapter = MemoryFactory.get_semantic_adapter(
-            cls.config["memory"]["semantic"],
-            llm_manager=cls.llm_manager,
-            embedding_store=cls.embedding_store,
-        )
- 
-        episodic_adapter = None
-        semantic_adapter = None
-        '''
-
-
 
         # --------------------------------------------------
         # Workspace Hub
@@ -226,8 +190,6 @@ class Platform:
             workspaces_root=workspaces_root,
             model_manager=self.model_manager,
             session_manager=self.session_manager,
-            #memory_manager=self.memory_manager,
-            #embedding_store=self.embedding_store,
             tool_client=self.tool_client,
             event_bus=self.event_bus
         )

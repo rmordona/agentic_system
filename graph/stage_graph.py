@@ -12,8 +12,11 @@ it only decides *what runs next*.
 from typing import Optional, Any, Dict, List
 from langgraph.graph import StateGraph, END
 from langgraph.channels import Topic, LastValue, BinaryOperatorAggregate
-from runtime.logger import AgentLogger
 from graph.state import State, AgentOutput, merge_reward_dicts
+
+from runtime.logger import AgentLogger
+
+logger = AgentLogger.get_logger(  component="system")
 
 class StageGraph:
 
@@ -44,8 +47,7 @@ class StageGraph:
         }
 
         # Logger
-        self.logger = AgentLogger.get_logger(workspace_name, component="stage_graph")
-        self.logger.info(f"StageGraph initializing with channels: {list(self.channels.keys())}")
+        logger.info(f"StageGraph initializing with channels: {list(self.channels.keys())}")
 
         # StateGraph
         self.graph = StateGraph(State, channels=self.channels)
@@ -54,9 +56,12 @@ class StageGraph:
     # -------------------------------
     def _build_graph(self):
         # 1. Validate all stages have loaded agents
+        logger.info(f"Validating all stages have loaded agents")
         for stage_name in self.stage_registry.list_stages():
             stage = self.stage_registry.get(stage_name)
+            logger.info(f"Stage Name: {stage}")
             for agent_role in stage.allowed_agents:
+                logger.info(f"Allowed agent: {agent_role}")
                 if not self.agent_registry.exists(agent_role):
                     raise ValueError(
                         f"Stage '{stage_name}' requires agent '{agent_role}' "
@@ -67,17 +72,21 @@ class StageGraph:
         for agent in self.agent_registry.all():
             node_func = self._make_agent_node(agent)
             self.graph.add_node(agent.role, node_func)
-        self.logger.info(f"Registered agent nodes: {list(self.graph.nodes.keys())}")
+        logger.info(f"Registered agent nodes added to graph: {list(self.graph.nodes.keys())}")
 
         # 3. Add stage router node
         self._add_stage_router_node()
+        logger.info(f"Stage Router added to graph")
 
         # 4. Add edges: agents → stage_router, stage_router → next_agent / END
         self._add_edges()
+        logger.info(f"Conditional Edges added to graph")
 
         # 5. Set entry point to stage_router
         self.graph.set_entry_point("stage_router")
-        self.logger.info("StageGraph build complete. Entry point: 'stage_router'")
+        logger.info("Entry to graph now set: First stop is the 'stage_router'.")
+
+        logger.info("StageGraph build complete. Entry point: 'stage_router'")
 
     # -------------------------------
     def _make_agent_node(self, agent):
@@ -87,6 +96,12 @@ class StageGraph:
 
             if agent.role not in stage.allowed_agents:
                 return {}
+
+            # Add the agent name to the state
+            logger.info(f"Adding agent ({agent.role}) to runtime state")
+            state["agent"] = agent.role
+
+            logger.info(f"State: {state}")
 
             # Run agent
             output = await agent.run(state)

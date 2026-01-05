@@ -31,9 +31,9 @@ from langchain_core.prompts import PromptTemplate
 from runtime.runtime_context import RuntimeContext
 from llm.model_manager import ModelManager
 from runtime.tools.tool_client import ToolClient
-from runtime.logger import AgentLogger
+from events.event_bus import EventBus
 
-logger = AgentLogger.get_logger(component="system")
+from runtime.logger import AgentLogger
 
 class BaseSkill:
     """
@@ -50,8 +50,6 @@ class BaseSkill:
             optional schema.json
     """
 
-    # Inherit the logger
-
     def __init__(
         self,
         workspace_dir: Path,
@@ -59,7 +57,7 @@ class BaseSkill:
         runtime_context: RuntimeContext,      # 🔑 expects RuntimeContext
         model_manager: ModelManager,
         tool_client: ToolClient,
-        event_bus=None,
+        event_bus: EventBus
     ):
         self.workspace_dir = workspace_dir
         self.workspace_name = workspace_dir.name
@@ -70,6 +68,9 @@ class BaseSkill:
         self.model_manager = model_manager
         self.tool_client = tool_client
         self.event_bus = event_bus
+
+        # --- Load Store Manager
+        self.store = self.model_manager.get_store()
 
         # --- Load artifacts ---
         self.skill_meta = self._load_json("skill.json")
@@ -82,9 +83,8 @@ class BaseSkill:
         self.output_mode = self.skill_meta.get("output_mode", "text")
         self.tools = self.skill_meta.get("tools", [])
 
-        # 🔑 Bind workspace logger ONCE
-        global logger
-        logger = AgentLogger.get_logger(self.workspace_name, component="runtime")
+        # Bind workspace logger ONCE
+        self.logger = AgentLogger.get_logger( component="module", module = __name__ )
 
     # ------------------------------------------------------------------
     # LangGraph Entry Point
@@ -94,34 +94,40 @@ class BaseSkill:
         """
         Executes the skill and returns a LangGraph-compatible state delta.
         """
-        print(f"Entering next agent run: {state}")
-        print(f"workspace: {self.workspace_name}")
-        logger.info(f"Running {self.workspace_name} workspace ...")
+        self.logger.info(f"Entering next agent run: {state}")
+        self.logger.info(f"workspace: {self.workspace_name}")
+        self.logger.info(f"Running {self.workspace_name} workspace ...")
 
         # Bind session and stage to context for this run
-        logger.info(f"Now binding sessions, stage, task to memory context")
-        runtime_context = self.runtime_context.with_session(state["session_id"]).with_stage(state["stage"]).with_task(state["task"]).generate_key_namespace()
+        self.logger.info(f"Now binding sessions, stage, task to memory context")
+        runtime_context = self.runtime_context \
+                .with_session(state["session_id"]) \
+                .with_agent(state["agent"]) \
+                .with_stage(state["stage"]) \
+                .with_task(state["task"]) \
+                .generate_key_namespace()
 
-        logger.info(f"Now Resolving context ...")
+        self.logger.info(f"Entering RAG - Now Resolving context ...")
         context = await self._resolve_context(state, runtime_context)
-        logger.info(f"Context completed and retrieved: {context}")
+        self.logger.info(f"Context completed and retrieved: {context}")
  
 
-        logger.info(f"Now Rendering prompt with context  ...")
+        self.logger.info(f"Now Rendering prompt with context  ...")
         prompt = self._render_prompt(context)
-        logger.info(f"Prompt rendered...")
-        logger.info(f"The System Prompt: {prompt}")
+        self.logger.info(f"Prompt rendered...")
 
-        logger.info(f"Now calling llm with the rendered prompt  ...")
-        output = await self._call_llm(prompt, state)
-        logger.info(f"LLM completed with generated output: {output}")
+        self.logger.info(f"The System Prompt: {prompt}")
+
+        self.logger.info(f"Now calling LLM Provider with the rendered prompt  ...")
+        output = await self._call_llm(prompt, runtime_context, state)
+        self.logger.info(f"LLM completed with generated output: {output}")
 
         if self.schema:
             output = self._validate_schema(output)
 
         await self._maybe_call_tools(output, state)
-        await self._persist_memory(output, runtime_context)
 
+        # Send partial update of states
         return self._emit_state_delta(output, state)
 
     # ------------------------------------------------------------------
@@ -129,7 +135,7 @@ class BaseSkill:
     # ------------------------------------------------------------------
 
     async def _resolve_context(self, state: Dict[str, Any], runtime_context) -> Dict[str, Any]:
-        resolved: Dict[str, Any] = {}
+        context: Dict[str, Any] = {}
 
         try:
             for ctx in self.context_meta.get("context", []):
@@ -137,60 +143,35 @@ class BaseSkill:
                 source = ctx["type"]
 
                 if source == "state":
-                    resolved[name] = state.get(ctx.get("key", name))
+                    context[name] = state.get(ctx.get("key", name))
 
                 elif source == "memory":
-                    resolved[name] = await self._resolve_memory(ctx, runtime_context, state)
+                    context[name] = await self._resolve_memory(ctx, runtime_context, state)
 
-                elif source == "embedding":
-                    resolved[name] = await runtime_context.semantic_search(
-                        query=state["task"],
-                        top_k=ctx.get("top_k", 5),
-                        filters=ctx.get("filters", None)
-                    )
-                elif source == "nl2sql":
-                    resolved[name] = await runtime_context.query(
-                        query=state["task"],
-                        top_k=ctx.get("top_k", 5),
-                        filters=ctx.get("filters", None)
-                    )
+                elif source == "text_to_sql":
+                    context[name] = await self._resolve_sql(ctx, runtime_context, state)
+
                 elif source == "external":
-                    resolved[name] = await self.tool_client.call(
-                        tool_name=ctx["service"],
-                        params=ctx.get("params", {}),
-                    )
+                    context[name] = await self._resolve_tool(ctx, state)
+                    
                 elif source == "computed":
-                    resolved[name] = await self._compute_value(ctx, state)
+                    context[name] = await self._compute_value(ctx, state)
+
                 elif source == "text":
-                    resolved[name] = ctx["text"]
+                    context[name] = ctx["text"]
+
                 else:
-                    resolved[name] = None
+                    context[name] = None
 
         except Exception as e:
-            logger.info(f"Failed to resolve context '{source}'")
-            logger.error(
+            self.logger.info(f"Failed to resolve context '{source}'")
+            self.logger.error(
                 f"Context Metadata being evaluated: '{self.context_meta}': {e}",
                 exc_info=True
             )
 
-        return resolved
+        return context
 
-    # ------------------------------------------------------------------
-    # Memory Persistence
-    # ------------------------------------------------------------------
-    from uuid import uuid4
-
-    def _memory_key(self, key_namespace:tuple):
-        uid = str(uuid4())
-        keys=dict(key_namespace)
-        session_id = keys["session_id"]
-        agent      = keys["agent"]
-        stage      = keys["agent"]
-        namespace  = keys["namespace"]
-        return f"{session_id}:{agent}:{stage}:{namespace}:{uid}"
-
-    async def _persist_memory(self, output: Any, runtime_context):
-        await runtime_context.store(memory=output)
 
     # ------------------------------------------------------------------
     # Memory Resolution
@@ -202,14 +183,16 @@ class BaseSkill:
 
         if memory_type == "semantic":
             # context already bound
-            return await runtime_context.query(
+            return await self.store.query(
                 query=state["task"],
                 top_k=filters.get("top_k", None),
                 limit=filters.get("limit", None),
             )
 
         if memory_type == "episodic":
-            return await runtime_context.fetch_memory(
+            keys=self._memory_key(key_namespace)
+            return await self.store.get(
+                key=keys,
                 top_k=filters.get("top_k", None),
                 limit=filters.get("limit", None),
             )
@@ -222,6 +205,68 @@ class BaseSkill:
         module = importlib.import_module(module_name)
         fn = getattr(module, func_name)
         return await fn(state) if asyncio.iscoroutinefunction(fn) else fn(state)
+
+
+    # ------------------------------------------------------------------
+    # Text to Sql Resolution
+    # ------------------------------------------------------------------
+
+    async def _resolve_sql(self, ctx: dict, runtime_context, state: dict):
+
+        stages = ctx.get("schema", "stages")
+        filters = ctx.get("filters", {})
+
+        for stage in stages:
+            if stage == "selection":
+                pass
+            if stage == "extraction":
+                pass
+            if stage == "execution":
+                pass
+
+    # ------------------------------------------------------------------
+    # Memory Persistence
+    # ------------------------------------------------------------------
+    from uuid import uuid4
+
+    def _memory_key(self, key_namespace:tuple):
+        uid = str(uuid4())
+        keys=dict(key_namespace)
+        session_id = keys["session_id"]
+        agent      = keys["agent"]
+        stage      = keys["stage"]
+        namespace  = keys["namespace"]
+        return f"{session_id}:{agent}:{stage}:{namespace}:{uid}"
+
+
+    # ------------------------------------------------------------------
+    # Tool Execution (Local Call)
+    # ------------------------------------------------------------------
+
+    async def _resolve_tool(self, ctx: dict,  state: dict):
+        module_path = ctx["function"]
+        module_name, func_name = module_path.rsplit(".", 1)
+        module = importlib.import_module(module_name)
+        fn = getattr(module, func_name)
+        return await fn(state) if asyncio.iscoroutinefunction(fn) else fn(state)
+
+    # ------------------------------------------------------------------
+    # Tool Call / Tool Invocation (FastMCP)
+    # ------------------------------------------------------------------
+
+    async def _maybe_call_tools(self, output: Any, state: dict):
+        self.logger.info(f"Tools: {self.tools}")
+        for tool in self.tools:
+            if tool.get("trigger") == "always":
+                await self.tool_client.call(
+                    tool_name=tool["name"],
+                    params={
+                        "workspace": self.workspace_dir.name,
+                        "output": output,
+                        "state": state,
+                    },
+                )
+
 
     # ------------------------------------------------------------------
     # Prompt & LLM
@@ -239,12 +284,12 @@ class BaseSkill:
                 f"Available context keys: {list(context.keys())}"
             )
 
-    async def _call_llm(self, prompt: str, state: Dict[str, Any]) -> Any:
+    async def _call_llm(self, prompt: str, runtime_context,  state: Dict[str, Any]) -> Any:
         #try:
         return await self.model_manager.generate(
             prompt=prompt,
-            inputs=state,
-            memory_key=state.get("session_id")
+            namespace=runtime_context.key_namespace, 
+            metadata=state,
             )
         #except:
         #    raise NotImplementedError("LLM execution is now handled by memory adapters or external tools.")
@@ -252,23 +297,6 @@ class BaseSkill:
 
     def _validate_schema(self, output: Any) -> Any:
         return output
-
-    # ------------------------------------------------------------------
-    # Tool Invocation (FastMCP)
-    # ------------------------------------------------------------------
-
-    async def _maybe_call_tools(self, output: Any, state: dict):
-        for tool in self.tools:
-            if tool.get("trigger") == "always":
-                await self.tool_client.call(
-                    service=tool["name"],
-                    params={
-                        "workspace": self.workspace_dir.name,
-                        "output": output,
-                        "state": state,
-                    },
-                )
-
 
 
     # ------------------------------------------------------------------

@@ -27,7 +27,6 @@
 # Copyright:
 #   © 2026 Raymond M.O. Ordona. All rights reserved.
 # -----------------------------------------------------------------------------
-
 from __future__ import annotations
 
 import json
@@ -36,6 +35,7 @@ from pathlib import Path
 from typing import Type
 
 from llm.stores.adapters.base_store import BaseStore
+from llm.embeddings.adapters.base_client import BaseEmbeddingClient
 
 from runtime.logger import AgentLogger
 
@@ -48,6 +48,63 @@ class StoreFactory:
 
     _config: dict | None = None
     _loaded: bool = False
+    _reflection_prompt_cache: Optional[str] = None
+
+    @classmethod
+    def load_reflection_prompt(
+        cls,
+        prompt_path: Optional[str] = None,
+    ) -> str:
+        """
+        Load the system reflection prompt from reflection.md.
+
+        This prompt is intended to be used as a SYSTEM message
+        for post-generation self-reflection.
+
+        Behavior:
+        - Loads once and caches the result
+        - Raises on missing file (fail fast)
+        - Returns raw markdown string
+
+        Args:
+            prompt_path: Optional explicit path to reflection.md.
+                         Defaults to ./prompts/reflection.md
+
+        Returns:
+            The reflection system prompt as a string.
+        """
+
+        if cls._reflection_prompt_cache is not None:
+            return cls._reflection_prompt_cache
+
+        # Default path resolution
+        if prompt_path is None:
+            prompt_path = Path(__file__).resolve().parents[2] / "prompts" / "reflection.md"
+        else:
+            prompt_path = Path(prompt_path)
+
+        if not prompt_path.exists():
+            logger.error(f"Reflection prompt not found at: {prompt_path}")
+            raise FileNotFoundError(
+                f"reflection.md not found at {prompt_path}. "
+                "This file is required for self-reflection."
+            )
+
+        try:
+            content = prompt_path.read_text(encoding="utf-8").strip()
+        except Exception as e:
+            logger.error(f"Failed to read reflection prompt: {e}")
+            raise
+
+        if not content:
+            raise ValueError("reflection.md is empty")
+
+        cls._reflection_prompt_cache = content
+
+        logger.info(f"Reflection prompt loaded from {prompt_path}")
+
+        return content
+
 
     # ------------------------------------------------------------------
     # Configuration
@@ -93,7 +150,9 @@ class StoreFactory:
     # Resolution
     # ------------------------------------------------------------------
     @classmethod
-    def get(cls, provider: str = "default") -> BaseStore:
+    def get(cls, 
+        provider: str = "default", 
+        embedding_client: BaseEmbeddingClient = None) -> BaseStore:
         """
         Instantiate a memory store backend by provider name.
         """
@@ -114,5 +173,8 @@ class StoreFactory:
         kwargs = {k: v for k, v in cfg.items() if k not in {"module", "class"}}
 
         logger.debug(f"Instantiating store provider '{provider}'")
+        logger.info(f"Available parameters: {kwargs}")
 
-        return StoreCls(**kwargs)
+        return StoreCls(
+            embedding_client=embedding_client,
+            **kwargs)

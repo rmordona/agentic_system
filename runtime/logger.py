@@ -73,6 +73,7 @@ class AgentLogger:
         cls,
         component: str,
         workspace: Optional[str] = None,
+        module: Optional[str] = None
     ) -> logging.Logger:
         """
         component must be either:
@@ -82,13 +83,22 @@ class AgentLogger:
         if not cls._initialized:
             cls.initialize()
 
-        if component not in {"system", "runtime"}:
+        if component not in {"system", "runtime", "module"}:
             raise ValueError("component must be 'system' or 'runtime'")
 
         if component == "runtime" and not workspace:
             raise ValueError("workspace is required when component='runtime'")
 
-        key = f"{component}:{workspace or 'global'}"
+        if component == "module" and not module:
+            raise ValueError("Module name is required when component='module'")
+
+        if component == "module":
+            key = f"{component}:{module}"
+            log_path = cls._resolve_log_path(component, module=module)
+        else:
+            key = f"{component}:{workspace or 'global'}"
+            log_path = cls._resolve_log_path(component, workspace=workspace)
+
         if key in cls._loggers:
             return cls._loggers[key]
 
@@ -96,7 +106,6 @@ class AgentLogger:
         logger.setLevel(cls._level)
         logger.propagate = False
 
-        log_path = cls._resolve_log_path(component, workspace)
         log_path.parent.mkdir(parents=True, exist_ok=True)
 
         handler = logging.FileHandler(log_path)
@@ -117,15 +126,19 @@ class AgentLogger:
     def _resolve_log_path(
         cls,
         component: str,
-        workspace: Optional[str],
+        workspace: Optional[str] = None,
+        module: Optional[str] = None
     ) -> Path:
         assert cls._base_dir is not None
 
         if component == "system":
             return cls._base_dir / "system.log"
 
-        # component == "runtime"
-        return cls._base_dir / "runtime" / f"{workspace}.log"
+        if component == "runtime":
+            return cls._base_dir / "runtime" / f"{workspace}.log"
+   
+        if component == "module":
+            return cls._base_dir / "runtime" / f"{module}.log"
 
     @staticmethod
     def _parse_log_level(level: str) -> int:

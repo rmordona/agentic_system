@@ -35,7 +35,7 @@ import importlib
 from pathlib import Path
 from typing import Type
 
-from llm.embeddings.base_client import BaseEmbeddingClient
+from llm.embeddings.adapters.base_client import BaseEmbeddingClient
 
 from runtime.logger import AgentLogger
 
@@ -48,6 +48,8 @@ class EmbeddingFactory:
 
     _config: dict | None = None
     _loaded: bool = False
+    _provider: str = None
+    _model_name : str = None
 
     # ------------------------------------------------------------------
     # Configuration
@@ -98,22 +100,32 @@ class EmbeddingFactory:
         Instantiate an embedding client by provider name.
         """
         if cls._config is None:
+            logger.warning("EmbeddingFactory config not loaded")
             raise RuntimeError("EmbeddingFactory config not loaded")
 
-        embedding_cfg = cls._config.get("embedding", {})
-        cfg = embedding_cfg.get(provider)
+        cls._provider, cls._model_name = provider.split(':', 1)
 
-        if not cfg:
-            raise ValueError(f"No embedding config for provider '{provider}'")
+        embedding_clients_cfg = cls._config.get("embedding_clients", {})
+        client_cfg = embedding_clients_cfg.get(cls._provider)
+
+        if not client_cfg:
+            logger.warning(f"No embedding config for provider '{cls._provider}'")
+            raise ValueError(f"No embedding config for provider '{cls._provider}'")
+
+        logger.info(f"Provider and Model: '{cls._provider}' and '{cls._model_name}'")
+        logger.info(f"Embedding Config chosen: {client_cfg}")
 
         EmbeddingCls = cls._load_class(
-            module_path=cfg["module"],
-            class_name=cfg["class"]
+            module_path=client_cfg["module"],
+            class_name=client_cfg["class"]
         )
 
         # Remove factory-only keys
-        kwargs = {k: v for k, v in cfg.items() if k not in {"module", "class"}}
+        kwargs = {k: v for k, v in client_cfg.items() if k not in {"module", "class"}}
 
-        logger.debug(f"Instantiating embedding provider '{provider}'")
+        logger.debug(f"Instantiating embedding provider '{cls._provider}'")
 
-        return EmbeddingCls(**kwargs)
+        return EmbeddingCls(
+            model_name=cls._model_name, 
+            **kwargs
+        )

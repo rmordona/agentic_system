@@ -20,12 +20,14 @@
 # -----------------------------------------------------------------------------
 
 # llm/chatmodels/chatmodel_factory.py
+from __future__ import annotations
 
 import json
 import importlib
 from pathlib import Path
 from typing import Type
 
+from langchain.chat_models.base import BaseChatModel
 from runtime.logger import AgentLogger
 
 logger = AgentLogger.get_logger(  component="system")
@@ -38,6 +40,8 @@ class ChatModelFactory:
 
     _config: dict | None = None
     _loaded: bool = False
+    _provider: str | None = None
+    _model_name: str | None = None
 
     @classmethod
     def load_config(cls, path: Path) -> None:
@@ -62,23 +66,35 @@ class ChatModelFactory:
             )
 
     @classmethod
-    def get(cls, provider: str, model_name: str, **kwargs):
+    def get(cls, provider: str = "default") -> BaseChatModel:
+        """
+        Instantiate an embedding client by provider name.
+        """
         if cls._config is None:
+            logger.warning("ChatModelFactory config not loaded")
             raise RuntimeError("ChatModelFactory config not loaded")
 
-        cfg = cls._config.get(provider)
-        if not cfg:
-            raise ValueError(f"No chatmodel config for '{provider}'")
+        cls._provider, cls._model_name = provider.split(':', 1)
+
+        chatmodel_clients_cfg = cls._config.get("chatmodel_clients", {})
+        client_cfg = chatmodel_clients_cfg.get(cls._provider)
+
+        if not client_cfg:
+            logger.warning(f"No embedding config for provider '{cls._provider}'")
+            raise ValueError(f"No embedding config for provider '{cls._provider}'")
+
+        logger.info(f"Provider and Model: '{cls._provider}' and '{cls._model_name}'")
+        logger.info(f"ChatModel Config chosen: {client_cfg}")
 
         ChatCls = cls._load_class(
-            module_path=cfg["module"],
-            class_name=cfg["class"]
+            module_path=client_cfg["module"],
+            class_name=client_cfg["class"]
         )
 
-        endpoint = cfg.get("endpoint", {}).get("base")
+        # Remove factory-only keys
+        kwargs = {k: v for k, v in client_cfg.items() if k not in {"module", "class"}}
 
         return ChatCls(
-            model_name=model_name,
-            endpoint=endpoint,
+            model_name=cls._model_name,
             **kwargs
         )

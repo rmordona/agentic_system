@@ -1,9 +1,12 @@
 from pathlib import Path
 from graph.stage_graph import StageGraph
-from runtime.logger import AgentLogger
+
 from runtime.agent_registry import AgentRegistry
 from runtime.stage_registry import StageRegistry
 from runtime.workspace_loader import WorkspaceLoader
+
+from runtime.logger import AgentLogger
+logger = AgentLogger.get_logger(  component="system")
 
 class GraphManager:
     """
@@ -24,10 +27,6 @@ class GraphManager:
         self.stage_registry = stage_registry
         self.hitl_callback = hitl_callback
 
-        # Bind workspace logger ONCE
-        global logger
-        logger = AgentLogger.get_logger(self.workspace_name, component="graph_manager")
-
         self._graphs = {}
 
     # ------------------------------------------------------------------
@@ -44,6 +43,7 @@ class GraphManager:
             return self._graphs[self.workspace_name]
 
         # Build graph dynamically from agent registry and stage router
+        logger.info("We are about to enter graph building, plus graph compilation.")
         graph = StageGraph(
             workspace_name=self.workspace_name,
             agent_registry=self.agent_registry,
@@ -53,7 +53,7 @@ class GraphManager:
 
         # Cache the compiled graph
         self._graphs[self.workspace_name] = graph
-        logger.info(f"Compiled and cached graph for workspace: {self.workspace_name}")
+        logger.info(f"Graph compiled and cached for workspace '{self.workspace_name}'")
 
         return graph
 

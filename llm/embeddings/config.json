@@ -1,24 +1,24 @@
 {
-  "embedding" : {
+  "embedding_clients" : {
     "default" : "ollama",
     "ollama" : {
-        "module": "llm.embeddings.adapters.ollama_embeddings",
+        "module": "llm.embeddings.adapters.ollama_embedding_client",
         "class": "OllamaEmbeddingClient",
-        "embed" : "nomic-embed-text:latest",
-        "endpoint" : "http://localhost:11434/api/embeddings"
+        "endpoint" : "http://localhost:11434/api/embed",
+        "models" : [ "nomic-embed-text:latest" ]
     },
     "openai" : {
-        "module": "llm.embeddings.adapters.openai_embeddings",
+        "module": "llm.embeddings.adapters.openai_embedding_client",
         "class": "OpenAIEmbeddingClient",
         "embed" : "openai:text-embedding-3-small",
-        "endpoint": "",
+        "models" : [ "text-embedding-3-small", "nomic-embed-text:latest" ],
         "api_key": "${OPENAI_API_KEY}"
     },
     "cohere" : {
-        "module": "llm.embeddings.adapters.cohere_embeddings",
+        "module": "llm.embeddings.adapters.cohere_embedding_client",
         "class": "CohereEmbeddingClient",
-        "embed" : "embed-v4.0",
-        "endpoint" : "",
+        "embed" : "cohere:embed-v4.0",
+        "models" : [ "embed-v4.0", "nomic-embed-text:latest" ],
         "api_key": "${COHERE_API_KEY}"
     }
   }

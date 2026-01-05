@@ -67,7 +67,7 @@ class Orchestrator:
 
         # Bind workspace logger ONCE
         global logger
-        logger = AgentLogger.get_logger(self.workspace_name, component="orchestrator")
+        logger = AgentLogger.get_logger( component="runtime", workspace = self.workspace_name )
 
     async def run(self, session_state: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -92,16 +92,13 @@ class Orchestrator:
 
             logger.info("We are inside graph.astream - an event is emitted ...")
             logger.info(event)
-            print("We are inside graph.astream - an event is emitted:")
-            print(event)
 
             logger.info("Emitting graph_event ...")
-            print("Emitting graph_event ...")
+
             await self.event_bus.emit("graph_event", event)
             logger.info("Now waiting for graph_event response")
-            print("Now waiting for graph_event response")
 
-        print("Exited from graph.astream")
+        logger.info("Exited from graph.astream")
 
         await self.event_bus.emit(
                 "orchestrator_end",

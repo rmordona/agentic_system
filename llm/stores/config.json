@@ -1,19 +1,22 @@
 
 {
    "stores": {
-      "default": "in-memory",
-      "in-memory" : {
+      "default": "in-memory-ollama",
+      "in-memory-ollama" : {
           "module": "llm.stores.adapters.inmemory_store",
           "class": "InMemoryStore",
-          "dim": 1536,
-          "embed": "openai:text-embedding-3-small"
+          "dims": 1536
+      },
+      "in-memory-openai" : {
+          "module": "llm.stores.adapters.inmemory_store",
+          "class": "InMemoryStore",
+          "dims": 1536
       },
       "oracle": {
         "module": "llm.stores.adapters.oracle_store",
         "class": "OracleStore",
         "dsn": "username:password@localhost:5432/agentic_embeddings",
         "tables": ["embedding1", "embedding2"],
-        "embedding_model": "nomic-embed-text",
         "dims": 768
       },
       "chromadb": {
@@ -22,7 +25,6 @@
         "url" : "http://localhost/8000",
         "persist_directory": "./data/chromadb",
         "collections": ["embedding1", "embedding2"],
-        "embedding_model": "nomic-embed-text",
         "dims": 768
       },
       "postgres": {
@@ -31,14 +33,12 @@
         "dsn": "postgresql://username:password@localhost:5432/agentic_embeddings",
         "persist_directory": "./data/postgres",
         "collections": ["embedding1", "embedding2"],
-        "embedding_model": "nomic-embed-text",
         "dims": 768
       },
       "redis": {
         "module": "llm.stores.adapters.redis_store",
         "class": "RedisStore",
         "url": "redis://localhost:6379/0",
-        "namespace": "agentic_episodic",
         "ttl_seconds": 86400
       }
   }

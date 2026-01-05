@@ -36,7 +36,7 @@ class ReloadManager:
         self.loggers = {
             ws_name: AgentLogger.get_logger(
                 workspace=ws_name,
-                component="reload_manager"
+                component="runtime"
             )
             for ws_name in workspace_loaders.keys()
         }

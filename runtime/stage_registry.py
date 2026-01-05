@@ -6,14 +6,15 @@ the StageGraph during execution.
 
 StageRegistry does NOT execute agents or manage state.
 """
-
-
 from __future__ import annotations
 import json
 from pathlib import Path
 from typing import Dict, List, Optional, Any, Callable
-from runtime.logger import AgentLogger
 from events.event_bus import EventBus
+
+from runtime.logger import AgentLogger
+
+logger = AgentLogger.get_logger(  component="system")
 
 class Stage:
     def __init__(self, meta: Dict[str, Any], workspace_name: str, exit_condition: Optional[Callable[[Dict[str, Any]], bool]] = None):
@@ -29,8 +30,7 @@ class Stage:
 
         self.event_bus = None
 
-        # Logger
-        self.logger = AgentLogger.get_logger(workspace_name, component=f"stage_{self.name}")
+
 
         assert callable(self.exit_condition), "exit_condition must be callable"
 
@@ -50,7 +50,7 @@ class Stage:
         try:
             return self.exit_condition(state)
         except Exception as e:
-            self.logger.error(f"Error evaluating exit_condition for stage '{self.name}': {e}")
+            logger.error(f"Error evaluating exit_condition for stage '{self.name}': {e}")
             return False
 
     def __repr__(self) -> str:
@@ -67,12 +67,11 @@ class StageRegistry:
 
         self._stages: Dict[str, Stage] = {}
         self._order: List[str] = []
-        self.logger = AgentLogger.get_logger(self.workspace_name, component="stage_registry")
 
     def load_stages(self):
         stage_path = Path(self.workspace_dir / self.stage_file)
         if not stage_path.exists():
-            self.logger.error(f"Stage file not found: {stage_path}")
+            logger.error(f"Stage file not found: {stage_path}")
             raise FileNotFoundError(f"Stage file not found: {stage_path}")
 
         with stage_path.open("r", encoding="utf-8") as f:
@@ -80,7 +79,7 @@ class StageRegistry:
 
         stages_meta = data.get("stages", [])
         if not stages_meta:
-            self.logger.warning("No stages defined in stage.json")
+            logger.warning("No stages defined in stage.json")
             return
 
         # Sort by priority
@@ -89,7 +88,7 @@ class StageRegistry:
             stage = Stage(stage_meta, self.workspace_name)
             self._stages[stage.name] = stage
             self._order.append(stage.name)
-            self.logger.info(f"Registered stage '{stage.name}' with allowed_agents={stage.allowed_agents}")
+            logger.info(f"Registered stage '{stage.name}' with allowed_agents={stage.allowed_agents}")
 
     # -----------------------------
     # Accessors
@@ -107,7 +106,7 @@ class StageRegistry:
 
     def next_stage(self, current_stage: str) -> Optional[str]:
         if current_stage not in self._order:
-            self.logger.warning(f"Current stage '{current_stage}' not found in stage order")
+            logger.warning(f"Current stage '{current_stage}' not found in stage order")
             return None
         idx = self._order.index(current_stage)
         if idx + 1 < len(self._order):

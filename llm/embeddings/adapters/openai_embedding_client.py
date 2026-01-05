@@ -13,7 +13,7 @@ from typing import Dict, Any
 import requests
 import numpy as np
 
-from llm.embeddings.base_client import BaseEmbeddingClient
+from llm.embeddings.adapters.base_client import BaseEmbeddingClient
 
 # ------------------------------
 # OpenAI embedding client

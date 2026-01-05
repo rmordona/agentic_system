@@ -5,7 +5,7 @@ from runtime.tools.tool_registry import ToolRegistry
 from runtime.tools.tool_policy import ToolPolicy
 from runtime.logger import AgentLogger
 
-logger = AgentLogger.get_logger(component="system")
+#logger = AgentLogger.get_logger(component="system")
 
 class ToolClient(Tool):
     """
@@ -22,6 +22,8 @@ class ToolClient(Tool):
         self.policy = policy
         self.agent_role = agent_role
 
+        self.logger = AgentLogger.get_logger(component="module", module=__name__)
+
     async def call(self, 
             tool_name: str, 
             **kwargs
@@ -29,8 +31,8 @@ class ToolClient(Tool):
         allowed = self.policy.check(self.agent_role, tool_name)
         if allowed:
             tool = self.registry.get(tool_name)
-            logger.info(f"Running tool '{tool_name}' for '{self.agent_role}'")
+            self.logger.info(f"Running tool '{tool_name}' for '{self.agent_role}'")
             return await tool.call(**kwargs)
-        logger.warning(f"'{self.agent_role}' is not allwed to run the tool '{tool_name}' ... Permission denied ...")
+        self.logger.warning(f"'{self.agent_role}' is not allwed to run the tool '{tool_name}' ... Permission denied ...")
         return {}
 

@@ -21,8 +21,7 @@ from events.event_bus import EventBus
 
 from runtime.logger import AgentLogger
 
-
-
+logger = AgentLogger.get_logger(component="system")
  
 class AgentRegistry:
     """
@@ -53,9 +52,6 @@ class AgentRegistry:
         self._agents: Dict[str, SkillAgent] = {}
         self._roles_ordered: List[str] = []
 
-        global logger
-        logger = AgentLogger.get_logger(self.workspace_name, component="agent_registry")
-
     # ------------------------------------------------------------------
     # Agent Loading
     # ------------------------------------------------------------------
@@ -76,8 +72,6 @@ class AgentRegistry:
                 continue
 
             skill_file = agent_dir / "skill.json"
-            logger.info(f"agent_dir: {agent_dir}")
-            logger.info(f"skill_file: {skill_file}")
 
             if not skill_file.exists():
                 logger.warning(f"Missing skill.json in {agent_dir}")
@@ -88,7 +82,6 @@ class AgentRegistry:
             try:
                 # Create a MemoryContext for this agent
                 runtime_context = RuntimeContext(
-                    #memory_manager=self.memory_manager,
                     namespace=f"workspace:{self.workspace_name}",
                 )
 
@@ -98,18 +91,18 @@ class AgentRegistry:
                     stage_meta={},          # injected later
                     runtime_context=runtime_context,   # inject context instead of manager
                     model_manager=self.model_manager,
-                    tool_client=self.tool_client,
+                    tool_client = self.tool_client,
                     event_bus=self.event_bus
                 )
+
                 self.register(agent)
                 logger.info(f"Loaded agent: {agent.role} ({skill_name})")
 
             except Exception as e:
                 logger.error(
                     f"Failed to load agent from {agent_dir}: {e}",
-                    exc_info=True
+                    # exc_info=True
                 )
-
 
         logger.info(f"Registered agent roles: {self.roles()}")
 
