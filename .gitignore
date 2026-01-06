@@ -2,5 +2,4 @@
 venv
 lib
 bin
-node_modules
-ui_platform/frontend/node_modules
+**/node_modules/
