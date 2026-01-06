@@ -1,11 +1,11 @@
 cd frontend
 
 # Clean the cache
-#rm -rf node_modules package-lock.json
+rm -rf node_modules package-lock.json
 
 # install packages (done once)
-#npm install
+npm install
 
 # now run frontend
-rm -rf node_modules/.vite
+# rm -rf node_modules/.vite
 npm run dev

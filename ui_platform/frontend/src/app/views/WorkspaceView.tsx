@@ -1,16 +1,12 @@
-// -----------------------------------------------------------------------------
 // File: src/app/views/WorkspaceView.tsx
-// -----------------------------------------------------------------------------
-
 import React from 'react'
-import { observer } from 'mobx-react-lite'
 import { useNavigate } from 'react-router-dom'
-
-import { workspaceStore } from '../../store/workspaceStore'
+import { useWorkspaceStore } from '../../store/workspaceStore'
 import WorkspaceCardView from './WorkspaceCardView'
 
-const WorkspaceView: React.FC = observer(() => {
+const WorkspaceView: React.FC = () => {
   const navigate = useNavigate()
+  const workspaces = useWorkspaceStore((state) => state.workspaces)
 
   const handleOpenWorkspace = (id: string) => {
     navigate(`/workspaces/${id}`)
@@ -25,16 +21,16 @@ const WorkspaceView: React.FC = observer(() => {
       </header>
 
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {workspaceStore.workspaces.map(ws => (
+        {workspaces.map((ws) => (
           <WorkspaceCardView
             key={ws.id}
             workspace={ws}
-            onOpen={() => handleOpenWorkspace(ws.id)}
+            onClick={() => handleOpenWorkspace(ws.id)}
           />
         ))}
       </section>
     </div>
   )
-})
+}
 
 export default WorkspaceView
