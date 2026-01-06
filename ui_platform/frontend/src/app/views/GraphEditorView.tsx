@@ -5,9 +5,6 @@ import { useParams } from 'react-router-dom'
 import ChatView from './ChatView'
 import ReactFlowGraphView from './ReactFlowGraphView'
 
-import 'reactflow/dist/style.css'
-
-
 const GraphEditorView: React.FC<{ mode: 'user' | 'developer' }> = ({ mode }) => {
   
   const { workspaceId } = useParams<{ workspaceId: string }>()
@@ -36,7 +33,7 @@ const GraphEditorView: React.FC<{ mode: 'user' | 'developer' }> = ({ mode }) => 
       </div>
 
       {/* Graph Canvas */}
-      <div className="flex-1 bg-white dark:bg-gray-900 p-6">
+      <div className="flex-1 bg-white dark:bg-gray-900 p-6 flex flex-col">
         <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">
           Graph Editor
         </h2>
@@ -45,12 +42,8 @@ const GraphEditorView: React.FC<{ mode: 'user' | 'developer' }> = ({ mode }) => 
           Workspace ID: <strong>{workspaceId}</strong>
         </p>
 
-        <div className="h-full rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-700 flex items-center justify-center">
-          <span className="text-gray-500 dark:text-gray-400">
-              <div className="flex-1 h-full p-4">
-                <ReactFlowGraphView devMode={true} />
-              </div>
-          </span>
+        <div className="flex-1 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-700 overflow-hidden">
+          <ReactFlowGraphView devMode={true} />
         </div>
       </div>
     </div>
