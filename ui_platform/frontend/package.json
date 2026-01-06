@@ -13,7 +13,7 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@headlessui/react": "^1.9.0",
+    "@headlessui/react": "^1.7.18",
     "@heroicons/react": "^2.0.18",
     "@tanstack/react-query": "^5.3.0",
     "@tanstack/react-query-devtools": "^5.3.0",
@@ -23,20 +23,27 @@
     "clsx": "^2.1.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-flow-renderer": "^11.8.0",
+    "reactflow": "^11.11.4",
     "react-router-dom": "^6.17.0",
     "sse.js": "^1.0.0",
-    "zustand": "^4.6.1"
+    "zustand": "^4.5.2",
+    "postcss" : "",
+    "autoprefixer" : "",
+    "mobx-react-lite" : "",
+    "tailwindcss" : "",
+    "@tailwindcss/forms" : "",
+    "@tailwindcss/typography" : "",
+    "@tailwindcss/aspect-ratio" : ""
   },
   "devDependencies": {
     "@types/node": "^20.4.2",
     "@types/react-router-dom": "^5.3.3",
-    "@vitejs/plugin-react": "^5.2.0",
+    "@vitejs/plugin-react": "^4.3.0",
     "autoprefixer": "^10.4.15",
     "eslint": "^8.46.0",
-    "eslint-config-prettier": "^9.0.0",
+    "eslint-config-prettier": "^9.1.0",
     "postcss": "^8.4.35",
-    "prettier": "^3.9.1",
+    "prettier": "^3.2.5",
     "tailwindcss": "^3.4.4",
     "typescript": "^5.2.2",
     "vite": "^5.2.0"

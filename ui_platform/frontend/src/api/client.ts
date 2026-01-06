@@ -1,22 +1,16 @@
 // -----------------------------------------------------------------------------
 // Project: Agentic System UI Platform
-// File: ui_platform/frontend/src/api/client.ts
+// File: src/api/client.ts
 //
 // Description:
 //   Centralized HTTP client for all REST API calls.
 //
-//   Responsibilities:
-//     - JWT token attachment
-//     - Automatic JSON handling
-//     - Standardized error handling
-//     - Request/response typing
-//     - Auth-aware request lifecycle
-//
-//   This client is used by:
-//     - workspace APIs
-//     - graph APIs
-//     - run execution APIs
-//     - authentication APIs
+// Responsibilities:
+//   - JWT token attachment
+//   - Automatic JSON handling
+//   - Standardized error handling
+//   - Request/response typing
+//   - Auth-aware request lifecycle
 //
 // Author: Raymond M.O. Ordona
 // Created: 2026-01-04
@@ -51,9 +45,8 @@ export class ApiClient {
   }
 
   // ---------------------------------------------------------------------------
-  // Core Request Method
+  // Core request method
   // ---------------------------------------------------------------------------
-
   private async request<T>(
     path: string,
     options: RequestInit = {}
@@ -89,3 +82,44 @@ export class ApiClient {
         details: errorBody,
       } satisfies ApiError
     }
+
+    // Return parsed JSON
+    return response.json() as Promise<T>
+  }
+
+  // ---------------------------------------------------------------------------
+  // Convenience HTTP methods
+  // ---------------------------------------------------------------------------
+  public get<T>(path: string): Promise<T> {
+    return this.request<T>(path, { method: 'GET' })
+  }
+
+  public post<T>(path: string, body?: any): Promise<T> {
+    return this.request<T>(path, {
+      method: 'POST',
+      body: body ? JSON.stringify(body) : undefined,
+    })
+  }
+
+  public put<T>(path: string, body?: any): Promise<T> {
+    return this.request<T>(path, {
+      method: 'PUT',
+      body: body ? JSON.stringify(body) : undefined,
+    })
+  }
+
+  public delete<T>(path: string): Promise<T> {
+    return this.request<T>(path, { method: 'DELETE' })
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Default API client instance
+// ----------------------------------------------------------
+export const api = new ApiClient({
+  baseUrl: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000',
+  getAccessToken: () => localStorage.getItem('accessToken'),
+  onUnauthorized: () => {
+    console.warn('Unauthorized request detected')
+  },
+})

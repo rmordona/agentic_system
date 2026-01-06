@@ -36,6 +36,9 @@ export default defineConfig({
     port: 5173,          // Default Vite dev port
     open: true,          // Open browser on start
     cors: true,          // Enable CORS for backend integration
+    fs: {
+      strict: false,
+    },
   },
   preview: {
     port: 4173,          // Preview production build
@@ -45,6 +48,7 @@ export default defineConfig({
     sourcemap: true,     // Generate source maps for production
     target: 'esnext',    // Modern JS target
     rollupOptions: {
+      input: 'index.html', 
       output: {
         manualChunks(id) {
           // Separate vendor dependencies for better caching

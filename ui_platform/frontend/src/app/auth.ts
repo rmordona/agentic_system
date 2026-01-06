@@ -94,3 +94,10 @@ export function logout(): void {
   localStorage.removeItem(USER_MODE_KEY)
   window.location.href = '/login'
 }
+
+
+// src/app/auth.ts
+export async function login(username: string, password: string): Promise<boolean> {
+  // Implement actual login logic here
+  return username === 'admin' && password === 'password'
+}

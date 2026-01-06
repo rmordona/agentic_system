@@ -1,87 +1,119 @@
-// -----------------------------------------------------------------------------
-// Project: Agentic System UI Platform
-// File: ui_platform/frontend/src/app/routes.tsx
-//
-// Description:
-//   Application routing configuration.
-//
-//   Responsibilities:
-//     - Route definitions
-//     - Lazy loading of views
-//     - Auth-protected routes
-//     - Developer vs User mode gating
-//
-//   Uses React Router v6+
-// -----------------------------------------------------------------------------
+import React, { lazy, Suspense } from 'react'
+import { createBrowserRouter, Navigate } from 'react-router-dom'
 
-import React, { lazy } from 'react'
-import { Navigate, RouteObject } from 'react-router-dom'
-import { isAuthenticated, isDeveloperMode } from './auth'
+// Layouts
+import PublicLayout from '@/components/layout/PublicLayout'
+import AuthLayout from '@/components/layout/AuthLayout'
+
+// Loaders
+import { requireAuthLoader } from './loaders/AuthLoader'
+import { fetchWorkspaceLoader } from './loaders/WorkspaceLoader'
+import { fetchRunLoader } from './loaders/RunLoader'
+
+// Error handling
+import RouteErrorBoundary from '../app/errors/RouteErrorBoundary'
 
 // -----------------------------------------------------------------------------
-// Lazy-loaded Views
+// Lazy-loaded views
 // -----------------------------------------------------------------------------
+const LoginView = lazy(() => import('./views/LoginView'))
+const WorkspaceView = lazy(() => import('./views/WorkspaceView'))
+const WorkspaceDashboardView = lazy(() => import('./views/WorkspaceDashboardView'))
+const RunView = lazy(() => import('./views/RunView'))
+const GraphEditorView = lazy(() => import('./views/GraphEditorView'))
+const NotFoundView = lazy(() => import('./views/NotFoundView'))
 
-const LoginView = lazy(() => import('../views/LoginView'))
-const WorkspaceView = lazy(() => import('../views/WorkspaceView'))
-const GraphEditorView = lazy(() => import('../views/GraphEditorView'))
-const RunView = lazy(() => import('../views/RunView'))
-const NotFoundView = lazy(() => import('../views/NotFoundView'))
+// Fallback for Suspense
+const LoadingFallback = () => (
+  <div className="flex items-center justify-center h-screen text-gray-700 dark:text-gray-200">
+    Loading...
+  </div>
+)
 
-// -----------------------------------------------------------------------------
-// Route Guards
-// -----------------------------------------------------------------------------
+const CompositeWorkspaceError: React.FC = () => {
+  const error = useRouteError()
 
-/**
- * Require authentication to access a route.
- */
-function requireAuth(element: JSX.Element): JSX.Element {
-  return isAuthenticated() ? element : <Navigate to="/login" replace />
-}
+  if (isRunError(error)) return <RouteErrorBoundary />
+  if (isPermissionError(error)) return <NotFoundView />
 
-/**
- * Require developer mode for advanced tooling.
- */
-function requireDeveloperMode(element: JSX.Element): JSX.Element {
-  if (!isAuthenticated()) {
-    return <Navigate to="/login" replace />
-  }
-  if (!isDeveloperMode()) {
-    return <Navigate to="/workspaces" replace />
-  }
-  return element
+  return <GenericWorkspaceError />
 }
 
 // -----------------------------------------------------------------------------
-// Route Definitions
+// Production-ready routes
 // -----------------------------------------------------------------------------
-
-/**
- * Central route table for the application.
- */
-export const routes: RouteObject[] = [
-  {
-    path: '/',
-    element: <Navigate to="/workspaces" replace />,
-  },
+export const routes = createBrowserRouter([
+  // Public routes
   {
     path: '/login',
-    element: <LoginView />,
+    element: (
+      <PublicLayout>
+        <Suspense fallback={<LoadingFallback />}>
+          <LoginView />
+        </Suspense>
+      </PublicLayout>
+    ),
   },
+
+  // Authenticated routes
   {
-    path: '/workspaces',
-    element: requireAuth(<WorkspaceView />),
+    path: '/',
+    element: <AuthLayout />,
+    errorElement: <RouteErrorBoundary />,
+    //loader: requireAuthLoader, // temporarily can return null for bypass
+    children: [
+      { index: true, element: <Navigate to="/workspaces" replace /> },
+
+      // Workspace list
+      {
+        path: 'workspaces',
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <WorkspaceView />
+          </Suspense>
+        ),
+      },
+
+      // Workspace dashboard with nested routes
+      {
+        path: 'workspaces/:workspaceId',
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <WorkspaceDashboardView />
+          </Suspense>
+        ),
+        // loader: fetchWorkspaceLoader, // optional; can bypass for now
+        children: [
+          { index: true, element: <div className="p-4 bg-green-200">Overview</div> },
+          {
+            path: 'runs/:runId',
+            element: (
+              <Suspense fallback={<LoadingFallback />}>
+                <RunView />
+              </Suspense>
+            ),
+            // loader: fetchRunLoader, // optional; can bypass for now
+          },
+          {
+            path: 'graph',
+            element: (
+              <Suspense fallback={<LoadingFallback />}>
+                <GraphEditorView />
+              </Suspense>
+            ),
+          },
+        ],
+      },
+
+      // Catch-all 404
+      {
+        path: '*',
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <NotFoundView />
+          </Suspense>
+        ),
+      },
+    ],
   },
-  {
-    path: '/workspaces/:workspaceId',
-    element: requireAuth(<RunView />),
-  },
-  {
-    path: '/workspaces/:workspaceId/graph',
-    element: requireDeveloperMode(<GraphEditorView />),
-  },
-  {
-    path: '*',
-    element: <NotFoundView />,
-  },
-]
+])

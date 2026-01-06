@@ -1,0 +1,42 @@
+frontend/
+├─ index.html
+├─ package.json
+├─ package-lock.json
+├─ vite.config.ts
+├─ tailwind.config.js
+├─ postcss.config.js
+├─ src/
+│  ├─ main.tsx
+│  ├─ styles/theme.ts
+│  ├─ app/
+│  │  ├─ App.tsx
+│  │  ├─ routes.tsx
+│  │  ├─ auth.ts
+│  │  ├─ chat/
+│  │  │  ├─ ChatWindow.tsx
+│  │  │  ├─ ChatMessage.tsx
+│  │  │  ├─ ChatInput.tsx
+│  │  │  └─ chatStore.ts
+│  │  ├─ styles/theme.css
+│  │  ├─ layout/
+│  │  │  ├─ TopBar.tsx
+│  │  │  ├─ SideBar.tsx
+│  │  │  └─ MainPanel.tsx
+│  │  ├─ graph/
+│  │  │  ├─ EdgeInspector.tsx
+│  │  │  ├─ GraphEditor.tsx
+│  │  │  └─ NodeInspector.tsx
+│  │  ├─ observability/
+│  │  │  ├─ RunTimeline.tsx
+│  │  │  └─ StageStatus.tsx
+│  │  └─ prompts/
+│  │     ├─ PromptViewer.tsx
+│  │     └─ IOInspector.tsx
+│  ├─ api/
+│  │  ├─ client.ts
+│  │  └─ sse.ts
+│  └─ store/
+│     ├─ workspaceStore.ts
+│     ├─ runStore.ts
+│     ├─ graphStore.ts
+
