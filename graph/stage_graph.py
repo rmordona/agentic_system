@@ -8,15 +8,17 @@ StageGraph does NOT execute skills or manage memory —
 it only decides *what runs next*.
 """
 
-
 from typing import Optional, Any, Dict, List
 from langgraph.graph import StateGraph, END
 from langgraph.channels import Topic, LastValue, BinaryOperatorAggregate
 from graph.state import State, AgentOutput, merge_reward_dicts
 
+from runtime.sdd_pipeline_adapter import PipelineAdapter
+
 from runtime.logger import AgentLogger
 
-logger = AgentLogger.get_logger(  component="system")
+logger = AgentLogger.get_logger(component="system")
+
 
 class StageGraph:
 
@@ -25,10 +27,14 @@ class StageGraph:
         workspace_name: str,
         agent_registry,
         stage_registry,
+        pipeline_adapter: PipelineAdapter = None,
+        mode: str = "stage_router",  # can be "sdd" for PipelineAdapter mode
         hitl_callback: Optional[Any] = None,
     ):
         self.agent_registry = agent_registry
         self.stage_registry = stage_registry
+        self.pipeline_adapter = pipeline_adapter
+        self.mode = mode
         self.hitl_callback = hitl_callback
 
         # Channels
@@ -74,9 +80,9 @@ class StageGraph:
             self.graph.add_node(agent.role, node_func)
         logger.info(f"Registered agent nodes added to graph: {list(self.graph.nodes.keys())}")
 
-        # 3. Add stage router node
-        self._add_stage_router_node()
-        logger.info(f"Stage Router added to graph")
+        # 3. Add stage router node with SDD support if pipeline_adapter is provided
+        self._add_stage_router_node(pipeline_adapter=self.pipeline_adapter, mode=self.mode)
+        logger.info(f"Stage Router added to graph with mode: {self.mode}")
 
         # 4. Add edges: agents → stage_router, stage_router → next_agent / END
         self._add_edges()
@@ -85,7 +91,6 @@ class StageGraph:
         # 5. Set entry point to stage_router
         self.graph.set_entry_point("stage_router")
         logger.info("Entry to graph now set: First stop is the 'stage_router'.")
-
         logger.info("StageGraph build complete. Entry point: 'stage_router'")
 
     # -------------------------------
@@ -122,14 +127,19 @@ class StageGraph:
         return agent_node
 
     # -------------------------------
-    def _add_stage_router_node(self):
+    def _add_stage_router_node(self, pipeline_adapter=None, mode="stage_router"):
+        """
+        Stage router node with dual-mode support:
+        - mode="sdd": use PipelineAdapter for dynamic stage routing
+        - mode="stage_router": use original stage_registry routing
+        """
         async def stage_router(state: State) -> dict:
             stage_name = state["stage"]
             stage = self.stage_registry.get(stage_name)
             executed = state.get("executed_agents_per_stage", {}).get(stage_name, [])
             remaining = [a for a in stage.allowed_agents if a not in executed]
 
-            # Run next agent if any remaining
+            # 1️⃣ Run next agent if any remaining in current stage
             if remaining:
                 next_agent = remaining[0]
                 if next_agent not in self.graph.nodes:
@@ -138,21 +148,40 @@ class StageGraph:
                     )
                 return {"next_agent": next_agent}
 
-            # Stage exit
-            if stage.should_exit(state):
-                next_stage_name = self.stage_registry.next_stage(stage_name)
-                if not next_stage_name:
+            # 2️⃣ Stage exit → determine next stage
+            if mode == "sdd" and pipeline_adapter:
+                artifact = state.get("artifact", {"current_plan": []})
+                decision = pipeline_adapter.get_next_stage(artifact)
+                next_stage_name = decision.get("next_stage")
+                allowed_agents = decision.get("allowed_agents", [])
+
+                # Terminal stage or HITL required
+                if not next_stage_name or decision.get("hitl_required"):
                     return {"done": True}
 
-                next_stage = self.stage_registry.get(next_stage_name)
-                next_agent = next_stage.allowed_agents[0]
-                if next_agent not in self.graph.nodes:
-                    raise ValueError(
-                        f"StageRouter: First agent of next stage '{next_agent}' not in graph nodes!"
-                    )
+                # Update artifact back in state
+                state["artifact"] = artifact
 
+                # Pick first agent of next stage
+                next_agent = allowed_agents[0] if allowed_agents else None
                 return {"stage": next_stage_name, "next_agent": next_agent}
 
+            else:
+                # Fallback: original stage_router behavior
+                if stage.should_exit(state):
+                    next_stage_name = self.stage_registry.next_stage(stage_name)
+                    if not next_stage_name:
+                        return {"done": True}
+
+                    next_stage = self.stage_registry.get(next_stage_name)
+                    next_agent = next_stage.allowed_agents[0]
+                    if next_agent not in self.graph.nodes:
+                        raise ValueError(
+                            f"StageRouter: First agent of next stage '{next_agent}' not in graph nodes!"
+                        )
+                    return {"stage": next_stage_name, "next_agent": next_agent}
+
+            # 3️⃣ Default: done
             return {"done": True}
 
         self.graph.add_node("stage_router", stage_router)

@@ -1,0 +1,53 @@
+{
+  "name": "critic_evaluation",
+  "description": "Evaluates risks, weaknesses, or inconsistencies in previous proposals.",
+  "role" : "critic",
+  "llm": "local_llm_v1",
+  "output_mode": "json",
+  "prompt": {
+    "system": "prompt.md"
+  },
+  "output_schema": "schema.json",
+  "memory": {
+    "semantic": false,
+    "episodic": true
+  },
+  "tools": [
+    {
+      "name": "log_critique",
+      "when": "post_output"
+    },
+    {
+      "name": "log_critique",
+      "trigger": "always"
+    }
+  ],
+  "capabilities": ["analysis", "risk_assessment"],
+  "rewards": {
+    "enabled": true,
+    "callback": "agents.critic.agent.CriticReward.compute"
+  },
+  "execution": {
+    "next_stage": "synthesizer",
+    "priority": 5,
+    "skip_on_condition": "not state.get('skill_outputs', {}).get('optimistic_ideation')"
+  },
+  "runtime": {
+    "max_retries": 2,
+    "timeout_seconds": 20
+  },
+  "validation": {
+    "strict": true,
+    "required_keys": ["major_risks", "unrealistic_assumptions", "failure_scenarios", "required_changes"]
+  },
+  "logging": {
+    "enable": true,
+    "level": "INFO"
+  },
+  "safety": {
+    "max_output_length": 1500,
+    "banned_phrases": ["unsafe", "invalid"]
+  }
+}
+
+

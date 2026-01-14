@@ -33,55 +33,83 @@ const NodeControlPanelView: React.FC<NodeControlPanelProps> = ({
   const isNode = 'data' in selectedElement
 
   return (
-    <div className="absolute top-4 right-4 z-50 w-96 bg-gray-800 text-white rounded-lg shadow-lg">
-      {/* Navigation Tabs */}
-      <nav className="flex border-b border-gray-700 justify-between px-2">
-        {(['Profile', 'Context', 'Resources', 'Specifications'] as Tab[]).map((tab) => (
-          <button
-            key={tab}
-            className={`px-4 py-2 text-sm font-semibold transition-colors rounded-md ${
-              activeTab === tab ? 'bg-gray-700 text-yellow-400' : 'hover:bg-gray-700'
-            }`}
-            onClick={() => setActiveTab(tab)}
-          >
-            {tab}
-          </button>
-        ))}
-      </nav>
-
-      <div className="p-4 h-96 overflow-y-auto">
-        {/* Render content based on active tab */}
-        {activeTab === 'Profile' && isNode && (
-          <NodeProfileView node={selectedElement} setNodes={setNodes} />
-        )}
-        {activeTab === 'Context' && isNode && (
-          <NodeContextView node={selectedElement} setNodes={setNodes} />
-        )}
-        {activeTab === 'Resources' && isNode && (
-          <NodeResourceView node={selectedElement} setNodes={setNodes} />
-        )}
-        {activeTab === 'Specifications' && isNode && (
-          <NodeSpecificationView node={selectedElement} setNodes={setNodes} />
-        )}
-
-        {/* For edges, simple info view */}
-        {!isNode && (
-          <div>
-            <h3 className="font-bold mb-2">Edge ID: {selectedElement.id}</h3>
-            <p className="text-sm">Input: {selectedElement.data?.input}</p>
-            <p className="text-sm">Output: {selectedElement.data?.output}</p>
-          </div>
-        )}
-      </div>
-
-      {/* Close Button */}
-      <div className="border-t border-gray-700 p-2 text-right">
-        <button
-          className="bg-red-600 px-3 py-1 rounded hover:bg-red-700 text-sm"
-          onClick={() => setSelectedElement(null)}
+    <div className="absolute inset-x-0 top-6 z-50 flex justify-center pointer-events-none">
+      <div
+        className="w-[80%] rounded-xl shadow-xl border pointer-events-auto"
+        style={{
+          backgroundColor: '#9a9a9a',
+          borderColor: '#7f7f7f',
+          color: '#1f1f1f',
+        }}
+      >
+        {/* Navigation Tabs */}
+        <nav
+          className="flex justify-between gap-4 px-6 py-2 rounded-t-xl border-b"
+          style={{
+            backgroundColor: '#8a8a8a',
+            borderColor: '#6f6f6f',
+          }}
         >
-          Close
-        </button>
+          {(['Profile', 'Context', 'Resources', 'Specifications'] as Tab[]).map((tab) => (
+            <button
+              key={tab}
+              className="px-4 py-2 text-sm font-semibold rounded-md transition-colors"
+              style={{
+                backgroundColor: activeTab === tab ? '#6f6f6f' : 'transparent',
+                color: activeTab === tab ? '#ffffff' : '#2a2a2a',
+              }}
+              onClick={() => setActiveTab(tab)}
+            >
+              {tab}
+            </button>
+          ))}
+        </nav>
+
+        {/* Content */}
+        <div
+          className="p-6 h-[420px] overflow-y-auto"
+          style={{ backgroundColor: '#9a9a9a' }}
+        >
+
+          {activeTab === 'Profile' && isNode && (
+            <NodeProfileView node={selectedElement} setNodes={setNodes} />
+          )}
+          {activeTab === 'Context' && isNode && (
+            <NodeContextView node={selectedElement} setNodes={setNodes} />
+          )}
+          {activeTab === 'Resources' && isNode && (
+            <NodeResourceView node={selectedElement} setNodes={setNodes} />
+          )}
+          {activeTab === 'Specifications' && isNode && (
+            <NodeSpecificationView node={selectedElement} setNodes={setNodes} />
+          )}
+
+          {!isNode && (
+            <div>
+              <h3 className="font-bold mb-2">Edge ID</h3>
+              <p className="text-sm mb-1">{selectedElement.id}</p>
+              <p className="text-sm">Input: {selectedElement.data?.input}</p>
+              <p className="text-sm">Output: {selectedElement.data?.output}</p>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div
+          className="px-6 py-3 text-right rounded-b-xl border-t"
+          style={{
+            backgroundColor: '#8a8a8a',
+            borderColor: '#6f6f6f',
+          }}
+        >
+          <button
+            className="px-4 py-1.5 rounded text-sm text-white"
+            style={{ backgroundColor: '#b91c1c' }}
+            onClick={() => setSelectedElement(null)}
+          >
+            Close
+          </button>
+        </div>
       </div>
     </div>
   )

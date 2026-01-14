@@ -1,0 +1,122 @@
+/* Container */
+.stepper-node {
+  display: flex;
+  flex-direction: column;
+  background: #121212;
+  border-radius: 12px;
+  padding: 10px 16px;
+  width: 100%;
+  font-family: 'Inter', sans-serif;
+  color: #fff;
+
+  /* MAKE GLOWS VISIBLE */
+  overflow: visible;
+  position: relative;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+}
+
+/* Topbar with flex layout */
+.stepper-topbar {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+
+  /* MAKE GLOWS VISIBLE */
+  overflow: visible;
+  padding-bottom: 6px;
+}
+
+/* Step badges */
+.stepper-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: linear-gradient(145deg, #1f1f1f, #222);
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  color: #ccc;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  /* allow glow outside container */
+  position: relative;
+  z-index: 1;
+}
+
+/* Active badge with glow */
+.stepper-badge.active {
+  background: linear-gradient(145deg, #0ff4, #0ff2);
+  color: #000;
+  border: 1px solid #0ff;
+  box-shadow: 0 0 10px #0ff, 0 0 20px rgba(0, 255, 255, 0.4);
+}
+
+
+/* Scrollbar styling */
+.stepper-topbar::-webkit-scrollbar {
+  height: 4px;
+}
+.stepper-topbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+}
+
+/* Step badges */
+.stepper-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: linear-gradient(145deg, #1f1f1f, #222);
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  color: #ccc;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Step number */
+.step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #333;
+  color: #0ff;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Label */
+.step-label {
+  white-space: nowrap;
+}
+
+/* Active badge */
+.stepper-badge.active {
+  background: linear-gradient(145deg, #0ff4, #0ff2);
+  color: #000;
+  border: 1px solid #0ff;
+  box-shadow: 0 0 10px #0ff, 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+/* Hover */
+.stepper-badge:hover {
+  background: linear-gradient(145deg, #0ff1, #0ff2);
+  box-shadow: 0 0 6px #0ff, 0 0 12px rgba(0, 255, 255, 0.2);
+}
+
+/* Empty topbar */
+.stepper-topbar.empty {
+  color: #666;
+  font-style: italic;
+}

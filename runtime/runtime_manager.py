@@ -74,13 +74,19 @@ class RuntimeManager:
         #logger = AgentLogger.get_logger( component="runtime", workspace = self.workspace_name )
         logger = AgentLogger.get_logger( component="system" )
 
+        logger.info(f"Initializaing Runtime {self.workspace_name}... ")
+
         # ---- Singletons (loaded once per workspace) ----
         # Load Workspace Configuration (workspace.json)
         self.workspace_meta = WorkspaceLoader(workspace_path).load_workspace()
         logger.info(f"Workspace metadata loaded: {self.workspace_meta.get('name')}")
 
+        self.execution_mode = self.workspace_meta.get('execution_mode')
+        logger.info(f"Workspace Execution Mode: {self.execution_mode}")
+
         self.agent_registry = AgentRegistry(
             workspace_path,
+            execution_mode = self.execution_mode,
             model_manager=self.model_manager,
             tool_client=self.tool_client,
             event_bus=self.event_bus
@@ -94,7 +100,7 @@ class RuntimeManager:
 
         logger.info(f"Initializing runtime graph for workspace '{self.workspace_name}'")
         self.graph_manager = GraphManager(workspace_path, self.agent_registry, self.stage_registry)
-        self.graph_manager.build()
+        self.graph_manager.build(self.execution_mode, self.model_manager)
         logger.info("Execution graph built successfully for '{self.workspace_name}'")
 
         self.reload_manager = ReloadManager(

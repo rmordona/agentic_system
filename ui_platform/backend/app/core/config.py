@@ -43,6 +43,9 @@ class Settings(BaseModel):
     # Runtime
     MAX_CONCURRENT_RUNS: int = 50
 
+    # ROOT FOLDER
+    ROOT_FOLDER: str = os.getenv("CORE_ENGINE", "development")
+    MANIFEST_HOME: str = os.getenv("MANIFEST_HOME", f"{ROOT_FOLDER}/manifests")
 
 @lru_cache
 def get_settings() -> Settings:

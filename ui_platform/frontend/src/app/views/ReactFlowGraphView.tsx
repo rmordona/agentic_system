@@ -1,136 +1,195 @@
-import React, { useState, useCallback } from 'react'
+import React, {
+  useState,
+  useCallback,
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+  useEffect
+} from 'react'
+
 import ReactFlow, {
   addEdge,
   applyNodeChanges,
+  applyEdgeChanges,
   Background,
   Controls,
   Edge,
+  EdgeChange,
   Node,
   Connection,
   ReactFlowProvider,
   MiniMap,
-  OnLoadParams,
   NodeChange,
+  ReactFlowInstance,
 } from 'reactflow'
+
 import 'reactflow/dist/style.css'
-import NodeControlPanelView from './NodeControlPanelView' // <-- import
+
+import StageViewContainer from './StageViewContainer'
+import StepperNode from './nodes/StepperNode'
+import AgentNode from './nodes/AgentNode'
+import LLMNode from './nodes/LLMNode'
+import MemoryNode from './nodes/MemoryNode'
+import SkillsNode from './nodes/SkillsNode'
+import UserInputNode from './nodes/UserInputNode'
+import AIOutputNode from './nodes/AIOutputNode'
+import AgentOutputNode from './nodes/AgentOutputNode'
+
+import { StageGraphConfig, BuiltGraph } from '@/components/graph/BuildGraphFromConfig'
+import { buildGraphFromConfig } from '@/components/graph/BuildGraphFromConfig'
+
+import { WorkspaceContext } from '@/components/types/WorkspaceContext'
+
+const nodeTypes = {
+  StepperNode,
+  AgentNode,
+  LLMNode,
+  MemoryNode,
+  SkillsNode,
+  UserInputNode,
+  AIOutputNode,
+  AgentOutputNode,
+}
+
+export interface ReactFlowGraphViewHandle {
+  addNode: () => void
+  loadWorkflow: (workflowJson: StageGraphConfig) => void
+}
+
 
 interface ReactFlowGraphViewProps {
   devMode?: boolean
+  workspaceContext: WorkspaceContext
 }
 
-// Initial nodes & edges
-const initialNodes: Node[] = [
-  {
-    id: '1',
-    type: 'default',
-    data: { label: 'Node 1' },
-    position: { x: 0, y: 0 },
-    style: { background: '#1f2937', color: '#f9fafb', fontSize: 12, padding: 6, borderRadius: 6, width: 100 },
-  },
-  {
-    id: '2',
-    type: 'default',
-    data: { label: 'Node 2' },
-    position: { x: 200, y: 100 },
-    style: { background: '#1f2937', color: '#f9fafb', fontSize: 12, padding: 6, borderRadius: 6, width: 100 },
-  },
-]
 
-const initialEdges: Edge[] = [
-  {
-    id: 'e1-2',
-    source: '1',
-    target: '2',
-    animated: true,
-    style: { stroke: '#60a5fa', strokeWidth: 2 },
-    data: { input: 'default', output: 'default' },
-  },
-]
 
-export const ReactFlowGraphView: React.FC<ReactFlowGraphViewProps> = ({ devMode = false }) => {
-  const [nodes, setNodes] = useState<Node[]>(initialNodes)
-  const [edges, setEdges] = useState<Edge[]>(initialEdges)
-  const [selectedElement, setSelectedElement] = useState<Node | Edge | null>(null)
+export const ReactFlowGraphView = forwardRef<ReactFlowGraphViewHandle, ReactFlowGraphViewProps>(
+  ({ devMode = false, workspaceContext }, ref) => {
+    // =======================
+    // Sample Stage Config
+    // =======================
+    const stageConfig: StageGraphConfig = {
+      stages: [
+        {
+          name: 'ideation',
+          description: 'Generates creative ideas ...',
+          allowed_agents: ['optimistic'],
+          exit_condition: '...',
+          next_stages: ['evaluation'],
+          priority: 1,
+        },
+        {
+          name: 'evaluation',
+          description: 'Evaluates ideas...',
+          allowed_agents: ['critic'],
+          exit_condition: '...',
+          next_stages: ['synthesis'],
+          priority: 1,
+        },
+        {
+          name: 'synthesis',
+          description: 'Combines ideas...',
+          allowed_agents: ['synthesizer'],
+          exit_condition: 'True',
+          next_stages: [],
+          terminal: true,
+        },
+      ],
+    }
 
-  const onNodesChange = useCallback((changes: NodeChange[]) => {
-    setNodes((nds) => applyNodeChanges(changes, nds))
-  }, [])
+    // ============================
+    // Initialize graph state once
+    // ============================
+    const { nodes: initialNodes, edges: initialEdges, stages: initialStages } =
+       buildGraphFromConfig(stageConfig, workspaceContext)
 
-  const onEdgesChange = useCallback(() => {}, [])
+    const [nodes, setNodes] = useState<Node[]>(initialNodes)
+    const [edges, setEdges] = useState<Edge[]>(initialEdges)
+    const [stages, setStages] = useState<BuiltGraph['stages']>(initialStages)
+    const [activeStageId, setActiveStageId] = useState<string | null>(initialStages[0]?.id ?? null)
+    const [selectedElement, setSelectedElement] = useState<Node | Edge | null>(null)
 
-  const onConnect = useCallback(
-    (connection: Connection) =>
-      setEdges((eds) =>
-        addEdge(
-          {
-            ...connection,
-            animated: true,
-            style: { stroke: '#60a5fa', strokeWidth: 2 },
-            data: { input: 'default', output: 'default' },
-          },
-          eds
-        )
-      ),
-    []
-  )
+    const reactFlowInstance = useRef<ReactFlowInstance | null>(null)
+    const wrapperRef = useRef<HTMLDivElement | null>(null)
 
-  const onNodeClick = useCallback((_: React.MouseEvent, node: Node) => setSelectedElement(node), [])
-  const onEdgeClick = useCallback((_: React.MouseEvent, edge: Edge) => setSelectedElement(edge), [])
-
-  const onNodeMouseEnter = useCallback((_: React.MouseEvent, node: Node) => {
-    setNodes((nds) =>
-      nds.map((n) =>
-        n.id === node.id ? { ...n, style: { ...n.style, boxShadow: `0 0 0 3px #60a5fa` } } : n
-      )
+    // =======================
+    // ReactFlow callbacks
+    // =======================
+    const onNodesChange = useCallback((changes: NodeChange[]) => setNodes(nds => applyNodeChanges(changes, nds)),[])
+    const onEdgesChange = useCallback((changes: EdgeChange[]) => setEdges(eds => applyEdgeChanges(changes, eds)),[])
+    const onConnect = useCallback(
+      (connection: Connection) =>
+        setEdges(eds =>
+          addEdge(
+            {
+              ...connection,
+              animated: true,
+              type: 'bezier',
+              markerEnd: { type: 'arrowclosed' },
+              style: { stroke: '#60a5fa', strokeWidth: 2 },
+            },
+            eds
+          )
+        ),
+      []
     )
-  }, [])
 
-  const onNodeMouseLeave = useCallback((_: React.MouseEvent, node: Node) => {
-    setNodes((nds) =>
-      nds.map((n) => (n.id === node.id ? { ...n, style: { ...n.style, boxShadow: undefined } } : n))
-    )
-  }, [])
+    // const onNodeClick = useCallback((_: React.MouseEvent, node: Node) => setSelectedElement(node), [])
 
-  return (
-    <ReactFlowProvider>
-      <div className="w-full h-full bg-gray-900 rounded-lg border border-gray-700 relative">
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={devMode ? onConnect : undefined}
-          nodesDraggable
-          nodesConnectable={devMode}
-          zoomOnScroll
-          panOnDrag
-          onNodeClick={onNodeClick}
-          onEdgeClick={onEdgeClick}
-          onNodeMouseEnter={onNodeMouseEnter}
-          onNodeMouseLeave={onNodeMouseLeave}
-          fitView
-          style={{ fontSize: 12 }}
+    const onNodeClick = useCallback((_: React.MouseEvent, node: Node) => {
+      setSelectedElement(node)
+
+      // Sync active stage if node belongs to a stage
+      const stage = stages.find(s => s.nodes.some(n => n.id === node.id))
+      if (stage) setActiveStageId(stage.id)
+    }, [stages])
+
+    const onEdgeClick = useCallback((_: React.MouseEvent, edge: Edge) => setSelectedElement(edge), [])
+  
+    // =======================
+    // Imperative API
+    // =======================
+    useImperativeHandle(ref, () => ({
+      addNode() {
+        // Optional: implement dev mode add node
+      },
+      loadWorkflow(workflowJson: StageGraphConfig, workspaceContext: WorkspaceContext) {
+        if (!reactFlowInstance.current) return
+ 
+        const { nodes: newNodes, edges: newEdges, stages: newStages } = buildGraphFromConfig(workflowJson, workspaceContext)
+
+        setNodes(newNodes)
+        setEdges(newEdges)
+        setStages(newStages)
+        setActiveStageId(newStages[0]?.id ?? null)
+
+        reactFlowInstance.current.fitView({ padding: 0.2 })
+      },
+    }))
+
+    // =======================
+    // Render
+    // =======================
+    return (
+      <ReactFlowProvider>
+        <div
+          ref={wrapperRef}
+          className="w-full h-full bg-gray-900 rounded-lg border border-gray-700 relative"
+          style={{ overflow: 'visible' }}
         >
-          <Background gap={16} size={1} color="#374151" />
-          <MiniMap
-            nodeStrokeColor={(n) => (n.style?.background as string) || '#374151'}
-            nodeColor={(n) => (n.style?.background as string) || '#1f2937'}
-            nodeBorderRadius={6}
+          {/* Stage views */}
+          <StageViewContainer
+            stages={stages}
+            activeStageId={activeStageId}
+            onStageChange={setActiveStageId}
+            devMode={devMode}
+            workspaceContext={workspaceContext}
           />
-          <Controls />
-        </ReactFlow>
-        <NodeControlPanelView
-          selectedElement={selectedElement}
-          nodes={nodes}
-          edges={edges}
-          setNodes={setNodes}
-          setEdges={setEdges}
-          setSelectedElement={setSelectedElement}
-        />
-      </div>
-    </ReactFlowProvider>
-  )
-}
+        </div>
+      </ReactFlowProvider>
+    )
+  }
+)
 
 export default ReactFlowGraphView

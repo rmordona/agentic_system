@@ -1,0 +1,135 @@
+/* =========================================================
+   🔥 REACT FLOW GROUP OVERRIDES (REMOVE DASHED BORDERS)
+   ========================================================= */
+
+.react-flow__node-group,
+.react-flow__node-group.selected,
+.react-flow__node-group:hover,
+.react-flow__node-group:focus,
+.react-flow__node-group:focus-visible {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent;
+}
+
+/* =========================================================
+   🧱 STAGE NODE CONTAINER
+   ========================================================= */
+
+.stage-node {
+  border: 2px solid #15415a;
+  border-radius: 20px;
+  overflow: visible;
+  pointer-events: auto;
+  width: 600px;
+  height: 380px;
+  display: flex;
+  flex-direction: column;
+  background: #111827;
+}
+
+/* Selected state (clean highlight) */
+.stage-node.is-selected {
+  border-color: #3b82f6;
+}
+
+/* =========================================================
+   🧩 SHELL (INTERNAL LAYOUT ROOT)
+   ========================================================= */
+
+.stage-node__shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+}
+
+/* =========================================================
+   🟦 HEADER / TOP BAR
+   ========================================================= */
+
+.stage-node__topbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #1f2937;
+  color: #ffffff;
+  padding: 8px 12px;
+  border-top-left-radius: 18px;
+  border-top-right-radius: 18px;
+  box-sizing: border-box;
+}
+
+/* Badge */
+.stage-node__badge {
+  background-color: #60a5fa;
+  color: #020617;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+/* Title */
+.stage-node__title-text {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* =========================================================
+   📝 DESCRIPTION (FLUSH WITH HEADER)
+   ========================================================= */
+
+.stage-node__description {
+  padding: 4px 12px 8px;
+  font-size: 12px;
+  color: #d1d5db;
+  text-overflow: ellipsis;
+  background-color: #1f2937; /* same as header */
+  box-sizing: border-box;
+  max-height: 80px;
+
+  /* vertical overflow */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;  
+}
+
+/* =========================================================
+   🧬 BODY (FILL REMAINING SPACE + GRID TEXTURE)
+   ========================================================= */
+
+.stage-node__body {
+  position: relative;
+  background-color: #1f2937; /* stage container background */
+  border-radius: 8px;
+  border: 1px solid #374151;
+  width: 100%;
+  height: 100%;
+  padding: 8px;
+  overflow: visible;
+  transition: opacity 0.3s ease-in-out;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.02),
+      rgba(255, 255, 255, 0.02) 6px,
+      transparent 6px,
+      transparent 12px
+    );
+}
+
+/* =========================================================
+   🔗 HANDLES (OPTIONAL – KEEP IF YOU STYLE THEM)
+   ========================================================= */
+
+.stage-node__handle {
+  background: #c25569;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}

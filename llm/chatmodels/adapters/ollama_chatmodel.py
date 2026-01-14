@@ -181,10 +181,11 @@ class OllamaChatModel(BaseChatModel):
     def _generate(
         self,
         messages: List[HumanMessage],
+        temperature: float = 0.2,
         stop: Optional[List[str]] = None,
         run_manager: Optional[CallbackManagerForLLMRun] = None,
     ) -> ChatResult:
-        payload = self._build_chat_payload(messages, stream=False)
+        payload = self._build_chat_payload(messages, temperature, stream=False)
 
         logger.info(f"Building the payload ... {payload}")
         response = requests.post(
@@ -216,10 +217,11 @@ class OllamaChatModel(BaseChatModel):
     def _stream(
         self,
         messages: List[BaseMessage],
+        temperature: float = 0.2,
         stop: Optional[List[str]] = None,
         run_manager: Optional[CallbackManagerForLLMRun] = None,
     ) -> Iterator[ChatGeneration]:
-        payload = self._build_chat_payload(messages, stream=True)
+        payload = self._build_chat_payload(messages, temperature, stream=True)
 
         with requests.post(
             self.endpoint,
@@ -248,10 +250,11 @@ class OllamaChatModel(BaseChatModel):
     async def _astream(
         self,
         messages: List[BaseMessage],
+        temperature: float = 0.2,
         stop: Optional[List[str]] = None,
         run_manager: Optional[CallbackManagerForLLMRun] = None,
     ) -> AsyncIterator[ChatGeneration]:
-        payload = self._build_chat_payload(messages, stream=True)
+        payload = self._build_chat_payload(messages, temperature, stream=True)
 
         async with httpx.AsyncClient(timeout=self.request_timeout) as client:
             async with client.stream(
@@ -280,6 +283,7 @@ class OllamaChatModel(BaseChatModel):
     def _build_chat_payload(
         self,
         messages: List[BaseMessage],
+        temperature: float,
         *,
         stream: bool,
     ) -> Dict[str, Any]:
@@ -288,7 +292,7 @@ class OllamaChatModel(BaseChatModel):
             "stream": stream,
             "messages": [self._convert_message(m) for m in messages],
             "options": {
-                "temperature": self.temperature,
+                "temperature": temperature if temperature is not None else self.temperature,
                 "num_predict": self.max_tokens,
             },
         }

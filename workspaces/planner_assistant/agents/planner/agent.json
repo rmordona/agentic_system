@@ -1,0 +1,53 @@
+{
+  "name": "PlannerAgent",
+  "role": "planner",
+  "description": "Generates structured, executable plans from a selected strategy, annotates steps with risk, confidence, HITL flags, and dependencies.",
+  "capabilities": [
+    "sequence_generation",
+    "risk_annotation",
+    "confidence_scoring",
+    "hitl_flagging",
+    "tool_awareness",
+    "dependency_resolution"
+  ],
+  "input_schema": {
+    "goal": "string",
+    "selected_strategy": "string",
+    "constraints": "object",
+    "assumptions": "array[string]"
+  },
+  "output_schema": {
+    "plan": [
+      {
+        "step_id": "integer",
+        "description": "string",
+        "tool": "string",
+        "inputs": "object",
+        "risk_level": "low|medium|high",
+        "confidence": "float (0.0-1.0)",
+        "hitl_required": "boolean",
+        "dependencies": "array[integer]"
+      }
+    ]
+  },
+  "metadata": {
+    "author": "AgenticSystem",
+    "version": "1.0",
+    "plan_template": "PLAN.md",
+    "hints": [
+      "Ensure plan steps are executable and safe.",
+      "Use dependencies to enforce execution order.",
+      "Annotate steps requiring HITL carefully."
+    ]
+  },
+  "triggers": [
+    "on_strategy_selected",
+    "on_replan_request"
+  ],
+  "constraints": {
+    "max_steps": 20,
+    "tools_allowed": ["DBQuery", "ChartGen", "EmailSender", "CustomToolX"],
+    "hitl_threshold": 0.8
+  }
+}
+

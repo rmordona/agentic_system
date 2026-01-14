@@ -1,0 +1,155 @@
+/* Root node */
+.stage-node {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 360px; /* IMPORTANT: gives vertical space */
+  padding: 16px;
+  background: #0b1220;
+  border-radius: 14px;
+  color: #e5e7eb;
+  min-height: 360px;
+}
+
+
+/* Title + description remain at top */
+.stage-node__title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.stage-node__description {
+  font-size: 12px;
+  color: #9ca3af;
+  margin-bottom: 8px;
+}
+
+/* THIS is the centering container */
+.stage-node__content {
+  flex: 1; /* takes remaining vertical space */
+  display: flex;
+  align-items: center; /* ✅ centers children group vertically */
+}
+
+/* Children row */
+.stage-node__children {
+  display: flex;
+  gap: 24px;
+  padding: 16px;
+  width: 100%;
+
+  border-radius: 10px;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.02),
+      rgba(255, 255, 255, 0.02) 6px,
+      transparent 6px,
+      transparent 12px
+    ),
+    linear-gradient(135deg, #0f172a, #1f2937);
+
+  box-shadow:
+    0 0 0 1px rgba(56, 189, 248, 0.15),
+    0 0 14px rgba(56, 189, 248, 0.15);
+}
+
+/* Left: Model + Memory */
+.stage-node__left-column {
+  display: flex;
+  flex-direction: column;
+  padding-top: 50px;
+  gap: 20px;
+  align-items: center;
+}
+
+/* Center: Agent */
+.stage-node__center {
+  display: flex;
+  padding-right: 30px;
+  padding-left: 30px;
+  align-items: center;
+}
+
+/* Right: Skills */
+.stage-node__right {
+  display: flex;
+  padding-left: 50px;
+  align-items: center;
+}
+
+
+/* ───────── Fade animation ───────── */
+.stage-fade-enter {
+  opacity: 0;
+}
+.stage-fade-enter-active {
+  opacity: 1;
+  transition: opacity 300ms ease;
+}
+.stage-fade-exit {
+  opacity: 1;
+}
+.stage-fade-exit-active {
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+
+.stage-node__handle {
+  background: #c25569;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+
+/* SVG edge overlay */
+.stage-node__edges {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Edge base style */
+.stage-edge {
+  fill: none;
+  stroke: #0ff;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 8 6;
+  animation: dash 1s linear infinite;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: -14;
+  }
+}
+
+.stage-node__edges.is-active {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.stage-fade-enter {
+  opacity: 0;
+  transform: translateY(8px);
+}
+.stage-fade-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms ease, transform 300ms ease;
+}
+.stage-fade-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+.stage-fade-exit-active {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 300ms ease, transform 300ms ease;
+}
+

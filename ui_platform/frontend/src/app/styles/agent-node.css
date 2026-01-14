@@ -1,0 +1,123 @@
+.agent-node {
+  position: relative;
+  font-family: Inter, system-ui, sans-serif;
+  position: relative;   /* required so shell can be positioned relative to it */
+  overflow: visible;
+  pointer-events: auto; /* handles must be interactive */
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.agent-node__shell {
+  z-index: 2; /* ensures handles are above parent stage node but below React Flow edges */
+  width: 120px;
+  height: 120px;
+  background: #1e293b; /* slightly lighter dark background */
+  border-radius: 16px;
+  border: 2px solid #374151; /* default outline */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  color: #f9fafb;
+  font-size: 14px;
+  box-sizing: border-box;
+  overflow: hidden; /* ensures edges and handles are visible */
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+  position: relative;    /* required for child handles to position correctly */
+  overflow: visible;     /* crucial so edges are not clipped */
+  pointer-events: auto;  /* allow handles/edges to be interactive */
+}
+
+.agent-node.is-selected .agent-node__shell {
+  border: 2px solid #3b82f6;
+  box-shadow: 0 0 10px #3b82f6;
+}
+
+.agent-node__shell:hover {
+  border: 2px solid #3b82f6;
+  box-shadow: 0 0 10px #3b82f6;
+}
+
+
+/* HEADER */
+.agent-node__header {
+  padding: 10px 12px;
+  background: linear-gradient(180deg, #020617, #020617cc);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* TITLE */
+.agent-node__title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #e5e7eb;
+  letter-spacing: 0.02em;
+}
+
+/* BODY */
+.agent-node__body {
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.agent-node__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.agent-node__field label {
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+.agent-node__field input {
+  background: #020617;
+  border: 1px solid #1f2937;
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 12px;
+  color: #e5e7eb;
+}
+
+.agent-node__field input::placeholder {
+  color: #6b7280;
+}
+
+.agent-node__field input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.4);
+}
+
+/* FOOTER */
+.agent-node__footer {
+  padding: 8px 12px;
+  background: #020617;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  text-align: center;
+}
+
+.agent-node__footer-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: #60a5fa;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* HANDLES */
+.agent-node__handle {
+  width: 10px;
+  height: 10px;
+  background: #60a5fa;
+  border: 2px solid #020617;
+  pointer-events: auto; /* crucial for edges to connect */
+}
+
+.agent-node__handle--left {
+  left: -6px;
+}

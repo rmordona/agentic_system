@@ -18,17 +18,20 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+
 export interface ApiError {
   status: number
   message: string
   details?: any
 }
 
+
 export interface ApiClientConfig {
   baseUrl: string
   getAccessToken?: () => string | null
   onUnauthorized?: () => void
 }
+
 
 /**
  * Production-grade API client abstraction
@@ -111,15 +114,74 @@ export class ApiClient {
   public delete<T>(path: string): Promise<T> {
     return this.request<T>(path, { method: 'DELETE' })
   }
+
+
+  // ---------------------------------------------------------------------------
+  // Text request (for .md, .txt, etc.)
+  // ---------------------------------------------------------------------------
+  public async getText(path: string): Promise<string> {
+    const headers: HeadersInit = {}
+
+    const token = this.getAccessToken?.()
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`
+    }
+
+    const response = await fetch(`${this.baseUrl}${path}`, {
+      method: 'GET',
+      headers,
+    })
+
+    if (response.status === 401) {
+      this.onUnauthorized?.()
+      throw {
+        status: 401,
+        message: 'Unauthorized',
+      } satisfies ApiError
+    }
+
+    if (!response.ok) {
+      const text = await response.text().catch(() => null)
+      throw {
+        status: response.status,
+        message: text || response.statusText,
+      } satisfies ApiError
+    }
+
+    return response.text()
+  }
+
+  public validateApiResponse<T>(
+    schema: ZodSchema<T>,
+    data: unknown,
+    source: string
+  ): T {
+    const result = schema.safeParse(data)
+
+    if (!result.success) {
+      throw {
+        status: 500,
+        message: `Invalid response schema from ${source}`,
+        details: result.error.format(),
+      } satisfies ApiError
+    }
+
+    return result.data
+  }
+
+
 }
 
 // -----------------------------------------------------------------------------
 // Default API client instance
 // ----------------------------------------------------------
 export const api = new ApiClient({
-  baseUrl: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000',
+  baseUrl: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001',
   getAccessToken: () => localStorage.getItem('accessToken'),
   onUnauthorized: () => {
     console.warn('Unauthorized request detected')
   },
 })
+
+
+

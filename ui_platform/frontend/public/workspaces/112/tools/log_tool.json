@@ -1,0 +1,6 @@
+{
+  "name": "log_tool",
+  "type": "logger",
+  "config": {"level": "INFO"}
+}
+

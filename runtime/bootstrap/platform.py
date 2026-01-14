@@ -123,7 +123,7 @@ class Platform:
         # Config
         # --------------------------------------------------
         parent_path = Path(__file__).parent
-        config_path = parent_path / "config.json"  # runtime/config.json
+        config_path = parent_path / "config.json"  # runtime/bootstrap/config.json
 
         config_loader = ConfigLoader(global_config_path=config_path, workspaces_root=workspaces_root)
         self.config = config_loader.load()

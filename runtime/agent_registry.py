@@ -35,6 +35,7 @@ class AgentRegistry:
     def __init__(
         self, 
         workspace_path: Path,
+        execution_mode: str,
         model_manager: ModelManager,
         tool_client: ToolClient,
         event_bus: EventBus,

@@ -1,0 +1,7 @@
+Example Flow:
+- Deliberation outputs selected_strategy → writes to shared contract.
+- Planner agent reads selected_strategy → generates plan → writes to planner.plan.
+- Disclosure agent reads planner.plan → creates disclosure.summary and hitl_steps.
+- HITL agent reads disclosure.hitl_steps → suspends loop (hitl.loop_suspended = True) → collects human approvals → writes hitl.approved_steps.
+- Orchestrator resumes graph.astream → Executor agent reads planner.plan + hitl.approved_steps → executes approved steps.
+- Reflect/Replan agent monitors outcomes → may set planner.replan_requested = True → cycles back.

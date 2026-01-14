@@ -2,9 +2,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api import auth, workspaces, graphs, runs, sse
 from app.core.config import settings
+from dotenv import load_dotenv
 
-#app = FastAPI(title="Agentic UI Platform")
 
+# For settings, see backend/app/core/config.py
 app = FastAPI(title=settings.APP_NAME, debug=settings.DEBUG)
 
 app.add_middleware(

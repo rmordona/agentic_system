@@ -1,0 +1,48 @@
+.bottom-panel {
+  display: flex;
+  flex: 0 0 40%;
+  border-top: 1px solid #d1d5db; /* Tailwind gray-300 */
+  height: 40vh; /* or whatever fixed height you want */
+}
+
+.bottom-panel > .panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto; /* allow panels to expand proportionally */
+  overflow: hidden; /* keep scrolling inside content only */
+}
+
+.bottom-panel > .panel.prompt {
+  flex: 3 1 60%; /* proportional growth */
+  border-right: 1px solid #d1d5db;
+}
+
+.bottom-panel > .panel.skills,
+.bottom-panel > .panel.context {
+  flex: 1 1 20%; /* proportional growth */
+  border-right: 1px solid #d1d5db; /* context will override this */
+}
+
+.bottom-panel > .panel.context {
+  border-right: none;
+}
+
+.panel-title {
+  padding: 4px 8px;
+  font-weight: bold;
+  background-color: #e5e7eb; /* Tailwind gray-200 */
+  color: #111827; /* Tailwind gray-900 */
+  flex: 0 0 auto; /* title does not grow */
+}
+
+.panel-content {
+  flex: 1 1 auto; /* take remaining panel height */
+  overflow: auto; /* enables scrolling */
+  padding: 8px;
+  font-size: 0.875rem; /* text-sm */
+  white-space: pre-wrap;
+  background-color: #f9fafb; /* Tailwind gray-50 */
+  color: #111827;
+}
+
+

@@ -111,7 +111,18 @@ class ModelManager:
         if self.memory_manager:
             return self.memory_manager
         raise RuntimeError("Memory Manager not initialized.")
-        
+
+    # -----------------------
+    # Get Model Detail
+    # -----------------------
+    def get_model_info(self):
+        if self.llm:
+            return {
+                "provider": self.llm.endpoint,
+                "model_name" : self.llm.model_name,
+                "temperature" : self.llm.temperature }
+        raise RuntimeError("ChatModel not initialized.")
+
     # -----------------------------------------------------------------------------
     # Generate a response from the LLM with optional memory augmentation and persistence.
     #
@@ -182,12 +193,15 @@ class ModelManager:
     # - `document` in stored memory can capture LLM reasoning, self-reflection, or 
     #   auxiliary context after generation.
     # -----------------------------------------------------------------------------
+
     async def generate(
         self,
         prompt: str,
+        temperature: Optional[float] = 0.2,
         namespace: Tuple[str, str] = None,
         metadata: Dict[str, Any] = None,
         persist: bool = True,
+        reflect: bool = True,
         top_k: int = 5,
         reward: Optional[float] = None,
     ) -> str:
@@ -224,15 +238,21 @@ class ModelManager:
         message = [ {"role" : "user", "content" : prompt } ]
         logger.info(f"Prompt: {message}")
 
-        response = await self.llm.ainvoke(message)
+        config={
+            "temperature": temperature if temperature is not None else self.llm.temperature,
+            "model": self.llm.model_name,  # optional, if your adapter supports it
+        }
+
+        response = await self.llm.ainvoke(message, config)
 
         logger.info(f"LLM Response: {response}")
 
         # 4. Persist semantic memory (prompt + response)
-        logger.info("Now saving response to memory ...")
-
-        interaction_text = f"Prompt: {message}\nResponse: {response}"
         if persist and namespace:
+            logger.info("Now saving response to memory ...")
+
+            interaction_text = f"Prompt: {message}\nResponse: {response}"
+
             await self.memory_manager.save_semantic(
                 namespace=namespace,
                 key="last_query",
@@ -243,8 +263,10 @@ class ModelManager:
 
         # 5. Self-reflection on saved memory
         # This is combining user message and LLM response
-        await self._self_reflect( namespace=namespace, key="last_query", text=interaction_text)
+        if reflect:
+            await self._self_reflect( namespace=namespace, key="last_query", text=interaction_text)
 
+        logger.info("Returning response successfully ...")
 
         return response
 

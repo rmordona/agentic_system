@@ -1,0 +1,48 @@
+{
+  "name": "DisclosureAgent",
+  "role": "disclosure",
+  "description": "Summarizes and selectively exposes plan steps to humans based on risk, confidence, and system policies.",
+  "capabilities": [
+    "summarization",
+    "progressive_disclosure",
+    "hitl_flag_detection"
+  ],
+  "input_schema": {
+    "plan": [
+      {
+        "step_id": "integer",
+        "description": "string",
+        "tool": "string",
+        "inputs": "object",
+        "risk_level": "low|medium|high",
+        "confidence": "float",
+        "hitl_required": "boolean",
+        "dependencies": "array[integer]"
+      }
+    ]
+  },
+  "output_schema": {
+    "summary": [
+      {
+        "step_id": "integer",
+        "description": "string",
+        "risk_level": "low|medium|high",
+        "hitl_required": "boolean"
+      }
+    ]
+  },
+  "metadata": {
+    "author": "AgenticSystem",
+    "version": "1.0",
+    "hints": [
+      "Expose only necessary information for human approval.",
+      "Maintain ordering and risk indicators.",
+      "Highlight HITL-required steps."
+    ]
+  },
+  "triggers": [
+    "on_plan_generated",
+    "on_replan_request"
+  ]
+}
+

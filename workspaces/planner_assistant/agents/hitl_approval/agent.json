@@ -1,0 +1,45 @@
+{
+  "name": "HITLAgent",
+  "role": "approval",
+  "description": "Pauses execution for human review and collects approvals or modifications for high-risk or low-confidence plan steps.",
+  "capabilities": [
+    "human_interaction",
+    "approval_collection",
+    "plan_modification",
+    "pause_resume_loop"
+  ],
+  "input_schema": {
+    "summary": [
+      {
+        "step_id": "integer",
+        "description": "string",
+        "risk_level": "low|medium|high",
+        "hitl_required": "boolean"
+      }
+    ]
+  },
+  "output_schema": {
+    "approved_steps": [
+      {
+        "step_id": "integer",
+        "approved": "boolean",
+        "notes": "string (optional modification notes)"
+      }
+    ],
+    "resume_execution": "boolean"
+  },
+  "metadata": {
+    "author": "AgenticSystem",
+    "version": "1.0",
+    "hints": [
+      "Suspend graph.astream until human provides input.",
+      "Only unpause loop when all HITL-required steps are addressed.",
+      "Capture human modifications for replan if necessary."
+    ]
+  },
+  "triggers": [
+    "on_summary_ready",
+    "on_replan_request"
+  ]
+}
+

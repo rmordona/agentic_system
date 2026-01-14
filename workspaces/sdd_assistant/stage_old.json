@@ -1,0 +1,23 @@
+{
+  "stages": [
+    {
+      "id": "ideation",
+      "agent": "SkillAgent",
+      "mode": "exploratory"
+    },
+    {
+      "id": "sdd_gate",
+      "agent": "SDDAgent",
+      "inputs": ["spec.md", "plan.md", "constitution.md"],
+      "actions": ["judge", "validate"],
+      "on_fail": "block",
+      "on_ambiguous": "demand_clarity"
+    },
+    {
+      "id": "synthesis",
+      "agent": "SkillAgent",
+      "mode": "convergent"
+    }
+  ]
+}
+

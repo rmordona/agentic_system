@@ -1,0 +1,54 @@
+Input:
+{
+  "goal": "Generate a weekly sales report for the executive team",
+  "selected_strategy": "Aggregate sales data, summarize trends, visualize top products",
+  "constraints": { "deadline": "Friday 5 PM", "tools": ["DBQuery", "ChartGen"] },
+  "assumptions": ["Data in DBQuery is up-to-date"]
+}
+
+
+
+Planner Output:
+[
+  {
+    "step_id": 1,
+    "description": "Query sales database for last week’s transactions",
+    "tool": "DBQuery",
+    "inputs": { "start_date": "last_monday", "end_date": "last_sunday" },
+    "risk_level": "low",
+    "confidence": 0.95,
+    "hitl_required": false,
+    "dependencies": []
+  },
+  {
+    "step_id": 2,
+    "description": "Aggregate sales data by product category",
+    "tool": "DBQuery",
+    "inputs": { "aggregation": "sum", "group_by": "category" },
+    "risk_level": "medium",
+    "confidence": 0.9,
+    "hitl_required": false,
+    "dependencies": [1]
+  },
+  {
+    "step_id": 3,
+    "description": "Generate charts for top-selling products",
+    "tool": "ChartGen",
+    "inputs": { "metric": "sales", "top_n": 5 },
+    "risk_level": "medium",
+    "confidence": 0.85,
+    "hitl_required": true,
+    "dependencies": [2]
+  },
+  {
+    "step_id": 4,
+    "description": "Compile report and send to executive team",
+    "tool": "EmailSender",
+    "inputs": { "recipients": ["exec@example.com"], "subject": "Weekly Sales Report" },
+    "risk_level": "high",
+    "confidence": 0.75,
+    "hitl_required": true,
+    "dependencies": [3]
+  }
+]
+

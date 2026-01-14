@@ -7,5 +7,5 @@ rm -rf node_modules package-lock.json
 npm install
 
 # now run frontend
-# rm -rf node_modules/.vite
+ rm -rf node_modules/.vite
 npm run dev

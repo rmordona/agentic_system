@@ -42,6 +42,7 @@ class ChatModelFactory:
     _loaded: bool = False
     _provider: str | None = None
     _model_name: str | None = None
+    _temperature: 0.2
 
     @classmethod
     def load_config(cls, path: Path) -> None:

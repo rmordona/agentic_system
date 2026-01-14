@@ -1,0 +1,237 @@
+.icon-node {
+  position: relative;
+  width: 64px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: Inter, system-ui, sans-serif;
+  position: relative;
+  overflow: visible;
+  pointer-events: auto;  /* allow handles/edges to be interactive */
+}
+
+.icon-node--llm {
+  border: 1px solid #272930;
+  border-radius: 6px;
+  position: relative;
+  overflow: visible;
+  pointer-events: auto;  /* allow handles/edges to be interactive */
+}
+
+.icon-node--memory {
+  border: 1px solid #272930;
+  border-radius: 6px;
+  position: relative;
+  overflow: visible;
+  pointer-events: auto;  /* allow handles/edges to be interactive */
+}
+
+.icon-node--tools {
+  border: 1px solid #272930;
+  border-radius: 6px;
+  position: relative;
+  overflow: visible;
+  pointer-events: auto;  /* allow handles/edges to be interactive */
+}
+
+/* Circular container */
+.icon-node__circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+
+  background: radial-gradient(
+    circle at top left,
+    #1f2937,
+    #020617
+  );
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow:
+    0 6px 16px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.icon-node__circle:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 8px 22px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Icon */
+.icon-node__icon {
+  width: 24px;
+  height: 24px;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Label pill */
+.icon-node__label {
+  margin-top: 6px;
+  padding: 2px 8px;
+
+  font-size: 11px;
+  font-weight: 500;
+
+  background: #020617;
+  color: #9ca3af;
+
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Handles */
+.icon-node__handle {
+  width: 8px;
+  height: 8px;
+  background: #60a5fa;
+  border: 1px solid #020617;
+  pointer-events: auto; /* crucial for edges */
+}
+
+.icon-node__handle.react-flow__handle-left {
+  left: -6px;
+}
+
+.icon-node__handle.react-flow__handle-right {
+  right: -6px;
+}
+
+/* Special case for skill manager icon
+
+
+/* Circular container — clips contents */
+.icon-node__skill_manager_circle {
+  width: 60px;
+  height: 60px;
+  border-radius: 999px;
+  overflow: hidden; /* 🔑 CLIPS IMAGE CORNERS */
+
+  background: radial-gradient(
+    circle at top left,
+    #1f2937,
+    #020617
+  );
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow:
+    0 6px 45px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.icon-node__skill_manager_circle:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 8px 45px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Icon — clipped + circular */
+.icon-node__skill_manager_icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 999px; /* 🔑 */
+  object-fit: cover;    /* 🔑 fills circle correctly */
+  pointer-events: none;
+  user-select: none;
+}
+
+.icon-node__skill_manager_circle:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 8px 45px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* For Skills Grid */
+/* Skills grid */
+.icon-node__skills-grid {
+  border: 1px solid #272930;
+  padding: 10px;
+  border-radius: 6px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 8px;
+  margin-bottom: 6px;
+  position: relative;
+  overflow: visible;
+  pointer-events: auto;  /* allow handles/edges to be interactive */
+}
+
+/* Optional size tuning for node */
+.icon-node--skills {
+  padding: 10px;
+  min-width: 140px;
+}
+
+.icon-node__skills_circle {
+  width: 60px;
+  height: 60px;
+  border-radius: 999px;
+  overflow: hidden; /* 🔑 CLIPS IMAGE CORNERS */
+
+  background: radial-gradient(
+    circle at top left,
+    #1f2937,
+    #020617
+  );
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow:
+    0 6px 45px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+
+/* Default icon */
+.icon-node__skills_icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 999px; /* circular */
+  object-fit: cover;
+  pointer-events: none;
+  user-select: none;
+
+  /* Disabled/greyed-out look */
+  filter: brightness(0.5) grayscale(1); /* dark + gray */
+  opacity: 0.6;                        /* optional extra dimming */
+  transition: filter 0.2s ease, opacity 0.2s ease;
+}
+
+/* Optional: hover to highlight enabled state */
+.icon-node__skills_circle:hover .icon-node__skills_icon {
+  filter: brightness(1) grayscale(0);
+  opacity: 1;
+}
+
+
+.icon-node__skills_circle:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 8px 45px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}

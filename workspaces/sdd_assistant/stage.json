@@ -1,0 +1,69 @@
+{
+  "stages": [
+    {
+      "name": "spec_check",
+      "description": "Checks whether spec.md and constitution.md exist, are internally consistent, and are sufficiently complete to judge correctness.",
+      "allowed_agents": ["sdd_agent"],
+      "exit_condition": "len(state['executed_agents_per_stage'].get('spec_check', [])) >= 1",
+      "next_stages": ["clarification", "judgment"],
+      "priority": 1
+    },
+    {
+      "name": "clarification",
+      "description": "Requests clarification when the specification is missing, ambiguous, or internally inconsistent. No assumptions are allowed.",
+      "allowed_agents": ["sdd_agent"],
+      "exit_condition": "len(state['executed_agents_per_stage'].get('clarification', [])) >= 1",
+      "next_stages": ["spec_check"],
+      "priority": 2
+    },
+    {
+      "name": "judgment",
+      "description": "Judges whether the proposed artifact or plan is aligned with the intent and scope of the specification.",
+      "allowed_agents": ["sdd_agent"],
+      "exit_condition": "len(state['executed_agents_per_stage'].get('judgment', [])) >= 1",
+      "next_stages": ["validation"],
+      "priority": 1
+    },
+    {
+      "name": "validation",
+      "description": "Validates the artifact against spec.md and constitution.md, identifying concrete violations or confirming compliance.",
+      "allowed_agents": ["sdd_agent"],
+      "exit_condition": "len(state['executed_agents_per_stage'].get('validation', [])) >= 1",
+      "next_stages": ["block", "approval"],
+      "priority": 1
+    },
+    {
+      "name": "spec_revision",
+      "description": "Handles proposed spec changes with HITL review.",
+      "allowed_agents": ["skill", "sdd_agent"],
+      "execution_mode": "sdd",
+      "file_roles": {
+        "spec.md": "truth"
+      },
+      "write_permissions": {
+        "spec.md": "propose_only"
+      },
+      "requires_human_approval": true,
+      "next_stages": ["spec_check"]
+    },
+    {
+      "name": "block",
+      "description": "Blocks progress due to specification violations or constitutional breaches. Provides reasons and required corrective actions.",
+      "allowed_agents": ["sdd_agent"],
+      "exit_condition": "True",
+      "next_stages": [],
+      "terminal": true,
+      "priority": 3
+    },
+    {
+      "name": "approval",
+      "description": "Confirms that the artifact complies with the specification and constitution. Allows downstream stages or delivery.",
+      "allowed_agents": ["sdd_agent"],
+      "exit_condition": "True",
+      "next_stages": [],
+      "terminal": true,
+      "priority": 3
+    }
+  ]
+}
+

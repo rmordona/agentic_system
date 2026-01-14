@@ -4,6 +4,7 @@
   "description": "Multi-agent research and decision workflow",
   "owner": "platform-team",
   "default_entry_stage": "analysis",
+  "execution_mode" : "stage_router",
   "reload": {
     "enabled": true,
     "strategy": "hash",

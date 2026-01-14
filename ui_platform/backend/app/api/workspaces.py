@@ -23,6 +23,9 @@ router = APIRouter(tags=["workspaces"])
 _WORKSPACES: Dict[str, Dict] = {}
 
 
+from .workspaces_agents import router as agents_router
+router.include_router(agents_router, prefix="", tags=["agents"])
+
 @router.post("/", response_model=WorkspaceResponse)
 async def create_workspace(
     payload: WorkspaceCreate,
