@@ -6,6 +6,7 @@ curl http://localhost:11434/api/chat \
   ],
   "stream": false,
   "options": {
+    "temperature": 0.7,
     "num_predict": 512
   }
 }'

@@ -6,7 +6,7 @@ from runtime.stage_registry import StageRegistry
 from runtime.workspace_loader import WorkspaceLoader
 
 from llm.model_manager import ModelManager
-from runtime.sdd_pipeline_adapter import PipelineAdapter
+from runtime.pipeline.pipeline_adapter import PipelineAdapter
 
 from runtime.logger import AgentLogger
 logger = AgentLogger.get_logger(  component="system")
@@ -75,7 +75,7 @@ class GraphManager:
             workspace_name=self.workspace_name,
             agent_registry=self.agent_registry,
             stage_registry=self.stage_registry,
-            mode=self.mode,  # stage_router or sdd
+            execution_mode=self.execution_mode,  # stage_router or sdd
             hitl_callback=self.hitl_callback
         ).compile()
 

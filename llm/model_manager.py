@@ -120,7 +120,8 @@ class ModelManager:
             return {
                 "provider": self.llm.endpoint,
                 "model_name" : self.llm.model_name,
-                "temperature" : self.llm.temperature }
+                "temperature" : self.llm.temperature,
+                "max_tokens" : self.llm.max_tokens }
         raise RuntimeError("ChatModel not initialized.")
 
     # -----------------------------------------------------------------------------
@@ -197,7 +198,8 @@ class ModelManager:
     async def generate(
         self,
         prompt: str,
-        temperature: Optional[float] = 0.2,
+        temperature: Optional[float] = None,
+        max_tokens: Optional[int] = None,
         namespace: Tuple[str, str] = None,
         metadata: Dict[str, Any] = None,
         persist: bool = True,
@@ -235,11 +237,12 @@ class ModelManager:
         # 3. Call LLM
         logger.info(f"RAG: Finally, generating response (using {self.chatmodel_provider})...")
 
-        message = [ {"role" : "user", "content" : prompt } ]
+        message = [ {"role" : "system", "content" : prompt } ]
         logger.info(f"Prompt: {message}")
 
         config={
             "temperature": temperature if temperature is not None else self.llm.temperature,
+            "max_tokens": max_tokens if max_tokens is not None else self.llm.max_tokens,
             "model": self.llm.model_name,  # optional, if your adapter supports it
         }
 

@@ -84,10 +84,11 @@ from typing import List, Dict, Optional, Any
 import os
 
 from llm.model_manager import ModelManager
-from runtime.sdd_pipeline_template_extractor import PipelineTemplateExtractor
-from runtime.sdd_agent_markdown_adapter import SDDAgentMarkdownAdapter
-from runtime.sdd_pipeline_linter import PipelineLinter, PipelineLintError
-from runtime.sdd_pipeline_diff import PipelineDiff
+# from runtime.sdd_pipeline_template_extractor import PipelineTemplateExtractor
+from runtime.pipeline.pipeline_extractor import PipelineExtractor
+from runtime.pipeline.sdd_agent_markdown_adapter import SDDAgentMarkdownAdapter
+from runtime.pipeline.pipeline_linter import PipelineLinter, PipelineLintError
+from runtime.pipeline.pipeline_diff import PipelineDiff
 
 
 class PipelineAdapter:
@@ -136,7 +137,7 @@ class PipelineAdapter:
         self.model_manager = model_manager
 
         # 1️⃣ Load pipeline template
-        self.pipeline = self._load_pipeline_template()
+        self.pipeline = self._load_pipeline_template(workspace_path)
 
         # 2️⃣ Lint pipeline
         self._lint_pipeline(fail_on_lint_error)
@@ -153,8 +154,8 @@ class PipelineAdapter:
 
         # 6️⃣ Initialize SDDAgentMarkdownAdapter
         self.md_adapter = SDDAgentMarkdownAdapter(
-            md_path=artifact_md,
-            audit_path=audit_path
+            md_path=self.artifact_path,
+            audit_path=self.audit_path
         )
 
         logger.info("PipelineAdapter initialized successfully")
@@ -165,6 +166,7 @@ class PipelineAdapter:
 
     def _lint_pipeline(self, fail_on_error: bool):
         logger.info("Linting pipeline definition")
+        logger.info(f"Pipeline: {self.pipeline}")
         linter = PipelineLinter(self.pipeline)
         result = linter.lint(fail_fast=fail_on_error)
 
@@ -210,7 +212,8 @@ class PipelineAdapter:
 
         logger.info("Pipeline diffing completed")
 
-    def _load_pipeline_template(self) -> Dict[str, Any]:
+
+    def _load_pipeline_template(self, workspace_path: str) -> Dict[str, Any]:
         logger.info(
             "Loading pipeline template | "
             f"path={self.template_path}"
@@ -248,12 +251,32 @@ class PipelineAdapter:
 
         # Case 3: Markdown → LLM extraction
         logger.info("Falling back to Markdown → LLM pipeline extraction")
-        return self._extract_pipeline_from_markdown(content)
+        return self._extract_pipeline_from_markdown(workspace_path)
 
+    def _extract_pipeline_from_markdown(self, workspace_path: str) -> Dict[str, Any]:
+        logger.info("Extracting pipeline using Mistune 3.0 parser rom Markdown")    
+        parser = PipelineExtractor(self.workspace_path)
+        pipeline = parser.parse()
+
+        try:
+            extracted_stages = json.dumps(pipeline, indent=2)
+            logger.info( f"[PipelineExtractor] JSON parsing successful")
+            logger.info(f"Extracted stages: {extracted_stages}")
+            return json.loads(extracted_stages)
+
+        except json.JSONDecodeError as e:
+            logger.error(f"[PipelineExtractor:] Invalid JSON returned from LLM")
+            raise ValueError(f"[PipelineTemplateExtractor:] ")
+                
+        logger.info(f"Extracted the stage..")
+        return 
+
+    '''
     def _extract_pipeline_from_markdown(self, markdown: str) -> Dict[str, Any]:
-        logger.info("Extracting pipeline via LLM from Markdown")
+        logger.info("Extracting pipeline via LLM from Markdown")       
         extractor = PipelineTemplateExtractor(llm_client=self.model_manager, workspace_path=self.workspace_path )
         return extractor.extract(markdown)
+    '''
 
     def _validate_pipeline(self):
         logger.info("Validating pipeline structure")

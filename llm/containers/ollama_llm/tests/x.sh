@@ -1,4 +1,4 @@
-curl http://localhost:11434/api/embed --show-error --verbose \
+curl http://host.containers.internal:11434/api/embed --show-error --verbose \
   -H "Content-Type: application/json" \
   -d '{
   "model": "nomic-embed-text:latest",

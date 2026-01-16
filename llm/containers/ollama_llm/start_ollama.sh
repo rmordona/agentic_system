@@ -14,11 +14,18 @@ done
 
 #model="phi3:mini"
 #model="qwen2.5-coder:3b"
-model="qwen2:0.5b"
 
 # other: phi3:3.8b, llama3.1, qwen2.5, llama3.2
 # tinyllama ( ~1GB), qwen2:0.5b (~700MB), gemma:2b (~2GB)
 
+model="qwen2:0.5b"
+echo " Pulling $model model..."
+podman exec ollama ollama pull $model
+
+#model="qwen2:1.5b"
+#model="qwen2:1.5b-instruct"
+#model="tinyllama"
+model="granite3-moe:1b"
 echo " Pulling $model model..."
 podman exec ollama ollama pull $model
 

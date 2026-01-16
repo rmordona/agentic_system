@@ -113,7 +113,7 @@ class OllamaChatModel(BaseChatModel):
     )
 
     max_tokens: int = Field(
-        default=512,
+        default=4096,
         ge=1,
         description="Maximum tokens to generate",
     )
@@ -152,18 +152,20 @@ class OllamaChatModel(BaseChatModel):
 
         if self.models and self.model_name not in self.models:
             logger.error(
-                "Model '%s' not in supported list: %s",
+                "Model '%s' not in the supported list: %s",
                 self.model_name,
                 self.models,
             )
             raise ValueError(
-                f"Model '{self.model_name}' is not in supported list {self.models}"
+                f"Model '{self.model_name}' is not in the supported list {self.models}"
             )
 
         logger.info(
-            "OllamaChatModel initialized | model=%s endpoint=%s",
+            "OllamaChatModel initialized | model=%s endpoint=%s temperature=%s max_tokens=%s",
             self.model_name,
             self.endpoint,
+            self.temperature,
+            self.max_tokens
         )
 
     # ------------------------------------------------------------------
@@ -180,12 +182,13 @@ class OllamaChatModel(BaseChatModel):
 
     def _generate(
         self,
-        messages: List[HumanMessage],
-        temperature: float = 0.2,
+        messages: List[BaseMessage],
         stop: Optional[List[str]] = None,
         run_manager: Optional[CallbackManagerForLLMRun] = None,
+        temperature: float = None,
+        max_tokens: int = None,
     ) -> ChatResult:
-        payload = self._build_chat_payload(messages, temperature, stream=False)
+        payload = self._build_chat_payload(messages, temperature, max_tokens, stream=False)
 
         logger.info(f"Building the payload ... {payload}")
         response = requests.post(
@@ -194,7 +197,7 @@ class OllamaChatModel(BaseChatModel):
             timeout=self.request_timeout,
         )
 
-        logger.info(f"LLM Reponse status: {response}")
+        logger.info(f"LLM Response status: {response}")
         response.raise_for_status()
 
         data = response.json()
@@ -217,11 +220,12 @@ class OllamaChatModel(BaseChatModel):
     def _stream(
         self,
         messages: List[BaseMessage],
-        temperature: float = 0.2,
         stop: Optional[List[str]] = None,
         run_manager: Optional[CallbackManagerForLLMRun] = None,
+        temperature: float = None,
+        max_tokens: int = None,
     ) -> Iterator[ChatGeneration]:
-        payload = self._build_chat_payload(messages, temperature, stream=True)
+        payload = self._build_chat_payload(messages, temperature, max_tokens, stream=True)
 
         with requests.post(
             self.endpoint,
@@ -250,11 +254,12 @@ class OllamaChatModel(BaseChatModel):
     async def _astream(
         self,
         messages: List[BaseMessage],
-        temperature: float = 0.2,
         stop: Optional[List[str]] = None,
         run_manager: Optional[CallbackManagerForLLMRun] = None,
+        temperature: float = None,
+        max_tokens: int = None,
     ) -> AsyncIterator[ChatGeneration]:
-        payload = self._build_chat_payload(messages, temperature, stream=True)
+        payload = self._build_chat_payload(messages, temperature, max_tokens, stream=True)
 
         async with httpx.AsyncClient(timeout=self.request_timeout) as client:
             async with client.stream(
@@ -284,6 +289,7 @@ class OllamaChatModel(BaseChatModel):
         self,
         messages: List[BaseMessage],
         temperature: float,
+        max_tokens: int,
         *,
         stream: bool,
     ) -> Dict[str, Any]:
@@ -293,7 +299,7 @@ class OllamaChatModel(BaseChatModel):
             "messages": [self._convert_message(m) for m in messages],
             "options": {
                 "temperature": temperature if temperature is not None else self.temperature,
-                "num_predict": self.max_tokens,
+                "num_predict": max_tokens if max_tokens is not None else self.max_tokens 
             },
         }
 

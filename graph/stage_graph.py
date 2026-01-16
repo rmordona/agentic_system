@@ -13,7 +13,7 @@ from langgraph.graph import StateGraph, END
 from langgraph.channels import Topic, LastValue, BinaryOperatorAggregate
 from graph.state import State, AgentOutput, merge_reward_dicts
 
-from runtime.sdd_pipeline_adapter import PipelineAdapter
+from runtime.pipeline.pipeline_adapter import PipelineAdapter
 
 from runtime.logger import AgentLogger
 
@@ -28,13 +28,13 @@ class StageGraph:
         agent_registry,
         stage_registry,
         pipeline_adapter: PipelineAdapter = None,
-        mode: str = "stage_router",  # can be "sdd" for PipelineAdapter mode
+        execution_mode: str = "stage_router",  # can be "sdd" for PipelineAdapter mode
         hitl_callback: Optional[Any] = None,
     ):
         self.agent_registry = agent_registry
         self.stage_registry = stage_registry
         self.pipeline_adapter = pipeline_adapter
-        self.mode = mode
+        self.execution_mode = execution_mode
         self.hitl_callback = hitl_callback
 
         # Channels
@@ -81,8 +81,8 @@ class StageGraph:
         logger.info(f"Registered agent nodes added to graph: {list(self.graph.nodes.keys())}")
 
         # 3. Add stage router node with SDD support if pipeline_adapter is provided
-        self._add_stage_router_node(pipeline_adapter=self.pipeline_adapter, mode=self.mode)
-        logger.info(f"Stage Router added to graph with mode: {self.mode}")
+        self._add_stage_router_node(pipeline_adapter=self.pipeline_adapter, execution_mode=self.execution_mode)
+        logger.info(f"Stage Router added to graph with execution mode: {self.execution_mode}")
 
         # 4. Add edges: agents → stage_router, stage_router → next_agent / END
         self._add_edges()
@@ -127,7 +127,7 @@ class StageGraph:
         return agent_node
 
     # -------------------------------
-    def _add_stage_router_node(self, pipeline_adapter=None, mode="stage_router"):
+    def _add_stage_router_node(self, pipeline_adapter=None, execution_mode="stage_router"):
         """
         Stage router node with dual-mode support:
         - mode="sdd": use PipelineAdapter for dynamic stage routing
@@ -149,7 +149,7 @@ class StageGraph:
                 return {"next_agent": next_agent}
 
             # 2️⃣ Stage exit → determine next stage
-            if mode == "sdd" and pipeline_adapter:
+            if execution_mode == "sdd" and pipeline_adapter:
                 artifact = state.get("artifact", {"current_plan": []})
                 decision = pipeline_adapter.get_next_stage(artifact)
                 next_stage_name = decision.get("next_stage")

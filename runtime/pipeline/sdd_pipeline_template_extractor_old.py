@@ -41,7 +41,7 @@ class PipelineTemplateExtractor:
         self,
         llm_client,
         workspace_path : str = None,
-        pipeline_extractor_prompt_md: str = "sdd_pipeline_extractor.md",
+        pipeline_extractor_prompt_md: str = "pipeline_extractor.md",
     ):
         """
         llm_client must expose:
@@ -53,20 +53,20 @@ class PipelineTemplateExtractor:
         self.provider = self.model_info.get('provider')
         self.model_name = self.model_info.get('model_name')
         self.temperature = self.model_info.get('temperature')
+        self.max_tokens = self.model_info.get('max_tokens')
 
         self.extractor_prompt_path = workspace_path / "templates" / pipeline_extractor_prompt_md
 
         logger.info(
             "Initializing PipelineTemplateExtractor | "
-            f"provider={self.provider}, model={self.model_name}, temperature={self.temperature}, prompt_path={pipeline_extractor_prompt_md}"
+            f"provider={self.provider}, model={self.model_name}, temperature={self.temperature}, "
+            f"max_tokens={self.max_tokens}, prompt_path={pipeline_extractor_prompt_md}"
         )
 
         logger.info(
             "Initializing PipelineTemplateExtractor | "
             f"workspace_path={workspace_path}, extractor_prompt_path={self.extractor_prompt_path}"
         )
-
-
 
         if not self.extractor_prompt_path.exists():
             logger.error(
@@ -107,10 +107,19 @@ class PipelineTemplateExtractor:
         )
 
         prompt = self._build_prompt(markdown, trace_id)
+
         raw_output = self._call_llm(prompt, trace_id)
+
+        logger.info( "Raw Response received ... Now Parsing Json Output ... ")
+
         pipeline = self._parse_json(raw_output, trace_id)
 
+        logger.info( "Validating Pipeline based on JSON schema  ... ")
+
         self._validate_pipeline(pipeline, trace_id)
+
+        logger.info( "Normalizing Pipeline ... ")
+
         self._normalize_pipeline(pipeline, trace_id)
 
         logger.info(
@@ -151,69 +160,61 @@ class PipelineTemplateExtractor:
 
         return prompt
 
-    # ------------------------------------------------------------------
-    # LLM Invocation
-    # ------------------------------------------------------------------
-
-    '''
-    def _call_llm(self, prompt: str, trace_id: str, timeout: float = 50.0) -> str:
-        """
-        Synchronous wrapper for async LLM call.
-        Handles running event loop if one exists.
-        """
-        async def _async_call():
-            # Pass model_name and temperature as kwargs, depending on your ModelManager API
-            return await self.llm.generate(
-                prompt=prompt,
-            )
-
-        try:
-            loop = asyncio.get_running_loop()
-            # Already in an event loop → schedule coroutine and block
-            future = asyncio.run_coroutine_threadsafe(_async_call(), loop)
-            return future.result(timeout)
-        except RuntimeError:
-            # No loop → safe to run normally
-            return asyncio.run(asyncio.wait_for(_async_call(), timeout))
-    '''
 
     # ------------------------------------------------------------------
     # LLM Invocation (Synchronous)
     # ------------------------------------------------------------------
 
-    def _call_llm(self, prompt: str, trace_id: str, timeout: float = 0.0) -> str:
+    def _call_llm(self, prompt: str, trace_id: str) -> str:
         """
-        Synchronous wrapper for async LLM call.
-        Handles running loop and respects timeout using Future.result().
+        Synchronous bridge for async LLM call.
+        Always returns a STRING.
         """
-        import nest_asyncio
+
         import asyncio
-        from concurrent.futures import TimeoutError as FuturesTimeoutError
+        import threading
 
         async def _async_generate():
-            return await self.llm.generate(
+            result = await self.llm.generate(
                 prompt=prompt,
                 persist=False,
                 reflect=False
             )
 
+            # ✅ Normalize LangChain output
+            if hasattr(result, "content"):
+                return result.content
+
+            return result
+
         try:
-            # Check if an event loop is running
-            loop = asyncio.get_running_loop()
-            if loop.is_running():
-                # Already in a loop → use nest_asyncio and run as Future
-                nest_asyncio.apply()
-                future = asyncio.run_coroutine_threadsafe(_async_generate(), loop)
-                try:
-                    return future.result(timeout)
-                except FuturesTimeoutError:
-                    raise TimeoutError(
-                        f"[PipelineTemplateExtractor:{trace_id}] "
-                        f"LLM generation timed out after {timeout} seconds"
-                    )
+            asyncio.get_running_loop()
         except RuntimeError:
-            # No loop → safe to run normally
+            # No running loop
             return asyncio.run(_async_generate())
+
+        # Running loop → offload to thread
+        result_container = {}
+        error_container = {}
+
+        def _thread_runner():
+            try:
+                result_container["value"] = asyncio.run(_async_generate())
+            except Exception as e:
+                error_container["error"] = e
+
+        t = threading.Thread(target=_thread_runner, daemon=True)
+        t.start()
+        t.join()
+
+        if "error" in error_container:
+            raise RuntimeError(
+                f"[PipelineTemplateExtractor:{trace_id}] LLM invocation failed"
+            ) from error_container["error"]
+
+        return result_container["value"]
+
+
 
 
     # ------------------------------------------------------------------
@@ -226,8 +227,15 @@ class PipelineTemplateExtractor:
             "Parsing LLM output as JSON"
         )
 
+        output = raw
+        if raw.startswith("```json"):
+            output = raw[len("```json"):].lstrip()
+
+        logger.info("Do it now:")
+        logger.info(output)
+
         try:
-            parsed = json.loads(raw)
+            parsed = json.loads(output)
             logger.info(
                 f"[PipelineTemplateExtractor:{trace_id}] "
                 "JSON parsing successful"
@@ -241,7 +249,7 @@ class PipelineTemplateExtractor:
             )
             raise ValueError(
                 f"[PipelineTemplateExtractor:{trace_id}] "
-                f"Invalid JSON from LLM: {e}\nRaw output:\n{raw}"
+                f"Invalid JSON from LLM: {e}\nRaw output:\n{output}"
             )
 
     def _validate_pipeline(self, pipeline: Dict[str, Any], trace_id: str):
