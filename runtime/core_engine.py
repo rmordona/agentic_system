@@ -155,7 +155,7 @@ class StateSchema(BaseModel):
     # ------------------------------------------------------------------
     # Data Plane (append-only, domain governed)
     # ------------------------------------------------------------------
-    data_raw:  DataEnvelope[DomainType]  = Field(default_factory=DataEnvelope)
+    data_raw:  DataEnvelope[DomainType]  = None # Field(default_factory=DataEnvelope)
 
     # ------------------------------------------------------------------
     # Tool Plane (append-only execution records)
@@ -330,7 +330,7 @@ class AgentPlanner:
 
             logger.info("This is the first iteration ... So acquiring the first stage and first agent ...")
 
-            YOU NEED TO ALSO GET THE INITIAL DATA ENVELOPE since SCHEMAS are now BASED ON AGENTS
+            # YOU NEED TO ALSO GET THE INITIAL DATA ENVELOPE since SCHEMAS are now BASED ON AGENTS
 
             return await self.compose_initial_task(state)
 
@@ -421,8 +421,14 @@ class AgentPlanner:
     ################################################################################
     async def compose_initial_task(self, state: StateSchema):
 
+        logger.info("Composint initial task ...")
+
         # Acquire first stage
-        first_stage = self.stage_manager.first_stage()
+        first_stage = self.stage_manager.get_entry_stage()
+
+        logger.info(f"Entry Stage: {first_stage}")
+
+        logger.info(f"Allowed Agents: {self.stage_manager.allowed_agents(first_stage)}")
 
         # Acquire first agent
         first_agent = self.agent_manager.first_agent(
@@ -727,7 +733,7 @@ class CoreEngine:
         # --------------------------------------------------
         # 3. System Context
         # --------------------------------------------------
-        self.context = SystemContext(self.domain, domain_repo = domain_repo, agent_manager = self.agent_manager)
+        self.context = SystemContext(domain_repo = domain_repo, agent_manager = self.agent_manager)
 
         # --------------------------------------------------
         # 4. Initial Data Raw Setup 
@@ -797,8 +803,8 @@ class CoreEngine:
         return StateSchema(
             session_id  = self.session_id,
             domain      = self.domain,
-            #control_raw = None,        # AgentPlanner chooses the initial_artifact,
-            data_raw    = None,         # AgentPlanner chooses the first agent to get the data_raw
+            #control_raw = None,         # AgentPlanner chooses the initial_artifact,
+            #data_raw    = None,         # AgentPlanner chooses the first agent to get the data_raw
             data_type   = "envelope",
             tool_raw    = [],
             user_intent = user_intent,

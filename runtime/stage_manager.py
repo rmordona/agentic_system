@@ -143,7 +143,6 @@ class StageSchema:
 
 class StageManager:
 
-    stage_file: str = "stage.json"
     pipeline_adapter: PipelineAdapter = None
 
     def __init__(self, 
@@ -152,6 +151,7 @@ class StageManager:
 
         self.workspace_path = workspace_path
         self.workspace_name = workspace_path.name
+        self.entry_stage = ""
 
         if stage_file is not None:
             self.stage_file = stage_file
@@ -206,6 +206,8 @@ class StageManager:
             for agent in stage.allowed_agents:
                 self._allowed_agents.append(agent)
 
+        self.entry_stage = data.get("entry_stage")
+
         logger.info(f"Stages registered: {self.list_stages()}")
         logger.info(f"Prospect Agents: {self.all_allowed_agents()}")
 
@@ -214,12 +216,15 @@ class StageManager:
 
     # -----------------------------
     # Accessors
-    # -----------------------------
+    # -----------------------------    
     def get(self, stage_name: str) -> Optional[Stage]:
         return self._stages.get(stage_name)
 
     def get_description(self, stage_name: str) -> Optional[Stage]:
         return self._stages.get(stage_name)
+
+    def get_entry_stage(self):
+        return self.entry_stage
 
     def list_stages(self) -> List[str]:
         return list(self._stages.keys())

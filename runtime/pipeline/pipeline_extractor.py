@@ -36,13 +36,56 @@ class PipelineExtractor:
 
         self.CLOSED_STAGE_SET: List[str] = []
 
+
+    def normalize_lines(self, multi_line: str) -> str:
+        """
+        Normalize stage lines:
+        - For keys Description, Allowed Agents, Exit Condition, Next Stages:
+            remove bullets, remove bold markers, standardize as 'Key: Value'
+        - Keep all other lines untouched
+        """
+        valid_keys = {"description", "allowed agents", "exit condition", "next stages"}
+        normalized_lines = []
+
+        for line in multi_line.splitlines():
+            raw_line = line  # Keep a copy in case we don't modify it
+            line = line.strip()
+            if not line:
+                normalized_lines.append("")  # Preserve blank lines
+                continue
+
+            # Remove leading bullets and spaces
+            line_no_bullet = re.sub(r"^[-*]\s*", "", line)
+
+            # Remove bold markers around the key (**Key** -> Key)
+            line_no_bold = re.sub(r"^\*\*(.*?)\*\*", r"\1", line_no_bullet)
+
+            # Check if it's a valid key line
+            if ":" in line_no_bold:
+                key, value = line_no_bold.split(":", 1)
+                if key.strip().lower() in valid_keys:
+                    normalized_lines.append(f"{key.strip()}: {value.strip()}")
+                    continue
+
+            # Otherwise, keep the line as-is
+            normalized_lines.append(raw_line)
+
+        return "\n".join(normalized_lines)
+
+
+
+
     def parse(self) -> Dict:
         logger.info("Starting pipeline markdown parse", extra={"path": str(self.md_file)})
 
         md_text = self.md_file.read_text(encoding="utf-8")
         # Use mistune without a renderer to get the AST
+
+        # Normalize text
+        norm_md_text = self.normalize_lines(md_text)
+
         parser = mistune.create_markdown(renderer=None)
-        ast = parser(md_text)
+        ast = parser(norm_md_text)
 
         stages: List[Dict] = []
         current_stage: Optional[str] = None
@@ -115,9 +158,11 @@ class PipelineExtractor:
                 parts.append("\n")
         return "".join(parts)
 
+
     def _parse_stage_content(self, stage_name: str, lines: List[str]) -> Dict:
         """
-        Deterministic extraction of stage properties using flexible regex.
+        Parses a list of cleaned strings into a Stage dictionary.
+        This handles strings like '- **Description**: ...' or 'Allowed Agents: ...'
         """
         description = ""
         allowed_agents = []
@@ -126,39 +171,56 @@ class PipelineExtractor:
         next_stages = []
         is_next_stages = False
 
-        # Pattern captures: Optional bullet, optional bolding, Key, optional bolding, Value
-        key_val_pattern = re.compile(r"^(?:\s*-\s*)?(?:\*\*)?([a-zA-Z\s]+)(?:\*\*)?:\s*(.*)$", re.IGNORECASE)
-
         for line in lines:
-            match = key_val_pattern.match(line)
-            
-            if match:
-                key = match.group(1).strip().lower()
-                value = match.group(2).strip()
+            line_str = line.strip()
+            if not line_str:
+                continue
 
-                if key == "description":
-                    description = value
+            # 1. Detect transition to Next Stages block
+            # This triggers if we see "Next Stages:" or if we are already in the list
+            if "next stages" in line_str.lower() and ":" in line_str:
+                is_next_stages = True
+                # If there's content after "Next Stages:", check if it's a transition
+                potential_val = line_str.split(":", 1)[1].strip()
+                if not potential_val:
                     continue
-                elif key == "allowed agents":
-                    raw = value.strip("[]")
-                    allowed_agents = [a.strip().strip('"').strip("'") for a in raw.split(",") if a.strip()]
-                    continue
-                elif key == "exit condition":
-                    exit_condition = value
-                    continue
-                elif key == "terminal":
-                    terminal = value.lower() == "true"
-                    continue
-                elif key == "next stages":
-                    is_next_stages = True
-                    continue 
+                line_str = potential_val # Fall through to transition parsing
 
-            # Handle transition items (starts with '-' and is under 'Next Stages' header)
-            if is_next_stages and line.strip().startswith("-"):
-                normalized_line = PipelineDSLNormalizer.normalize_pipeline_text(line)
-                parsed = PipelineNextStageParser.parse(normalized_line)
-                if parsed:
-                    next_stages.append(parsed)
+            # 2. Handle Key-Value parsing (Description, Agents, Exit Condition)
+            if not is_next_stages and ":" in line_str:
+                # Remove Markdown noise: lstrip bullets and remove bolding
+                clean_line = line_str.lstrip("- ").replace("**", "").strip()
+                
+                parts = clean_line.split(":", 1)
+                if len(parts) == 2:
+                    key = parts[0].strip().lower()
+                    val = parts[1].strip()
+
+                    if key == "description":
+                        description = val
+                        continue
+                    elif key == "allowed agents":
+                        raw = val.strip("[]").replace("'", "").replace('"', "")
+                        allowed_agents = [a.strip() for a in raw.split(",") if a.strip()]
+                        continue
+                    elif key == "exit condition":
+                        exit_condition = val
+                        continue
+                    elif key == "terminal":
+                        terminal = val.lower() == "true"
+                        continue
+
+            # 3. Handle Transitions (Next Stages list)
+            # We assume transitions start with a bullet or follow the Next Stages header
+            if is_next_stages or line_str.startswith("-"):
+                # Clean the line of "Next Stages:" prefix if it exists on same line
+                clean_transition = line_str.replace("Next Stages:", "").strip()
+                if clean_transition:
+                    # Use your existing normalizer and parser
+                    normalized = PipelineDSLNormalizer.normalize_pipeline_text(clean_transition)
+                    parsed = PipelineNextStageParser.parse(normalized)
+                    if parsed:
+                        next_stages.append(parsed)
 
         return {
             "name": stage_name,
@@ -168,6 +230,7 @@ class PipelineExtractor:
             "next_stages": next_stages,
             "terminal": terminal,
         }
+
 
     def _validate_stages(self, stages: List[Dict]) -> None:
         """Ensures integrity and reachability of the parsed pipeline."""

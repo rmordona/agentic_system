@@ -132,9 +132,25 @@ class AgentProfiler:
                     
                     # SPECIAL HANDLING FOR BOOLEAN FIELDS
                     # If this is the human approval field, take only the first word
-                    if current_key == "requires_human_approval" and val:
-                        # "True (for overrides)" -> "True"
-                        val = val.split()[0].strip().rstrip(',').rstrip(';')
+                    #if current_key == "requires_human_approval" and val:
+                    #    # "True (for overrides)" -> "True"
+                    #    val = val.split()[0].strip().rstrip(',').rstrip(';')
+                    #
+                    #result[current_key] = AgentProfiler._convert_value(val) if val else None
+
+                    # --- SPECIAL HANDLING FOR FIELDS WITH COMMENTS ---
+                    # We want to strip out everything after the first word for specific fields
+                    # This turns "2 (to ensure...)" -> "2" 
+                    # And "True (for high risk)" -> "True"
+                    fields_to_strip = ["requires_human_approval", "max_iterations"]
+
+                    if current_key in fields_to_strip and val:
+                        # Split by space and take the first part, then clean up punctuation
+                        val = val.split()[0].strip().rstrip(',').rstrip(';').rstrip('.')
+
+                        if not val or val.lower() == "none":
+                            result[current_key] = None
+                            continue
                     
                     result[current_key] = AgentProfiler._convert_value(val) if val else None
                 

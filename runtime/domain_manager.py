@@ -36,7 +36,7 @@ def generate_uuid() -> str:
 DomainType = TypeVar("DomainType", bound=BaseModel)
 
 class DataEnvelope(BaseModel, Generic[DomainType]):
-    domain: str
+    agent: str
     type: str
     version: str
     producer: str
@@ -47,10 +47,10 @@ class DataEnvelope(BaseModel, Generic[DomainType]):
     references: List[str] = []
 
 class DataAdapter(Generic[DomainType]):
-    def __init__(self, domain_id: str, schema_class: type[DomainType]):
-        self.domain_id = domain_id
+    def __init__(self, agent_name: str, schema_class: type[DomainType]):
+        self.agent_name = agent_name
         self.payload_schema = schema_class
-        logger.info(f"DataAdapter initialized for domain '{domain_id}'")
+        logger.info(f"DataAdapter initialized for domain '{agent_name}'")
 
     def create_envelope(
         self,
@@ -59,7 +59,7 @@ class DataAdapter(Generic[DomainType]):
         stage: str
     ) -> DataEnvelope[DomainType]:
         logger.info(
-            f"Creating DataEnvelope | domain={self.domain_id} producer={producer} stage={stage}"
+            f"Creating DataEnvelope | domain={self.agent_name} producer={producer} stage={stage}"
         )
         logger.debug(f"Validating payload against {self.payload_schema.__name__}")
 
@@ -74,7 +74,7 @@ class DataAdapter(Generic[DomainType]):
 
         # 2. Create typed envelope
         envelope = DataEnvelope[DomainType](
-            domain=self.domain_id,
+            agent=self.agent_name,
             type=self.payload_schema.__name__.lower(),
             version="1.0",
             producer=producer,
@@ -142,7 +142,7 @@ class DataManager:
         agents = self.agent_manager.list_agents()
 
         for agent_name in agents:
-            logger.info(f"Agent: {agent_name}")
+            logger.info(f"Agent name: {agent_name}")
             profile = self.agent_manager.get_agent_profile(agent_name)
             data_json_schema = json.loads(profile.schema)
             logger.info(f"Agent Json Schema: {data_json_schema}")
@@ -211,87 +211,6 @@ class DataManager:
             return initial_envelope
         except ValueError as e:
             logger.error(f"Critical Error: Data domain '{agent_name}' schema, {e}")
-
-class DataManager1:
-    def __init__(self, repo_path: str):
-        self.repo_path = Path(repo_path)
-        self.domain_map: Dict[str, DataAdapter] = {}
-        logger.info(f"DataManager initialized | repo_path={self.repo_path}")
-
-    def scan_and_register(self):
-        logger.info("Scanning data domains for registration")
-
-        for file_path in self.repo_path.glob("*.py"):
-            if file_path.name.startswith("__"):
-                continue
-
-            domain_id = file_path.stem
-            logger.info(f"Discovered domain file: {file_path.name}")
-
-            try:
-                spec = importlib.util.spec_from_file_location(domain_id, file_path)
-                module = importlib.util.module_from_spec(spec)
-                spec.loader.exec_module(module)
-
-                class_name = f"{domain_id.capitalize()}Schema"
-                schema_class = getattr(module, class_name, None)
-
-                if not schema_class:
-                    logger.warning(
-                        f"Schema class '{class_name}' not found in {file_path.name}"
-                    )
-                    continue
-
-                self.domain_map[domain_id] = DataAdapter(
-                    domain_id=domain_id,
-                    schema_class=schema_class
-                )
-
-                logger.info(f"Successfully registered data domain '{domain_id}'")
-
-            except Exception as e:
-                logger.exception(f"Failed to load data domain '{domain_id}': {e}")
-
-    def get_adapter(self, domain_id: str) -> DataAdapter:
-        adapter = self.domain_map.get(domain_id)
-        if not adapter:
-            logger.error(f"DataAdapter not found for domain '{domain_id}'")
-        return adapter
-
-    def get_initial_envelope(self, domain_id: str) -> DataEnvelope:
-        """
-        Leverages the registered DataAdapter to create a type-safe starting envelope.
-        """
-        # 1. Retrieve the adapter we found during scan_and_register
-        adapter = self.domain_map.get(domain_id)
-
-        logger.info(f"Data Adapter for the given domain '{domain_id}': {adapter}")
-
-        if not adapter:
-            raise ValueError(f"Critical Error: Data domain '{domain_id}' is not registered.")
-
-        # 2. Use the adapter to create the envelope.
-        # Passing an empty dict {} triggers the Pydantic schema's default values.
-        # Producer is 'system' because this is the mission's 'Genesis' block.
-        initial_payload = adapter.payload_schema()
-        initial_payload_dict = initial_payload.model_dump() # converts into a dict
-
-        logger.info(
-            f"Instantiated default payload | "
-            f"type={type(initial_payload)} "
-            f"values={initial_payload_dict}"
-        )
-
-        try:
-            initial_envelope = adapter.create_envelope(
-                payload=initial_payload_dict, 
-                producer="system/genesis", 
-                stage="init"
-            )
-            return initial_envelope
-        except ValueError as e:
-            logger.error(f"Critical Error: Data domain '{domain_id}' schema, {e}")
-
 
 
 ##################################################################
@@ -429,14 +348,14 @@ class ToolManager:
 # SYSTEM CONTEXT
 ##################################################################
 class SystemContext:
-    def __init__(self, domain: str, domain_repo: str, agent_manager: AgentManager):
+    def __init__(self, domain_repo: str, agent_manager: AgentManager):
         logger.info("Initializing SystemContext")
 
         self.template_repo = domain_repo / "templates"
         self.data_repo     = domain_repo / "data"
         self.tools_repo    = domain_repo / "tools"      
 
-        self.data_manager = DataManager(domain, agent_manager)
+        self.data_manager = DataManager(agent_manager)
         self.tool_manager = ToolManager(self.tools_repo)
 
         self.data_manager.scan_and_register()
