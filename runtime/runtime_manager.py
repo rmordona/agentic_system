@@ -6,20 +6,20 @@ import uuid
 from pathlib import Path
 from typing import Dict, Optional, Any
 
+
 from runtime.workspace_loader import WorkspaceLoader
-from runtime.agent_registry import AgentRegistry
-from runtime.stage_registry import StageRegistry
-from runtime.graph_manager import GraphManager
+from runtime.core_engine import CoreEngine
+from runtime.runtime_context import RuntimeContext
 from runtime.reload_manager import ReloadManager
 from runtime.orchestrator import Orchestrator
-from runtime.session_manager import SessionManager
+from runtime.session_manager import SessionManager, SessionContext
 from runtime.lifecycle import register_lifecycle_handlers
-from llm.model_manager import ModelManager
-from runtime.tools.tool_client import ToolClient
 
 from events.event_bus import EventBus
 
 from runtime.logger import AgentLogger
+
+logger = AgentLogger.get_logger( component="system" )
 
 class RuntimeManager:
     """
@@ -29,18 +29,13 @@ class RuntimeManager:
     - Supports multi-session execution safely.
     """
 
-    # Inherit the logger
-    model_manager = None
-    tool_client = None
     event_bus = None
 
     _instances: Dict[str, RuntimeManager] = {}
 
     def __new__(cls, 
             workspace_path: Path,
-            model_manager: ModelManager,
             session_manager: SessionManager,
-            tool_client: ToolClient,
             event_bus: EventBus,
         ):
         ws_name = workspace_path.name
@@ -51,9 +46,7 @@ class RuntimeManager:
 
     def __init__(self, 
             workspace_path: Path,
-            model_manager: ModelManager,
             session_manager: SessionManager,
-            tool_client: ToolClient,
             event_bus: EventBus,
         ):
 
@@ -65,14 +58,20 @@ class RuntimeManager:
         self.workspace_path = workspace_path
         self.workspace_name = workspace_path.name
 
-        self.model_manager = model_manager
-        self.tool_client = tool_client
+        self.runtime_path = workspace_path.parent
+
+        self.session_manager = session_manager
+
+
+
+        #self.model_manager = model_manager
+        #self.tool_client = tool_client
 
         self.event_bus = event_bus
 
-        global logger
+        #global logger
         #logger = AgentLogger.get_logger( component="runtime", workspace = self.workspace_name )
-        logger = AgentLogger.get_logger( component="system" )
+
 
         logger.info(f"Initializaing Runtime {self.workspace_name}... ")
 
@@ -84,28 +83,9 @@ class RuntimeManager:
         self.execution_mode = self.workspace_meta.get('execution_mode')
         logger.info(f"Workspace Execution Mode: {self.execution_mode}")
 
-        self.agent_registry = AgentRegistry(
-            workspace_path,
-            execution_mode = self.execution_mode,
-            model_manager=self.model_manager,
-            tool_client=self.tool_client,
-            event_bus=self.event_bus
-        )
-        self.agent_registry.load_agents()
-        logger.info(f"Registered agents: {self.agent_registry.roles()}")
-
-        self.stage_registry = StageRegistry(workspace_path)
-        self.stage_registry.load_stages()
-        logger.info(f"Stages loaded: {self.stage_registry.list_stages()}")
-
-        logger.info(f"Initializing runtime graph for workspace '{self.workspace_name}'")
-        self.graph_manager = GraphManager(workspace_path, self.agent_registry, self.stage_registry)
-        self.graph_manager.build(self.execution_mode, self.model_manager)
-        logger.info("Execution graph built successfully for '{self.workspace_name}'")
 
         self.reload_manager = ReloadManager(
             workspace_loaders={self.workspace_name: self.workspace_meta},
-            graph_manager=self.graph_manager,
             interval_seconds=30
         )
                         
@@ -116,45 +96,28 @@ class RuntimeManager:
         # ---- Per-session storage ----
         self._orchestrators: Dict[str, Orchestrator] = {}
 
-    # ------------------------------------------------------------------
-    # Session Management
-    # ------------------------------------------------------------------
-
-    def create_session(self, session_id: Optional[str] = None) -> str:
-        """
-        Create a new session with a fresh orchestrator.
-        Returns the session_id.
-        """
-        session_id = session_id or str(uuid.uuid4())
-
-        # Stage registry, event bus, orchestrator
-        register_lifecycle_handlers(self.event_bus)
-
-        orchestrator = Orchestrator(
-            workspace_path=self.workspace_path,
-            agent_registry=self.agent_registry,
-            stage_registry=self.stage_registry,
-            graph_manager=self.graph_manager,
-            event_bus=self.event_bus,
-            session_id=session_id
-        )
-        self._orchestrators[session_id] = orchestrator
-        logger.info(f"Created new session: {session_id}")
-        return session_id
-
-    def get_orchestrator(self, session_id: str) -> Orchestrator:
+    def get_orchestrator(self, session_ctx: SessionContext) -> Orchestrator:
         """
         Retrieve orchestrator for a session.
         """
-        orchestrator = self._orchestrators.get(session_id)
-        if not orchestrator:
-            logger.error(f"No orchestrator found for session {session_id}")
-            raise ValueError(f"No orchestrator found for session {session_id}")
+
+        if session_ctx.session_id in self._orchestrators:
+            logger.info(f"Acquiring orchestrator for session: {session_ctx.session_id}")
+            orchestrator = self._orchestrators.get(session_ctx.session_id)
+        else:
+            logger.info(f"Creating new orchestrator for session: {session_ctx.session_id}")
+            orchestrator = Orchestrator(
+                workspace_path=self.workspace_path,
+                session_id=session_ctx.session_id,
+                event_bus=self.event_bus
+            )
+            self._orchestrators[session_ctx.session_id] = orchestrator
         return orchestrator
 
     async def run_user_message(
         self,
-        user_message: str,
+        user_id: str,
+        user_intent: str,
         session_id: Optional[str] = None,
         verbose: bool = True
     ) -> Dict[str, Any]:
@@ -164,34 +127,23 @@ class RuntimeManager:
         - Runs orchestrator
         """
 
-        logger.info("Entering User Session")
+        logger.info("Entering Session Space")
 
         # 1. Create or fetch session
-        if session_id and session_id in self._orchestrators:
-            orchestrator = self.get_orchestrator(session_id)
+        if session_id and self.session_manager.exists(user_id, session_id):
+            session_ctx = self.session_manager.get(session_id)
         else:
-            session_id = self.create_session(session_id)
-            orchestrator = self.get_orchestrator(session_id)
+            session_ctx = self.session_manager.create_session(user_id)
 
-        # 2. Initialize session state with user message
-        initial_state = {
-            "session_id": session_id,
-            "task": user_message,
-            "agent" : None,
-            "stage": self.stage_registry.first_stage(),
-            "done": False,
-            "history_agents": [],
-            "executed_agents_per_stage": {},
-            "rewards": {},
-            "winner": {},
-            "decision": {},
-        }
+        orchestrator = self.get_orchestrator(session_ctx)
 
-        logger.info(f"Running session {session_id} with user message: {user_message}")
+        logger.info(f"Running session {session_id} with user message: {user_intent}")
 
+ 
         logger.info("Orchestrator running")
-        # 3. Run orchestrator
-        result = await orchestrator.run(initial_state)
+
+        # 6. Run orchestrator
+        result = await orchestrator.run(user_intent, self.workspace_meta)
         return result
 
     # ------------------------------------------------------------------

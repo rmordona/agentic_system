@@ -3,10 +3,11 @@
 import json
 import hashlib
 from pathlib import Path
-from agents.skills.agent import SkillAgent
-from runtime.agent_registry import AgentRegistry
-from runtime.stage_registry import StageRegistry
+#from runtime.agent.agent_impersonator import ImpersonatorAgent
+##from runtime.agent_registry import AgentRegistry
+# from runtime.stage_registry import StageRegistry
 #from graph.state_graph import build_dynamic_graph
+
 from runtime.logger import AgentLogger
 
 logger = AgentLogger.get_logger(  component="system")
@@ -46,6 +47,7 @@ class WorkspaceLoader:
         # Compute workspace version hash
         self.version_hash = self._compute_version_hash()
 
+        logger.info(f"Workspace Meta: {workspace_meta}")
         logger.info("Workspace loaded successfully")
         return workspace_meta
 

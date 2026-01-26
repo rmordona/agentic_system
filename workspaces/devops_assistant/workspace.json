@@ -1,0 +1,18 @@
+{
+  "assistant_id": "develops_assistant",
+  "domain": "software_engineering",
+  "pipeline_template": "dev_sprint_pipeline.md",
+  "default_artifact_path": "artifacts/software/",
+  "agent_stack": [
+    "DevStrategistAgent",
+    "CodeArchitectAgent",
+    "SecurityAuditAgent",
+    "TestingSpecialistAgent",
+    "DevOpsDeployAgent"
+  ],
+  "capabilities": ["code_generation", "dependency_analysis", "vulnerability_scanning"],
+  "environment_vars": {
+    "target_framework": "nextjs_14",
+    "deployment_target": "vercel"
+  }
+}

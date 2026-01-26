@@ -6,7 +6,7 @@
       "class" : "OllamaChatModel",
       "endpoint": "http://localhost:11434/api/chat",
       "models" : [ "qwen2:0.5b", "llama3.2", "qwen2:1.5b-instruct", "tinyllama", "granite3-moe:1b" ],
-      "temperature" : 0.0,
+      "temperature" : 0.2,
       "max_tokens" :  2048,
       "request_timeout" : 120.0, 
       "apis" : {

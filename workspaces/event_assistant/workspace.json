@@ -1,0 +1,21 @@
+{
+  "assistant_id": "event_assistant",
+  "domain": "event_coordination",
+  "pipeline_template": "event_orchestration_pipeline.md",
+  "default_artifact_path": "artifacts/event_productions/",
+  "agent_stack": [
+    "EventStrategistAgent",
+    "VenueSpecialistAgent",
+    "SearchSpecialistAgent",
+    "LogisticsAgent",
+    "TechnicalDirectorAgent",
+    "ClientLiaisonAgent",
+    "ProcurementAgent",
+    "SafetyAgent"
+  ],
+  "capabilities": ["vendor_sourcing", "floorplan_generation", "av_tech_specs"],
+  "environment_vars": {
+    "default_timezone": "UTC",
+    "emergency_protocol_standard": "OSHA_Event_Safety"
+  }
+}

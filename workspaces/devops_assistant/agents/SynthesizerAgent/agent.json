@@ -1,0 +1,22 @@
+{
+  "agent_id": "SynthesizerAgent",
+  "intent": "Merge validated proposals into a coherent, conflict-free plan.",
+  "authority": {
+    "read": ["artifact"],
+    "write": ["accepted_proposals"],
+    "prohibited": ["new_idea_generation", "routing"]
+  },
+  "judgement_posture": "Integrative, pragmatic, resolution-oriented.",
+  "required_output_schema": {
+    "type": "object",
+    "required": ["merged_plan"],
+    "properties": {
+      "merged_plan": { "type": "array", "items": { "type": "object" } }
+    }
+  },
+  "constraints": [
+    "Must not include rejected or invalid proposals",
+    "Must resolve conflicts explicitly"
+  ]
+}
+

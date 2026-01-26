@@ -80,14 +80,6 @@ from runtime.bootstrap.config_loader import ConfigLoader
 from runtime.workspace_hub import WorkspaceHub
 from runtime.session_manager import SessionManager
 
-# LLM Model Manager
-from llm.model_manager import ModelManager
-
-# Tools
-from runtime.tools.tool_registry import ToolRegistry
-from runtime.tools.tool_policy import ToolPolicy
-from runtime.tools.tool_client import ToolClient
-
 from events.event_bus import EventBus
 
 
@@ -99,11 +91,7 @@ class Platform:
 
     _initialized = False
 
-    model_manager: ModelManager = None
     session_manager: SessionManager = None
-    tool_registry: ToolRegistry = None
-    tool_policy: ToolPOlicy = None
-    tool_client: ToolClient = None
     workspace_hub: WorkspaceHub = None
     event_bus: EventBus = None
 
@@ -141,13 +129,14 @@ class Platform:
         # --------------------------------------------------
         # Tools Config
         # --------------------------------------------------
-        tool_config_path = parent_path.parent / "tools" / "config.json" # runtime/tools/config.json
-        tools_policy_path = workspaces_root / "tools_policy.json" # workspaces/tools_config.json
+        #tool_config_path = parent_path.parent / "tools" / "config.json" # runtime/tools/config.json
+        #tools_policy_path = workspaces_root / "tools_policy.json" # workspaces/tools_config.json
 
         # --------------------------------------------------
         # Tool Bootstrapping
         # --------------------------------------------------
     
+        '''
         self.tool_registry = ToolRegistry(tool_config_path)
         self.tool_registry.load()
 
@@ -161,22 +150,12 @@ class Platform:
             agent_role="critic"
         )
         logger.info("ToolClient initialized")
+        '''
 
         # --------------------------------------------------
         # Event Bus
         # --------------------------------------------------
         self.event_bus = EventBus()
-
-
-        # --------------------------------------------------
-        # LLM Model bootstrap
-        # --------------------------------------------------
-        self.model_manager = ModelManager(
-            chatmodel_provider="ollama:qwen2:0.5b",
-            embedding_provider="ollama:nomic-embed-text:latest",
-            store_provider="in-memory-ollama",  
-            llm_config = parent_path.parent.parent / "llm",
-        )
 
         # --------------------------------------------------
         # Session Bootstrapping
@@ -188,9 +167,9 @@ class Platform:
         # --------------------------------------------------
         self.workspace_hub = WorkspaceHub(
             workspaces_root=workspaces_root,
-            model_manager=self.model_manager,
+            #model_manager=self.model_manager,
             session_manager=self.session_manager,
-            tool_client=self.tool_client,
+            #tool_client=self.tool_client,
             event_bus=self.event_bus
         )
 

@@ -1,0 +1,22 @@
+{
+  "agent_id": "IdeationAgent",
+  "intent": "Generate multiple solution options within given constraints.",
+  "authority": {
+    "read": ["artifact", "spec"],
+    "write": ["proposals"],
+    "prohibited": ["evaluation", "routing"]
+  },
+  "judgement_posture": "Creative, exploratory, constraint-aware.",
+  "required_output_schema": {
+    "type": "object",
+    "required": ["proposals"],
+    "properties": {
+      "proposals": { "type": "array", "items": { "type": "object" } }
+    }
+  },
+  "constraints": [
+    "Must align proposals with spec",
+    "Must not evaluate proposal quality"
+  ]
+}
+

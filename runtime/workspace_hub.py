@@ -4,8 +4,8 @@ from typing import Dict
 
 from runtime.runtime_manager import RuntimeManager
 from runtime.session_manager import SessionManager
-from llm.model_manager import ModelManager
-from runtime.tools.tool_client import ToolClient
+#from llm.model_manager import ModelManager
+#from runtime.tools.tool_client import ToolClient
 from events.event_bus import EventBus
 
 from runtime.logger import AgentLogger
@@ -20,9 +20,7 @@ class WorkspaceHub:
     _instance: WorkspaceHub | None = None
 
     def __new__(cls, workspaces_root: Path,
-            model_manager: ModelManager,
             session_manager: SessionManager,
-            tool_client: ToolClient,
             event_bus: EventBus):
         if cls._instance is None:
             cls._instance = super().__new__(cls)
@@ -30,9 +28,7 @@ class WorkspaceHub:
         return cls._instance
 
     def __init__(self, workspaces_root: Path,
-            model_manager: ModelManager,
             session_manager: SessionManager,
-            tool_client: ToolClient,
             event_bus: EventBus
     ):
         if self._initialized:
@@ -42,9 +38,7 @@ class WorkspaceHub:
         self._runtimes: Dict[str, RuntimeManager] = {}
         self._initialized = True
 
-        self.model_manager = model_manager
         self.session_manager = session_manager
-        self.tool_client = tool_client
         self.event_bus = event_bus
 
         logger.info(f"WorkspaceHub initialized at {workspaces_root}")
@@ -79,9 +73,7 @@ class WorkspaceHub:
 
         runtime = RuntimeManager(
             workspace_dir, 
-            self.model_manager,
             self.session_manager, 
-            self.tool_client,
             self.event_bus
         )
         self._runtimes[workspace_name] = runtime

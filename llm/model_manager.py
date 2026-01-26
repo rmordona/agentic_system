@@ -54,9 +54,22 @@ from llm.stores.store_factory import StoreFactory
 from llm.memory_manager import MemoryManager
 from langgraph.store.memory import InMemoryStore
 
+#from llm.stores.adapters.base_store import BaseStore
+#from llm.embeddings.adapters.base_client import BaseEmbeddingClient
+#from langchain.chat_models.base import BaseChatModel
+
+
 from runtime.logger import AgentLogger
 
 logger = AgentLogger.get_logger(component="system")
+
+'''
+class ModelSchema:
+    store: BaseStore = None
+    embedding_client: BaseEmbeddingClient = None
+    chatmodel: BaseChatModel = None
+    tools: List[Dict[str, Any]]
+'''
 
 class ModelManager:
     def __init__(
@@ -64,8 +77,10 @@ class ModelManager:
         chatmodel_provider: str,
         embedding_provider: str,
         store_provider: str,
-        llm_config: str
+        llm_config_dir: str
     ):
+
+        self.bound_tools = None
 
         self.chatmodel_provider = chatmodel_provider
         self.embedding_provider = embedding_provider
@@ -73,14 +88,14 @@ class ModelManager:
         # 1. Embeddings
         # -----------------------
         logger.info("Loading Embedding Factory")
-        EmbeddingFactory.load_config(llm_config / "embeddings/config.json")
+        EmbeddingFactory.load_config(llm_config_dir / "embeddings/config.json")
         self.embedding_client = EmbeddingFactory.get(embedding_provider)
 
         # -----------------------
         # 2. Stores
         # -----------------------
         logger.info("Loading Store Factory")
-        StoreFactory.load_config(llm_config / "stores/config.json")
+        StoreFactory.load_config(llm_config_dir / "stores/config.json")
         self.store = StoreFactory.get(store_provider, self.embedding_client) 
 
         logger.info(f"Loading reflection prompt")
@@ -100,7 +115,7 @@ class ModelManager:
         # -----------------------
         # Load chatmodel config once at platform startup
         logger.info("Loading Chat Model Factory")
-        ChatModelFactory.load_config(llm_config / "chatmodels/config.json")
+        ChatModelFactory.load_config(llm_config_dir / "chatmodels/config.json")
         self.llm = ChatModelFactory.get(chatmodel_provider)
 
 
@@ -124,6 +139,75 @@ class ModelManager:
                 "max_tokens" : self.llm.max_tokens }
         raise RuntimeError("ChatModel not initialized.")
 
+
+    def bind_tools(self, tools: List[Dict[str, Any]]):
+        """
+        Standard LangChain interface to attach tool schemas to the model.
+        """
+        # We store these to include them in the payload during _generate
+        self.bound_tools = tools
+        return self
+
+    # -----------------------------------------------------------------------------
+    # async def ainvoke
+    # -----------------------------------------------------------------------------
+    # Direct, tool-aware LLM invocation for AgentRunner or other orchestrators.
+    #
+    # This is the 'Fast Path' method:
+    #   - No RAG / memory augmentation
+    #   - No self-reflection
+    #   - Executes the prompt directly on the LLM
+    #   - Optionally binds tools for tool-aware reasoning
+    #
+    # Parameters:
+    #   prompt : str or List[BaseMessage]
+    #       User input or system messages to generate a response from the LLM
+    #   tools : Optional[List[Dict]]
+    #       ToolEnvelope schemas to bind to the LLM for tool-aware execution
+    #   **kwargs : dict
+    #       Additional model-specific configuration (temperature, max_tokens, etc.)
+    #
+    # Returns:
+    #   AIMessage
+    #       Raw LLM output with optional tool call proposals
+    #
+    # Usage:
+    #   response = await model_manager.ainvoke("Execute mission X", tools=tools_list)
+    # -----------------------------------------------------------------------------
+    async def ainvoke(
+            self, 
+            prompt: Union[str, List[BaseMessage]],
+            temperature: Optional[float] = None,
+            max_tokens: Optional[int] = None,
+            namespace: Tuple[str, str] = None,
+            metadata: Dict[str, Any] = None,
+            persist: bool = True,
+            reflect: bool = True,
+            top_k: int = 5,
+            **kwargs
+        ) -> AIMessage:
+            """
+            The 'Fast Path' for the AgentRunner. 
+            No RAG, no reflection—just raw execution.
+            """
+            
+            # 1. Bind tools if provided
+            executor = self.llm
+            if self.bound_tools:
+                executor = self.llm.bind_tools(self.bound_tools)
+
+            # We can use this later
+            config={
+                "temperature": temperature if temperature is not None else self.llm.temperature,
+                "max_tokens": max_tokens if max_tokens is not None else self.llm.max_tokens,
+                "model": self.llm.model_name,  # optional, if your adapter supports it
+            }
+            
+            # 2. Direct call to the OllamaChatModel's ainvoke/invoke
+            # This triggers the _generate logic we just refined
+            response = await executor.ainvoke(prompt, **kwargs)
+            
+            return response
     # -----------------------------------------------------------------------------
     # Generate a response from the LLM with optional memory augmentation and persistence.
     #
@@ -197,7 +281,7 @@ class ModelManager:
 
     async def generate(
         self,
-        prompt: str,
+        prompt: BaseMessage,
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
         namespace: Tuple[str, str] = None,
@@ -206,7 +290,7 @@ class ModelManager:
         reflect: bool = True,
         top_k: int = 5,
         reward: Optional[float] = None,
-    ) -> str:
+    ) -> AIMessage:
         """
         Generate text from LLM while automatically:
         - Retrieving relevant semantic memories
@@ -218,7 +302,7 @@ class ModelManager:
 
         logger.info("Performing  (RAG)")
         # 1. Retrieve relevant semantic memories
-        logger.info(f"RAG: Start with Retrieval (using {self.embedding_provider})...")
+        logger.info(f"RAG: Start with Retrieval ({self.embedding_provider})...")
         context_memories = []
         if namespace:
             context_memories = await self.memory_manager.retrieve_semantic(
@@ -237,8 +321,7 @@ class ModelManager:
         # 3. Call LLM
         logger.info(f"RAG: Finally, generating response (using {self.chatmodel_provider})...")
 
-        message = [ {"role" : "system", "content" : prompt } ]
-        logger.info(f"Prompt: {message}")
+        logger.info(f"Prompt: {prompt}")
 
         config={
             "temperature": temperature if temperature is not None else self.llm.temperature,
@@ -246,15 +329,18 @@ class ModelManager:
             "model": self.llm.model_name,  # optional, if your adapter supports it
         }
 
-        response = await self.llm.ainvoke(message, config)
+        response = await self.llm.ainvoke(prompt, config)
 
-        logger.info(f"LLM Response: {response}")
+        #content = response.generations[0].message.content
+
+        logger.info(f"LLM type: {type(response)}, response: {response.content}")
+        #logger.info(f"LLM Content: {content}")
 
         # 4. Persist semantic memory (prompt + response)
         if persist and namespace:
             logger.info("Now saving response to memory ...")
 
-            interaction_text = f"Prompt: {message}\nResponse: {response}"
+            interaction_text = f"Prompt: {prompt}\nResponse: {response.content}"
 
             await self.memory_manager.save_semantic(
                 namespace=namespace,

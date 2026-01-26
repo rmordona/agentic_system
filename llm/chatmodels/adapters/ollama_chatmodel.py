@@ -205,6 +205,13 @@ class OllamaChatModel(BaseChatModel):
         logger.info(f"Raw Data: {data}")
         content = data.get("message", {}).get("content", "")
 
+        # CALLING IT HERE:
+        # Pass the 'message' object which contains 'content' AND potentially 'tool_calls'
+        ai_msg = self._parse_ai_message(data.get("message", {}))
+
+        return ChatResult(generations=[ChatGeneration(message=ai_msg)])
+
+        '''
         return ChatResult(
             generations=[
                 ChatGeneration(
@@ -212,74 +219,89 @@ class OllamaChatModel(BaseChatModel):
                 )
             ]
         )
+        '''
 
     # ------------------------------------------------------------------
     # STREAMING (sync)
     # ------------------------------------------------------------------
 
     def _stream(
-        self,
-        messages: List[BaseMessage],
-        stop: Optional[List[str]] = None,
-        run_manager: Optional[CallbackManagerForLLMRun] = None,
-        temperature: float = None,
-        max_tokens: int = None,
-    ) -> Iterator[ChatGeneration]:
-        payload = self._build_chat_payload(messages, temperature, max_tokens, stream=True)
+            self,
+            messages: List[BaseMessage],
+            stop: Optional[List[str]] = None,
+            run_manager: Optional[CallbackManagerForLLMRun] = None,
+            temperature: float = None,
+            max_tokens: int = None,
+        ) -> Iterator[ChatGeneration]:
+            payload = self._build_chat_payload(messages, temperature, max_tokens, stream=True)
 
-        with requests.post(
-            self.endpoint,
-            json=payload,
-            stream=True,
-            timeout=self.request_timeout,
-        ) as response:
-            response.raise_for_status()
+            with requests.post(
+                self.endpoint,
+                json=payload,
+                stream=True,
+                timeout=self.request_timeout,
+            ) as response:
+                response.raise_for_status()
 
-            for line in response.iter_lines():
-                if not line:
-                    continue
+                for line in response.iter_lines():
+                    if not line:
+                        continue
 
-                data = self._parse_stream_chunk(line)
-                token = data.get("message", {}).get("content")
+                    # 1. Clean up the JSON line
+                    chunk_data = self._parse_stream_chunk(line)
+                    
+                    # 2. Extract the message portion
+                    message_chunk = chunk_data.get("message", {})
+                    if not message_chunk:
+                        continue
 
-                if token:
-                    yield ChatGeneration(
-                        message=AIMessage(content=token)
-                    )
+                    # 3. Use the unified mapper (Crucial for Tool Support)
+                    ai_message = self._parse_ai_message(message_chunk)
+
+                    # 4. Yield the generation if it contains data
+                    if ai_message.content or ai_message.tool_calls:
+                        yield ChatGeneration(message=ai_message)
 
     # ------------------------------------------------------------------
     # STREAMING (async)
     # ------------------------------------------------------------------
 
     async def _astream(
-        self,
-        messages: List[BaseMessage],
-        stop: Optional[List[str]] = None,
-        run_manager: Optional[CallbackManagerForLLMRun] = None,
-        temperature: float = None,
-        max_tokens: int = None,
-    ) -> AsyncIterator[ChatGeneration]:
-        payload = self._build_chat_payload(messages, temperature, max_tokens, stream=True)
+            self,
+            messages: List[BaseMessage],
+            stop: Optional[List[str]] = None,
+            run_manager: Optional[CallbackManagerForLLMRun] = None,
+            temperature: float = None,
+            max_tokens: int = None,
+        ) -> AsyncIterator[ChatGeneration]:
+            payload = self._build_chat_payload(messages, temperature, max_tokens, stream=True)
 
-        async with httpx.AsyncClient(timeout=self.request_timeout) as client:
-            async with client.stream(
-                "POST",
-                self.endpoint,
-                json=payload,
-            ) as response:
-                response.raise_for_status()
+            async with httpx.AsyncClient(timeout=self.request_timeout) as client:
+                async with client.stream(
+                    "POST",
+                    self.endpoint,
+                    json=payload,
+                ) as response:
+                    response.raise_for_status()
 
-                async for line in response.aiter_lines():
-                    if not line:
-                        continue
+                    async for line in response.aiter_lines():
+                        if not line:
+                            continue
 
-                    data = self._parse_stream_chunk(line)
-                    token = data.get("message", {}).get("content")
+                        # 1. Raw JSON line to Dict
+                        chunk_data = self._parse_stream_chunk(line)
+                        
+                        # 2. Map the 'message' part to a proper AIMessage
+                        # This captures BOTH content tokens and tool_calls
+                        message_chunk = chunk_data.get("message", {})
+                        if not message_chunk:
+                            continue
 
-                    if token:
-                        yield ChatGeneration(
-                            message=AIMessage(content=token)
-                        )
+                        ai_message = self._parse_ai_message(message_chunk)
+
+                        # 3. Yield if there is anything to report
+                        if ai_message.content or ai_message.tool_calls:
+                            yield ChatGeneration(message=ai_message)
 
     # ------------------------------------------------------------------
     # Helpers
@@ -293,7 +315,7 @@ class OllamaChatModel(BaseChatModel):
         *,
         stream: bool,
     ) -> Dict[str, Any]:
-        return {
+        payload =  {
             "model": self.model_name,
             "stream": stream,
             "messages": [self._convert_message(m) for m in messages],
@@ -302,6 +324,12 @@ class OllamaChatModel(BaseChatModel):
                 "num_predict": max_tokens if max_tokens is not None else self.max_tokens 
             },
         }
+
+        # OLLAMA SPECIFIC: Add tools to the payload if they are bound
+        if hasattr(self, "bound_tools") and self.bound_tools:
+            payload["tools"] = self.bound_tools
+
+        return payload
 
     def _convert_message(self, message: BaseMessage) -> Dict[str, str]:
         if isinstance(message, SystemMessage):
@@ -326,3 +354,32 @@ class OllamaChatModel(BaseChatModel):
             return json.loads(raw_line)
         except json.JSONDecodeError:
             return {}
+
+
+    # Tool Binding
+    def bind_tools(self, tools: List[Dict[str, Any]]):
+        """
+        Standard LangChain interface to attach tool schemas to the model.
+        """
+        # We store these to include them in the payload during _generate
+        self.bound_tools = tools
+        return self
+
+    def _parse_ai_message(self, message_data: Dict[str, Any]) -> AIMessage:
+        """
+        Extracts content AND tool_calls from Ollama's response.
+        """
+        content = message_data.get("content", "")
+        tool_calls = []
+        
+        # Ollama returns tool calls in a specific 'tool_calls' array
+        raw_tool_calls = message_data.get("tool_calls", [])
+        for rtc in raw_tool_calls:
+            function_data = rtc.get("function", {})
+            tool_calls.append({
+                "name": function_data.get("name"),
+                "args": function_data.get("arguments"),
+                "id": str(rtc.get("id", "0"))
+            })
+            
+        return AIMessage(content=content, tool_calls=tool_calls)

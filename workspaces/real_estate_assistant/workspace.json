@@ -1,0 +1,22 @@
+{
+  "assistant_id": "realty_assistant",
+  "domain": "real_estate",
+  "pipeline_template": "acquisition_pipeline.md",
+  "default_artifact_path": "artifacts/property_deals/",
+  "agent_stack": [
+    "RealtyStrategyAgent",
+    "MarketAnalysisAgent",
+    "SearchSpecialistAgent",
+    "UnderwritingAgent",
+    "InspectorAgent",
+    "DueDiligenceAgent",
+    "InvestmentCommitteeAgent",
+    "LegalCounselAgent",
+    "TransactionCoordinatorAgent"
+  ],
+  "capabilities": ["mls_data_access", "zoning_map_analysis", "financial_modeling"],
+  "environment_vars": {
+    "target_market": "commercial_multifamily",
+    "min_cap_rate": 0.06
+  }
+}

@@ -18,7 +18,7 @@ from runtime.logger import AgentLogger
 def parse_args():
     parser = argparse.ArgumentParser(description="Run a task through the agentic platform CLI")
     parser.add_argument("--workspace", type=str, required=True, help="Workspace name or path")
-    parser.add_argument("--message", type=str, required=True, help="User task message")
+    parser.add_argument("--message", type=str, required=True, help="User Intent")
     parser.add_argument("--user_id", type=str, required=True, help="User ID for session tracking")
     parser.add_argument("--session_id", type=str, help="Optional existing session ID")
     parser.add_argument("--verbose", action="store_true", help="Enable verbose logging")
@@ -41,14 +41,14 @@ async def main():
 
     workspace_hub = Platform.workspace_hub
 
-
     # 3. Create or get workspace RuntimeManager (singleton per workspace)
     runtime = workspace_hub.get_runtime(args.workspace)
 
     # runtime = workspace_hub.get_runtime(args.workspace)
 
     result = await runtime.run_user_message(
-        user_message=args.message,
+        user_id=args.user_id,
+        user_intent=args.message,
         session_id=args.session_id, # optional
         verbose=args.verbose
     )
@@ -59,7 +59,7 @@ async def main():
     print(f"Workspace: {workspaces_root.name}")
     print(f"User ID: {args.user_id}")
     print(f"Session ID: {args.session_id}")
-    print(f"Task: {args.message}")
+    print(f"User Intent: {args.message}")
     print("Result:")
     print(result)
 

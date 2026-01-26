@@ -1,0 +1,18 @@
+{
+  "assistant_id": "travel_assistant",
+  "domain": "travel_logistics",
+  "pipeline_template": "trip_planning_pipeline.md",
+  "default_artifact_path": "artifacts/itineraries/",
+  "agent_stack": [
+    "TravelStrategistAgent",
+    "SearchSpecialistAgent",
+    "LogisticsAgent",
+    "SafetyAgent",
+    "ProcurementAgent"
+  ],
+  "capabilities": ["ota_api_access", "visa_requirement_lookup", "weather_forecasting"],
+  "environment_vars": {
+    "preferred_currency": "USD",
+    "loyalty_programs": ["marriott_bonvoy", "delta_skymiles"]
+  }
+}

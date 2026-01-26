@@ -67,6 +67,67 @@
 #   - Deterministic routing with explicit exit semantics
 #   - Decoupled agents with zero filesystem or routing authority
 #
+##################################################################################
+# Artifact Semantics in Agentic Pipelines
+# --------------------------------------
+#
+# The "artifact" is the canonical, shared state object of an agentic pipeline.
+# It represents everything the system has produced, observed, or decided so far,
+# and it is the ONLY object stages are allowed to read from or write to, subject
+# to explicit governance rules.
+#
+# In modern agentic systems, an artifact is:
+#   - A structured data object (not free-form text)
+#   - Versioned and auditable
+#   - Deterministic and replayable
+#   - The single source of truth for pipeline state
+#
+# The artifact is NOT:
+#   - A single file
+#   - A single proposal
+#   - A single agent output
+#
+# The artifact IS:
+#   - The source of truth
+#   - The decision substrate for routing and validation
+#   - The input to the pipeline execution graph
+#
+# All exit conditions and routing rules operate exclusively on the artifact.
+# For example:
+#
+#   Exit Condition: all_proposals_reviewed(artifact)
+#
+# This means:
+#   "Given the current pipeline state as recorded in the artifact,
+#    have all proposals been evaluated?"
+#
+# The pipeline NEVER asks the LLM subjective questions like:
+#   "Did you review everything?"
+#
+# Instead, it asks objective, state-based questions:
+#   "What does the artifact objectively show?"
+#
+# This design enables:
+#   - Deterministic execution
+#   - Full auditability
+#   - Reliable replay and simulation
+#   - Strong governance and safety guarantees
+#
+# Example of  Artifacts
+#    artifact = {
+#        "spec": {...},                      # parsed spec.md
+#        "proposals": [...],                 # ideation outputs
+#        "reviews": [...],                   # critic feedback
+#        "accepted_proposals": [...],        # synthesis result
+#        "rejected_proposals": [...],
+#        "issues": [...],                    # detected problems
+#        "metadata": {
+#            "stage_history": [...],
+#            "timestamps": {...},
+#            "agents_used": {...},
+#        }
+#    }
+#
 #
 # Author: Raymond M.O. Ordona
 # Created: 2026-01-01
@@ -166,7 +227,7 @@ class PipelineAdapter:
 
     def _lint_pipeline(self, fail_on_error: bool):
         logger.info("Linting pipeline definition")
-        logger.info(f"Pipeline: {self.pipeline}")
+        # logger.info(f"Pipeline: {self.pipeline}")
         linter = PipelineLinter(self.pipeline)
         result = linter.lint(fail_fast=fail_on_error)
 
@@ -269,7 +330,7 @@ class PipelineAdapter:
             raise ValueError(f"[PipelineTemplateExtractor:] ")
                 
         logger.info(f"Extracted the stage..")
-        return 
+        return {}
 
     '''
     def _extract_pipeline_from_markdown(self, markdown: str) -> Dict[str, Any]:

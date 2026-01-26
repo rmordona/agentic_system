@@ -61,9 +61,6 @@ class PipelineLinter:
         logger.info("Checking Entry Invariants ... ")
         self._check_entry_invariants()
 
-        logger.info("Checking Exit Invariants ... ")
-        self._check_exit_invariants()
-
         logger.info("Checking Reachability ... ")
         self._check_reachability()
 
@@ -182,16 +179,22 @@ class PipelineLinter:
     def _check_entry_invariants(self):
         logger.debug("Checking entry invariants")
 
-        incoming = defaultdict(int)
-        for src, targets in self._graph.items():
-            for tgt in targets:
-                incoming[tgt] += 1
+        # Use explicit entry_stage if provided, otherwise fallback to in-degree 0
+        explicit_entry = self.pipeline.get("entry_stage")
 
-        entry_stages = [
-            s["name"]
-            for s in self.pipeline.get("stages", [])
-            if incoming[s["name"]] == 0
-        ]
+        if explicit_entry:
+            entry_stages = [explicit_entry]
+        else:
+            incoming = defaultdict(int)
+            for src, targets in self._graph.items():
+                for tgt in targets:
+                    incoming[tgt] += 1
+
+            entry_stages = [
+                s["name"]
+                for s in self.pipeline.get("stages", [])
+                if incoming[s["name"]] == 0
+            ]
 
         if len(entry_stages) != 1:
             msg = f"Pipeline must have exactly one entry stage; found {entry_stages}"

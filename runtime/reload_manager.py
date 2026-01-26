@@ -5,7 +5,7 @@ import asyncio
 from pathlib import Path
 from typing import Dict
 from runtime.workspace_loader import WorkspaceLoader
-from runtime.graph_manager import GraphManager
+# from runtime.stage_manager import StageManager
 from runtime.logger import AgentLogger
 
 class ReloadManager:
@@ -17,17 +17,17 @@ class ReloadManager:
     def __init__(
         self,
         workspace_loaders: Dict[str, WorkspaceLoader],
-        graph_manager: GraphManager,
+        #stage_manager: StageManager,
         interval_seconds: int = 30,
     ):
         """
         Args:
             workspace_loaders: dict of workspace_name -> WorkspaceLoader
-            graph_manager: GraphManager instance for invalidation
+            stage_manager: StageManager instance for invalidation
             interval_seconds: polling interval for reload check
         """
         self.workspace_loaders = workspace_loaders
-        self.graph_manager = graph_manager
+        # self.stage_manager = stage_manager
         self.interval_seconds = interval_seconds
         self._tasks: Dict[str, asyncio.Task] = {}
         self._running = False
@@ -92,7 +92,7 @@ class ReloadManager:
         try:
             await loader.load()
             logger.info(f"Workspace '{ws_name}' reloaded successfully.")
-            self.graph_manager.invalidate(ws_name)
+            self.stage_manager.invalidate(ws_name)
             logger.info(f"Graph invalidated for workspace '{ws_name}'.")
         except Exception as e:
             logger.error(f"Failed to reload workspace '{ws_name}': {e}")
