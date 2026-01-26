@@ -129,14 +129,6 @@ class AgentProfiler:
             if current_key:
                 if ntype == "paragraph":
                     val = text if text != "None" else None
-                    
-                    # SPECIAL HANDLING FOR BOOLEAN FIELDS
-                    # If this is the human approval field, take only the first word
-                    #if current_key == "requires_human_approval" and val:
-                    #    # "True (for overrides)" -> "True"
-                    #    val = val.split()[0].strip().rstrip(',').rstrip(';')
-                    #
-                    #result[current_key] = AgentProfiler._convert_value(val) if val else None
 
                     # --- SPECIAL HANDLING FOR FIELDS WITH COMMENTS ---
                     # We want to strip out everything after the first word for specific fields
@@ -149,7 +141,10 @@ class AgentProfiler:
                         val = val.split()[0].strip().rstrip(',').rstrip(';').rstrip('.')
 
                         if not val or val.lower() == "none":
-                            result[current_key] = None
+                            if current_key == "max_iterations":
+                                result[current_key] = None
+                            else:
+                                result[current_key] = False
                             continue
                     
                     result[current_key] = AgentProfiler._convert_value(val) if val else None
