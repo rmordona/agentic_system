@@ -1,0 +1,18 @@
+type: object
+required:
+  - market_data
+  - timestamp
+properties:
+  market_data:
+    type: object
+    required: [price, volume]
+    properties:
+      price: { type: number }
+      volume: { type: number }
+  timestamp:
+    type: string
+    format: date-time
+  risk_mode:
+    type: string
+    enum: [CONSERVATIVE, NORMAL, AGGRESSIVE]
+

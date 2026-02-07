@@ -23,15 +23,8 @@ from __future__ import annotations
 import asyncio
 from typing import Any, Dict, Optional
 from events.event_bus import EventBus
-#from langgraph.graph import StateGraph
 
-#from runtime.agent_registry import AgentRegistry
-#from runtime.stage_registry import StageRegistry
-#from runtime.stage_manager import StageManager
-#from runtime.runtime_context import RuntimeContext
-
-#from runtime.graph.stage_state import StateSchema, AgentOutput, set_default_channel
-
+from runtime.artifact_factory import Task
 from runtime.core_engine import CoreEngine
 
 from runtime.logger import AgentLogger
@@ -82,8 +75,12 @@ class Orchestrator:
         Returns final session state.
         """
 
+        # 1. Create the instance (sync)
         logger.info("Just entered the Orchestrator... Now instantiating the Core Engine ...")
         self.core_engine = CoreEngine(self.session_id, user_intent, workspace_meta, self.workspace_path)
+
+        # 2. Perform the async setup (MCP handshakes, tool scanning)
+        await self.core_engine.initialize()
 
         # Compile the graph.
         logger.info("Compile the Graph ...")
@@ -115,6 +112,9 @@ class Orchestrator:
 
             logger.info("<-------------------- We are inside graph.astream - an event is emitted ... -------------------> ")
             logger.info(f"Event yield: {event}")
+            logger.console(f"State: {self.initial_state}")
+
+            self.hitl_loop(event)
 
             logger.info("Emitting graph_event ...")
 
@@ -134,6 +134,23 @@ class Orchestrator:
 
         return self.initial_state
 
+    def hitl_loop(self, event: Any):
+
+        for node_name, state_update in event.items():
+            logger.console(f"\nNode: {node_name}")
+            logger.console(f"state_update: {state_update}") 
+            try: 
+                workflow = state_update.get("workflow_metadata")
+                if workflow and workflow.get("status"):
+                    status = workflow.get("status")
+                    if status == "SUSPENDED":
+                        logger.console(f"\nUser Intent: {workflow.get("user_intent")}")
+                        logger.console(f"Agent: {workflow.get("agent")}")
+                        logger.console(f"Role: {workflow.get("role")}")
+                        user_response = input("\n>>> Provide guidance: ")
+            except Exception as e:
+                logger.info(f"Exception Encountered: {e}")
+ 
     def _merge_state_delta(self, delta: Dict[str, Any]):
         """
         Merge LangGraph node delta into session state.

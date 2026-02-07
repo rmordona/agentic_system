@@ -1,0 +1,29 @@
+type: object
+additionalProperties: false
+required:
+  - action
+  - order_type
+  - position_size
+  - execution_notes
+
+properties:
+
+  action:
+    type: string
+    enum: [BUY, SELL, HOLD]
+
+  order_type:
+    type: string
+    enum: [MARKET, LIMIT]
+
+  position_size:
+    type: number
+    minimum: 0
+
+  execution_notes:
+    type: array
+    description: >
+      Human-readable rationale or execution caveats.
+    items:
+      type: string
+

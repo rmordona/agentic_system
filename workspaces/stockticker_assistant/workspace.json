@@ -1,0 +1,27 @@
+{
+  "assistant_id": "stock_ticker_intelligence_v1",
+  "domain": "financial_markets",
+  "pipeline_template": "ticker_pipeline_template.md",
+  "default_artifact_path": "artifacts/ticker_reports/",
+  "agent_stack": [
+    "MacroWatcher",
+    "QuantAnalyst",
+    "SentimentScout",
+    "RiskGuard",
+    "TraderAgent"
+  ],
+  "capabilities": [
+    "real_time_market_data",
+    "sentiment_analysis_nlp",
+    "technical_indicator_computation",
+    "risk_exposure_modeling",
+    "atomic_trade_execution"
+  ],
+  "environment_vars": {
+    "trading_mode": "paper",
+    "base_currency": "USD",
+    "max_drawdown_limit": "0.05",
+    "mcp_tools_path": "./tools/",
+    "schemas_path": "./schemas/"
+  }
+}

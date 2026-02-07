@@ -1,0 +1,80 @@
+type: object
+additionalProperties: false
+required:
+  - symbol
+  - timestamp
+  - technical_assessment
+  - sentiment_assessment
+  - account_state
+
+properties:
+
+  symbol:
+    type: string
+    description: >
+      Financial instrument identifier. Used for scoping risk decisions.
+
+  timestamp:
+    type: string
+    format: date-time
+    description: >
+      Evaluation timestamp for this risk decision.
+
+  # ---------------------------------------------------------------------------
+  # Upstream Agent Outputs
+  # ---------------------------------------------------------------------------
+  technical_assessment:
+    type: object
+    additionalProperties: false
+    required: [confidence_score, price_targets]
+    properties:
+      confidence_score:
+        type: integer
+        minimum: 1
+        maximum: 10
+
+      price_targets:
+        type: object
+        required: [entry, stop_loss, take_profit]
+        properties:
+          entry: { type: number }
+          stop_loss: { type: number }
+          take_profit: { type: number }
+
+  sentiment_assessment:
+    type: object
+    additionalProperties: false
+    required: [sentiment_score]
+    properties:
+      sentiment_score:
+        type: number
+        minimum: -1
+        maximum: 1
+        description: >
+          Normalized sentiment score (-1 bearish → +1 bullish).
+
+  # ---------------------------------------------------------------------------
+  # Capital & Exposure Context
+  # ---------------------------------------------------------------------------
+  account_state:
+    type: object
+    additionalProperties: false
+    required:
+      - equity
+      - open_risk_pct
+      - max_risk_pct
+    properties:
+      equity:
+        type: number
+        minimum: 0
+
+      open_risk_pct:
+        type: number
+        minimum: 0
+        maximum: 1
+
+      max_risk_pct:
+        type: number
+        minimum: 0
+        maximum: 1
+

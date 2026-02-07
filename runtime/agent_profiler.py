@@ -6,13 +6,24 @@ import yaml
 import mistune
 from pydantic import BaseModel, Field, ValidationError
 
+from runtime.artifact_factory import ArtifactSchema
 from runtime.logger import AgentLogger
 logger = AgentLogger.get_logger(component="system")
 
 
-# -----------------------------------------------------------------------------
-# AgentProfile: Immutable compiled agent representation
-# -----------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------
+# AgentOutput: Immutable compiled agent output
+# --------------------------------------------------------------------------------------------------
+class AgentOutput(BaseModel):
+    agent: str
+    task_id: str
+    artifact_patch: Dict | None
+    artifact_is_valid: bool
+    issues: List[str] = []
+
+# --------------------------------------------------------------------------------------------------
+# AgentProfile: static properties of the agent: capabilities, roles, permissions, tools, expertise.
+# --------------------------------------------------------------------------------------------------
 class AgentProfile(BaseModel):
     name: str = Field(..., description="Unique agent identifier")
     role: str = Field(..., description="Human-readable role of the agent")
@@ -24,11 +35,13 @@ class AgentProfile(BaseModel):
     task_style: str = Field(..., description="Primary cognitive mode of the agent")
     expected_outputs: List[str] = Field(default_factory=list)
     forbidden_actions: List[str] = Field(default_factory=list)
+    authority_notes: List[str] = Field(default_factory=list)
     max_iterations: int | None = None
     requires_human_approval: bool = False
     context_placeholder: str = "{conversation_history}"
     task_placeholder: str = "{task}"
-    schema: str = "JSON format text"
+    input_schema: dict = {}
+    output_schema: dict = {}
 
     class Config:
         frozen = True  # Immutable at runtime
@@ -52,7 +65,7 @@ class AgentProfiler:
     # Parse a single AGENT.md and produce AgentProfile
     # -------------------------------------------------------------------------
     @staticmethod
-    def _compile_md(md_text: str) -> AgentProfile:
+    def _compile_md(md_text: str, input_schema: dict, output_schema: dict) -> AgentProfile:
 
         logger.info("About to compile md ...")
 
@@ -62,6 +75,10 @@ class AgentProfiler:
 
         # Convert AST to dict (assume YAML frontmatter style or key: value blocks)
         data = AgentProfiler._ast_to_dict(ast)
+
+        # Add Input and Output Schema
+        data["input_schema"] = input_schema
+        data["output_schema"] = output_schema
 
         logger.info(f"Raw Data parsed: {data}")
 
@@ -187,4 +204,82 @@ class AgentProfiler:
             return int(val)
         except ValueError:
             return val
+
+    # -------------------------------------------------------------------------
+    # Retrieve Schema
+    # -------------------------------------------------------------------------
+    @staticmethod
+    def _load_schema(schema_path: str) -> dict:
+        try:
+            with open(schema_path, "r") as f:
+                schema = yaml.safe_load(f)
+                AgentProfiler.validate_schema_integrity(schema)
+
+            return {
+                "success": True,
+                "schema": schema,
+                "error": None,
+            }
+
+        except FileNotFoundError:
+            return {
+                "success": False,
+                "schema": None,
+                "error": f"Schema file not found: {schema_path}",
+            }
+
+        except Exception as e:
+            return {
+                "success": False,
+                "schema": None,
+                "error": f"Failed to load schema: {str(e)}",
+            }
+
+    # -------------------------------------------------------------------------
+    # Validate Integrity of schema.
+    # -------------------------------------------------------------------------
+    @staticmethod
+    def validate_schema_integrity(schema: Dict[str, Any], path: str = "root", definitions: Optional[Dict[str, Any]] = None):
+        """
+        Scans a YAML schema for broken $refs or missing 'type' keys 
+        that cause Pydantic construction failures.
+        """
+        if definitions is None:
+            definitions = schema.get("definitions", {})
+
+        # 1. Check for missing type or ref at current level
+        s_type = schema.get("type")
+        s_ref = schema.get("$ref")
+
+        if not s_type and not s_ref:
+            logger.error(f"ERROR: Field at '{path}' has no 'type' and no '$ref'.")
+            return False
+
+        # 2. Validate $ref resolution
+        if s_ref:
+            ref_key = s_ref.split("/")[-1]
+            if ref_key not in definitions:
+                logger.error(f"ERROR: Broken Reference at '{path}'. '{ref_key}' not found in definitions.")
+                return False
+            # Recurse into the definition using the same definitions dict
+            return AgentProfiler.validate_schema_integrity(definitions[ref_key], f"{path} -> {ref_key}", definitions)
+
+        # 3. Recurse into Objects
+        if s_type == "object":
+            props = schema.get("properties", {})
+            if not props and not schema.get("additionalProperties"):
+                logger.warning(f"WARNING: Object at '{path}' has no properties defined.")
+
+            for prop_name, prop_schema in props.items():
+                AgentProfiler.validate_schema_integrity(prop_schema, f"{path}.{prop_name}", definitions)
+
+        # 4. Recurse into Arrays
+        elif s_type == "array":
+            items = schema.get("items")
+            if not items:
+                logger.error(f"ERROR: Array at '{path}' is missing 'items' definition.")
+                return False
+            AgentProfiler.validate_schema_integrity(items, f"{path}[]", definitions)
+
+        return True
 

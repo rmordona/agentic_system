@@ -1,0 +1,139 @@
+type: object
+additionalProperties: false
+required:
+  - symbol
+  - timestamp
+  - market_data
+  - timeframes
+
+# =============================================================================
+# Shared Definitions
+# =============================================================================
+definitions:
+
+  timeframe_series:
+    type: object
+    additionalProperties: false
+    required:
+      - interval
+      - candles
+    properties:
+
+      interval:
+        type: string
+        enum: [1m, 5m, 15m, 1h, 4h, 1d]
+        description: >
+          Candle resolution for this timeframe.
+
+      candles:
+        type: array
+        minItems: 20
+        description: >
+          Ordered historical OHLCV candles (oldest → newest).
+        items:
+          type: object
+          additionalProperties: false
+          required:
+            - open
+            - high
+            - low
+            - close
+            - volume
+          properties:
+            open: { type: number }
+            high: { type: number }
+            low: { type: number }
+            close: { type: number }
+            volume: { type: number }
+
+
+properties:
+
+  # ---------------------------------------------------------------------------
+  # Identity / Scope
+  # ---------------------------------------------------------------------------
+  symbol:
+    type: string
+    description: >
+      Financial instrument identifier (e.g. AAPL, BTC-USD, EURUSD).
+      Used purely for labeling outputs, not semantic interpretation.
+
+  timestamp:
+    type: string
+    format: date-time
+    description: >
+      ISO-8601 timestamp representing the evaluation time of this input snapshot.
+
+  # ---------------------------------------------------------------------------
+  # Core Numerical Inputs
+  # ---------------------------------------------------------------------------
+  market_data:
+    type: object
+    additionalProperties: false
+    required:
+      - price
+      - volume
+    properties:
+      price:
+        type: number
+        description: >
+          Latest traded price of the instrument.
+
+      volume:
+        type: number
+        description: >
+          Latest traded volume. Must be numeric and unadjusted.
+
+  # ---------------------------------------------------------------------------
+  # Historical Time Series (Multi-Timeframe)
+  # ---------------------------------------------------------------------------
+  timeframes:
+    type: object
+    additionalProperties: false
+    required:
+      - short
+      - medium
+      - long
+    properties:
+
+      short:
+        $ref: "#/definitions/timeframe_series"
+
+      medium:
+        $ref: "#/definitions/timeframe_series"
+
+      long:
+        $ref: "#/definitions/timeframe_series"
+
+  # ---------------------------------------------------------------------------
+  # Optional Model Parameters (Purely Quantitative)
+  # ---------------------------------------------------------------------------
+  model_parameters:
+    type: object
+    additionalProperties: false
+    description: >
+      Optional numerical tuning parameters for statistical models.
+      No semantic or narrative inputs allowed.
+    properties:
+      garch_window:
+        type: integer
+        minimum: 10
+        maximum: 500
+        description: >
+          Lookback window size for volatility clustering (GARCH).
+
+      correlation_window:
+        type: integer
+        minimum: 5
+        maximum: 250
+        description: >
+          Lookback window for correlation matrix computation.
+
+      confidence_threshold:
+        type: number
+        minimum: 0
+        maximum: 1
+        description: >
+          Minimum statistical confidence required to emit non-neutral signals.
+
+

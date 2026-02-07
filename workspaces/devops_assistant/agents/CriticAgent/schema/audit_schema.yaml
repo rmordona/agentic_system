@@ -1,0 +1,38 @@
+# Red Team Audit Schema
+type: object
+required: 
+  - critical_flaws
+  - assumption_audit
+  - robustness_score
+  - red_team_verdict
+properties:
+  critical_flaws:
+    type: array
+    items:
+      type: object
+      required: [flaw, severity, counter_argument]
+      properties:
+        flaw: 
+          type: string
+          description: "A detailed description of the vulnerability."
+        severity: 
+          type: string
+          enum: [LOW, MEDIUM, HIGH, FATAL]
+        counter_argument: 
+          type: string
+          description: "Potential mitigation or defense against this flaw."
+  
+  assumption_audit:
+    type: array
+    items: 
+      type: string
+      description: "List of underlying assumptions made by the system."
+
+  robustness_score: 
+    type: integer
+    minimum: 1
+    maximum: 10
+
+  red_team_verdict: 
+    type: string
+    enum: [CHALLENGED, ROBUST]

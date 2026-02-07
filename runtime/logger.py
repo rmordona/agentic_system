@@ -116,6 +116,9 @@ class AgentLogger:
         handler.setFormatter(formatter)
         logger.addHandler(handler)
 
+        # add new functon to support console output
+        logger.console = print
+
         cls._loggers[key] = logger
         return logger
 

@@ -1,5 +1,8 @@
+import inspect
+import importlib.util
 from pathlib import Path
 from typing import Dict
+
 
 from runtime.agent_profiler import AgentProfile, AgentProfiler
 
@@ -34,9 +37,12 @@ class AgentManager:
     """
 
     def __init__(self, workspace_path: str ):
+        self.workspace_path = workspace_path
         self.agents_dir = workspace_path / "agents"
         self._registry: Dict[str, RegisteredAgent] = {}
         self._profiles: Dict[str, AgentProfile] = {}
+        self.input_schema: dict = {}
+        self.output_schema: dict = {}
 
     def scan_and_register_agents(self) -> None:
         """
@@ -54,12 +60,29 @@ class AgentManager:
             agent_name = subdir.name
             agent_md_path = subdir / "AGENT.md"
 
+            # Agent Contracts
+            input_schema_yaml_path = subdir / "INPUT_SCHEMA.yaml"
+            output_schema_yaml_path = subdir / "OUTPUT_SCHEMA.yaml"
+
             if not agent_md_path.exists():
                 logger.warning(
                     f"Skipping agent '{agent_name}': AGENT.md not found"
                 )
                 continue
 
+            if not input_schema_yaml_path.exists():
+                logger.warning(
+                    f"Skipping agent '{agent_name}': INPUT_SCHEMA.yaml not found"
+                )
+                continue
+
+            if not output_schema_yaml_path.exists():
+                logger.warning(
+                    f"Skipping agent '{agent_name}': OUTPUT_SCHEMA.yaml not found"
+                )
+                continue
+
+            # Register Agent
             try:
                 md_text = agent_md_path.read_text(encoding="utf-8")
 
@@ -78,11 +101,46 @@ class AgentManager:
                     exc_info=True,
                 )
 
+            # Read the Default Input Schema
             try:
 
-                self._profiles[agent_name] = AgentProfiler._compile_md(md_text)
+                input_result = AgentProfiler._load_schema(input_schema_yaml_path)
 
-                logger.info(f"Agent '{agent_name} is now profiled: {self._profiles[agent_name]}")
+                #logger.info(f"Agent '{agent_name} set with default input schema: {input_result}")
+                if input_result.get("success"):
+                    self.input_schema = input_result.get("schema")
+                else:
+                    raise Exception(input_result.get("error"))
+
+            except Exception as e:
+                logger.error(
+                    f"Failed to retrieve input schema for agent '{agent_name}': {e}",
+                    exc_info=True,
+                )
+
+                # Read the Default Output Schema
+            try:
+
+                output_result = AgentProfiler._load_schema(output_schema_yaml_path)
+
+                #logger.info(f"Agent '{agent_name} set with default output schema: {output_result}")
+                if output_result.get("success"):
+                    self.output_schema = output_result.get("schema")
+                else:
+                    raise Exception(output_result.get("error"))
+
+            except Exception as e:
+                logger.error(
+                    f"Failed to retrieve output schema for agent '{agent_name}': {e}",
+                    exc_info=True,
+                )
+
+            # Profile the agent
+            try:
+
+                self._profiles[agent_name] = AgentProfiler._compile_md(md_text, self.input_schema, self.output_schema)
+
+                logger.info(f"Agent '{agent_name} is now profiled: {self._profiles[agent_name].role}")
 
             except Exception as e:
                 logger.error(

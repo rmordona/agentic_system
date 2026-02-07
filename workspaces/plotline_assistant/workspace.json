@@ -1,0 +1,24 @@
+{
+  "assistant_id": "plotline_assistant",
+  "domain": "narrative_design",
+  "pipeline_template": "novel_development_cycle.md",
+  "default_artifact_path": "artifacts/narrative/",
+  "agent_stack": [
+    "WorldBuilderAgent",
+    "CharacterArchitectAgent",
+    "PlotStrategistAgent",
+    "ProseRefinerAgent",
+    "ConsistencyAuditAgent"
+  ],
+  "capabilities": [
+    "lore_cross_referencing",
+    "thematic_analysis",
+    "dialogue_tuning",
+    "timeline_validation"
+  ],
+  "environment_vars": {
+    "genre": "cyberpunk_noir",
+    "tone": "gritty_melancholic",
+    "perspective": "first_person_past"
+  }
+}

@@ -131,6 +131,9 @@ import hashlib
 from typing import Dict, Any, List, Optional
 from datetime import datetime
 from pydantic import BaseModel
+from uuid import uuid4
+
+#from runtime.agent_profiler import AgentProfile
 
 from runtime.logger import AgentLogger
 logger = AgentLogger.get_logger(component="system")
@@ -197,7 +200,11 @@ class Task(BaseModel):
     id: str
     description: str
     stage: str
-    status: Literal["pending", "done", "blocked"] = "pending"
+    depends_on: List[str] = []
+    status: Literal["pending", "done", "blocked", "completed"] = "pending"
+    result: dict | None = None
+    error: str | None = None
+    reason: str | None = None
 
 
 class HITLState(BaseModel):
@@ -230,6 +237,9 @@ class ArtifactSchema(BaseModel):
     current_plan: List[Task] = Field(default_factory=list)
     plan_history: List[Dict] = Field(default_factory=list)
 
+    # Open tasks are tasks that haven't been executed or completed yet
+    open_tasks: List[Task] = Field(default_factory=list)
+
     # ---- Knowledge ----
     spec: Optional[Dict] = None
     constraints: Dict = Field(default_factory=dict)
@@ -246,9 +256,6 @@ class ArtifactSchema(BaseModel):
     # ---- Validation ----
     validation_errors: List[str] = Field(default_factory=list)
     warnings: List[str] = Field(default_factory=list)
-
-    # Open tasks are tasks that haven't been executed or completed yet
-    open_tasks: List[Task] = Field(default_factory=list)
 
     # ---- Human-in-the-loop ----
     hitl: HITLState = Field(default_factory=HITLState)
@@ -301,6 +308,40 @@ class ArtifactFactory:
     # ---------------------------------------------------------------------
     # Public API
     # ---------------------------------------------------------------------
+    @staticmethod
+    def show_tasks(tasks: list):
+        logger.console("\nList of Open Tasks:")
+        for task in tasks:
+            logger.console(f"- [ ] {task.id}: {task.description}")
+
+
+    @staticmethod
+    def initialize_from_agent(agent_profile: Any, session_id: str = None) -> ArtifactSchema:
+        """
+        Creates the starting point for a pipeline execution 
+        based on a specific Agent's profile.
+        """
+        return ArtifactSchema(
+            # Identity mapped from AGENT.md
+            role=agent_profile.role,
+            purpose=agent_profile.description,
+            mission=f"Execute task as {agent_profile.name}",
+            
+            # Session & State
+            session_id=session_id or str(uuid4()),
+            status="initialized",
+            
+            # Planning
+            current_stage="asset_alignment", # Or your pipeline entry_stage
+            
+            # Knowledge (Initial empty containers)
+            spec=None, 
+            constraints={
+                "forbidden_actions": agent_profile.forbidden_actions,
+                "max_iterations": agent_profile.max_iterations,
+                "authority": agent_profile.authority_notes
+            }
+        )
 
     def compile(self, md_text: str) -> ArtifactSchema:
         """

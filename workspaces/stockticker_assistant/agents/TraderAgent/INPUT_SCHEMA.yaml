@@ -1,0 +1,44 @@
+type: object
+additionalProperties: false
+required:
+  - symbol
+  - timestamp
+  - trade_permission
+  - price_targets
+  - risk_constraints
+
+properties:
+
+  symbol:
+    type: string
+
+  timestamp:
+    type: string
+    format: date-time
+
+  # ---------------------------------------------------------------------------
+  # Upstream Decisions
+  # ---------------------------------------------------------------------------
+  trade_permission:
+    type: boolean
+    description: >
+      Global approval signal from RiskGuard.
+
+  price_targets:
+    type: object
+    additionalProperties: false
+    required: [entry, stop_loss, take_profit]
+    properties:
+      entry: { type: number }
+      stop_loss: { type: number }
+      take_profit: { type: number }
+
+  risk_constraints:
+    type: object
+    additionalProperties: false
+    required: [max_position_size]
+    properties:
+      max_position_size:
+        type: number
+        minimum: 0
+

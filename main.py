@@ -1,12 +1,21 @@
 import argparse
 import asyncio
 from pathlib import Path
-#import logging
+import warnings
+
+def warn(*args, **kwargs):
+    pass
+
+warnings.warn = warn
+
+
 
 from runtime.bootstrap.platform import Platform
 from runtime.runtime_manager import RuntimeManager
 from runtime.workspace_hub import WorkspaceHub
 from runtime.logger import AgentLogger
+
+
 
 # --------------------------------------------------
 # Logging

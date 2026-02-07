@@ -1,0 +1,27 @@
+type: object
+additionalProperties: false
+required:
+  - trade_allowed
+  - max_position_size
+  - risk_flags
+
+properties:
+
+  trade_allowed:
+    type: boolean
+    description: >
+      Final authorization for trade execution.
+
+  max_position_size:
+    type: number
+    minimum: 0
+    description: >
+      Maximum allowable position size based on current risk constraints.
+
+  risk_flags:
+    type: array
+    description: >
+      Risk-related warnings or constraints triggered during evaluation.
+    items:
+      type: string
+

@@ -1,0 +1,43 @@
+type: object
+additionalProperties: false
+required:
+  - symbol
+  - timestamp
+  - sources
+
+properties:
+
+  symbol:
+    type: string
+    description: >
+      Financial instrument identifier.
+
+  timestamp:
+    type: string
+    format: date-time
+
+  # ---------------------------------------------------------------------------
+  # Raw Narrative Inputs
+  # ---------------------------------------------------------------------------
+  sources:
+    type: object
+    additionalProperties: false
+    required:
+      - news
+      - social
+    properties:
+
+      news:
+        type: array
+        description: >
+          Curated news headlines or summaries.
+        items:
+          type: string
+
+      social:
+        type: array
+        description: >
+          Social media or forum excerpts.
+        items:
+          type: string
+

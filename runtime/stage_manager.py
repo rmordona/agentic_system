@@ -177,7 +177,7 @@ class StageManager:
         data = { "stages" : []}
 
         logger.info(f"Register Stage Policies")
-        self.policy_registry = PolicyRegistry()
+        self.policy_registry = PolicyRegistry(self.workspace_path)
 
         logger.info(f"Hydrating Pipelines")
         self.load_pipeline_stages()
