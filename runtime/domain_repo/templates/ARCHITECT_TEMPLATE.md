@@ -9,7 +9,8 @@ Agent Profile:
 - Task Style: {profile_task_style}
 - Can Execute Tools: {profile_can_execute_tools}
 - Forbidden Actions: {profile_forbidden_actions}
-- Output Schema: {profile_schema}
+- Input Schema: {profile_input_schema}
+- Output Schema: {profile_output_schema}
 
 Available tools:
 {available_tools}
@@ -19,7 +20,7 @@ Using the assigned agent's task style, generate three (3) tasks.
 
 Requirements:
 
-1. Output MUST be valid JSON only. No extra text.
+1. Output MUST be valid JSON only based on the Output Schema. No extra text.
 2. JSON must be a list of objects. Each object represents a task with these fields:
    - "id": unique string identifier
    - "description": concise text describing the task
@@ -47,19 +48,4 @@ Rules:
 1. **Mandatory Closing**: Every JSON response MUST be a complete, valid object. You must explicitly verify the presence of closing braces and brackets before ending the turn.
 2. **No Truncation**: If the payload is large, prioritize structural integrity over content length. Never "cut off" a JSON object to save tokens.
 
-Example valid output:
-
-[
-  {
-    "id": "fetch_flight_prices",
-    "description": "Retrieve current flight prices from the provider API.",
-    "execution": "tool",
-    "tool_name": "flight_api"
-    "dependencies": [""]
-  },
-  {
-    "id": "summarize_flights",
-    "description": "Summarize retrieved flight options in a readable table.",
-    "execution": "llm"
-  }
 ]

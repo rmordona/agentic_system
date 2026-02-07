@@ -365,20 +365,20 @@ class DataManager:
     def get_default_for_type(self, field_type: Any) -> Any:
         origin = get_origin(field_type)
 
-        # 1️⃣ Lists
+        # 1. Lists
         if origin is list:
             return []
 
-        # 2️⃣ Nested Pydantic models (THIS fixes input/output)
+        # 2. Nested Pydantic models (THIS fixes input/output)
         if isinstance(field_type, type) and issubclass(field_type, BaseModel):
             return self.instantiate_with_defaults(field_type)
 
-        # 3️⃣ Literals
+        # 3. Literals
         if origin is Literal:
             args = getattr(field_type, "__args__", [])
             return args[0] if args else NODEFAULT
 
-        # 4️⃣ Primitives
+        # 4. Primitives
         if field_type is str:
             return NODEFAULT
         if field_type is int:
@@ -390,7 +390,7 @@ class DataManager:
         if field_type is dict:
             return {}
 
-        # 5️⃣ Fallback
+        # 5. Fallback
         return NODEFAULT
 
 
@@ -410,7 +410,6 @@ class DataManager:
         logger.info(f"Data Adapter for the given agent '{agent_name}': {adapter}")
 
         if not adapter:
-            logger.info("What???")
             raise ValueError(f"Critical Error: Data agent '{agent_name}' is not registered.")
 
         # 2. Use the adapter to create the envelope.
@@ -689,6 +688,11 @@ class ToolManager:
             })
         return llm_tools
 
+    def list_available_tools(self):
+        keys = self.tool_map.keys()
+        result = ", ".join(keys)
+        return result
+
 
     def auto_envelope_wrapper(func, agent_role: str, stage: str):
         @wraps(func)
@@ -738,20 +742,21 @@ class ToolManager:
 ##################################################################
 
 class SystemContext:
-    def __init__(self, workspace_path: str, agent_manager: AgentManager):
+    def __init__(self, template_repo: str, workspace_path: str, agent_manager: AgentManager):
         # Only setup synchronous variables here
+        self.template_repo = Path(template_repo)
         self.workspace_path = Path(workspace_path)
         self.agent_manager = agent_manager
         self.data_manager = DataManager(agent_manager)
         self.tool_manager = ToolManager(agent_manager)
 
     @classmethod
-    async def create(cls, workspace_path: str, agent_manager: AgentManager):
+    async def create(cls, template_repo: str, workspace_path: str, agent_manager: AgentManager):
         """
         The proper way to instantiate SystemContext asynchronously.
         """
         logger.info("Initializing SystemContext via Async Factory")
-        instance = cls(workspace_path, agent_manager)
+        instance = cls(template_repo, workspace_path, agent_manager)
         
         # 1. Sync registration
         instance.data_manager.scan_and_register_schema()

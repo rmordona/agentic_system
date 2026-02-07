@@ -784,6 +784,10 @@ class AgentPlanner:
         self.architect_template = load_file(template_repo / "ARCHITECT_TEMPLATE.md")
         # self.plan_template = self.load_file(template_repo / "PLAN_TEMPLATE.md")
 
+
+        tools = self.context.tool_manager.list_available_tools()
+        logger.info(f"List of available tools: {tools}")
+
         # 1. Hydrate the INSTRUCTIONS (The System Prompt)
         logger.info("[AgentPlanner] Build Phase: Hydrating the system prompt.")
         system_prompt = await hydrate(self.architect_template, {
@@ -793,8 +797,10 @@ class AgentPlanner:
             "profile_task_style" : profile.task_style,
             "profile_can_execute_tools" : str(profile.can_execute_tools),
             "profile_forbidden_actions": profile.forbidden_actions,
-            "profile_schema" : profile.schema,
-            "user_intent" : state.user_intent
+            "profile_input_schema" : profile.input_schema,
+            "profile_output_schema" : profile.output_schema,
+            "user_intent" : state.user_intent,
+            "available_tools" : str(tools),
         })
         logger.info(f"Agent Planner initial Prompt: {system_prompt}")
 
@@ -1123,9 +1129,9 @@ class CoreEngine:
 
         self.domain = workspace_meta.get("domain")
 
-        domain_repo = self.workspace_path.parent.parent / "runtime" / "domain_repo" 
+        self.template_repo = self.workspace_path.parent.parent / "runtime" / "domain_repo" / "templates" 
 
-        logger.info(f"Domain Repo: {domain_repo}")
+        logger.info(f"Template Repo: {self.template_repo}")
 
     async def initialize(self):
 
@@ -1144,7 +1150,7 @@ class CoreEngine:
         # --------------------------------------------------
         # 3. System Context
         # --------------------------------------------------
-        self.context = await SystemContext.create(workspace_path = self.workspace_path, agent_manager = self.agent_manager)
+        self.context = await SystemContext.create(template_repo = self.template_repo, workspace_path = self.workspace_path, agent_manager = self.agent_manager)
 
         # --------------------------------------------------
         # 4. Initial Data Raw Setup 
