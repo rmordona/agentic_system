@@ -821,7 +821,7 @@ class AgentPlanner:
 
         for task in task_dict:
             artifact.current_plan.append(Task(
-                id=task.get("task_name"),
+                id=task.get("id"),
                 description=task.get("description"),
                 status="pending",
                 stage=state.stage
