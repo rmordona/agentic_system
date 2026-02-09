@@ -1,0 +1,41 @@
+type: object
+description: "Agnostic Tool Contract for Value at Risk (VaR) Quantitative Analysis"
+properties:
+  tool_name:
+    type: string
+    const: "calculate_var"
+  description:
+    type: string
+    const: "Calculates Value at Risk (VaR) for a proposed trade based on historical volatility and 95% confidence intervals."
+
+  # --- INPUT HANDSHAKE ---
+  input_schema:
+    type: object
+    required: [ticker, position_size]
+    properties:
+      ticker:
+        type: string
+        description: "The stock or asset ticker symbol."
+      position_size:
+        type: number
+        description: "The total dollar value of the proposed position."
+
+  # --- OUTPUT CONTRACT ---
+  output_schema:
+    type: object
+    required: [ticker, position_value, VaR_95, risk_percentage]
+    properties:
+      ticker:
+        type: string
+      position_value:
+        type: number
+        description: "The verified position size used for the calculation."
+      VaR_95:
+        type: number
+        description: "The maximum expected loss at a 95% confidence level."
+      risk_percentage:
+        type: string
+        description: "The percentage of the total position at risk (e.g., '3.5%')."
+
+# Ensures the contract includes the identity metadata and the schemas
+required: [tool_name, description, input_schema, output_schema]

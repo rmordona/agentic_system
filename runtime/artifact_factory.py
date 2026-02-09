@@ -124,21 +124,6 @@
 # Created: 2026-01-01
 # -----------------------------------------------------------------------------
 
-import re
-import mistune
-import json
-import hashlib
-from typing import Dict, Any, List, Optional
-from datetime import datetime
-from pydantic import BaseModel
-from uuid import uuid4
-
-#from runtime.agent_profiler import AgentProfile
-
-from runtime.logger import AgentLogger
-logger = AgentLogger.get_logger(component="system")
-
-
 # -------------------------------------------------------------------------
 # Schema Definitions
 # -------------------------------------------------------------------------
@@ -190,6 +175,21 @@ logger = AgentLogger.get_logger(component="system")
 #   Bodies execute.
 ################################################################################
 
+import re
+import mistune
+import json
+import hashlib
+from typing import Dict, Any, List, Optional
+from datetime import datetime
+from pydantic import BaseModel
+from uuid import uuid4
+
+#from runtime.agent_profiler import AgentProfile
+
+from runtime.logger import AgentLogger
+logger = AgentLogger.get_logger(component="system")
+
+
 from pydantic import BaseModel, Field
 from typing import List, Dict, Optional, Literal
 from datetime import datetime
@@ -200,6 +200,8 @@ class Task(BaseModel):
     id: str
     description: str
     stage: str
+    execution: Literal["tool", "llm"] = "tool"
+    tool_name: str = ""
     depends_on: List[str] = []
     status: Literal["pending", "done", "blocked", "completed"] = "pending"
     result: dict | None = None
@@ -332,7 +334,7 @@ class ArtifactFactory:
             status="initialized",
             
             # Planning
-            current_stage="asset_alignment", # Or your pipeline entry_stage
+            current_stage="--INIT--", # Or your pipeline entry_stage
             
             # Knowledge (Initial empty containers)
             spec=None, 

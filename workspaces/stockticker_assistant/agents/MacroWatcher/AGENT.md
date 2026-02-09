@@ -21,10 +21,11 @@ Analyzes high-level economic indicators to determine the current "Market Regime.
 Holistic and cautious. It looks for the "Big Picture" and prioritizes capital preservation over individual ticker opportunity.
 
 # EXPECTED OUTPUTS (YAML):
-regime: "BULL_EXPANSION | BEAR_CONTRACTION | VOLATILE_SIDEWAYS"
-risk_index: [1-10]
-key_drivers: [list of strings]
-trade_permission: boolean
+macro_analysis:
+  regime: "BULL_EXPANSION | BEAR_CONTRACTION | VOLATILE_SIDEWAYS"
+  risk_index: 1-10
+  key_drivers: [list of strings]
+  trade_permission: boolean
 
 # FORBIDDEN ACTIONS:
 - Analyzing individual stock tickers

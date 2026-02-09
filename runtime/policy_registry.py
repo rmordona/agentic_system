@@ -1,4 +1,5 @@
 import ast
+import json
 import inspect
 import importlib
 from pathlib import Path
@@ -15,6 +16,7 @@ logger = AgentLogger.get_logger(component="system")
 
 @dataclass(frozen=True)
 class StageEvalContext:
+    task: dict
     artifact: dict
     data: dict
     tools: list
@@ -107,6 +109,7 @@ class PolicyRegistry:
         state_ctx: dict | None = None,
     ) -> bool:
         ctx_obj = StageEvalContext(
+            task=state_ctx.get("task"),
             artifact=artifact,
             data=state_ctx.get("data", {}) if state_ctx else {},
             tools=state_ctx.get("recent_tools", []) if state_ctx else [],
@@ -129,6 +132,20 @@ class Predicates:
             fn.__policy_name__ = name or fn.__name__
             return fn
         return decorator
+
+    @staticmethod
+    def process(ctx: StageEvalContext) -> dict:
+        logger.info(f"ctx: {ctx}")
+        task_result = ctx.task.result
+        logger.info(f"Task Result: {task_result}")
+        output = task_result.output
+        logger.info(f"Task Result Output: {output}")
+
+        text_content_obj = output[0]
+        raw_text = text_content_obj.text
+
+        data = json.loads(raw_text)
+        return data
 
 
 ################################################################################

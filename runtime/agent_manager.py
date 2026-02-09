@@ -101,12 +101,12 @@ class AgentManager:
                     exc_info=True,
                 )
 
-            # Read the Default Input Schema
+            # Read the Default Input Schema <--- Input and Output schema moved to ToolManager
+            # We will be using this schema from a non-mcp call, e.g. producing json formats based on given 
+            # input parameters (not from a multi-task agent perspective, but for a single-task agent perspective).
             try:
 
                 input_result = AgentProfiler._load_schema(input_schema_yaml_path)
-
-                #logger.info(f"Agent '{agent_name} set with default input schema: {input_result}")
                 if input_result.get("success"):
                     self.input_schema = input_result.get("schema")
                 else:
@@ -147,7 +147,6 @@ class AgentManager:
                     f"Failed to profile agent '{agent_name}': {e}",
                     exc_info=True,
                 )
-
 
         logger.info(
             f"Agent scan complete. Total registered agents: {len(self._registry)}"

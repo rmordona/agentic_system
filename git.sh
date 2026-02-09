@@ -1,4 +1,4 @@
 git config --global http.postBuffer 524288000
 git add --all
-git commit -m "(POC) Re-factoring to decouple domain specific schema, tools, pipelines, and templates from agents to be more domain agnostic"
+git commit -m "(POC) Revamping the registration of Tools and Tool Sets. Task handles only a tool call or an llm generation."
 git push -u origin main

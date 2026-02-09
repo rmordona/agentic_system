@@ -1,0 +1,35 @@
+type: object
+description: "Agnostic Tool Contract for Macro-Economic News Retrieval"
+properties:
+  tool_name:
+    type: string
+    const: "search_macro_news"
+  description:
+    type: string
+    const: "Scans global financial news outlets for macro-economic themes, focusing on central bank policy and geopolitical risk."
+
+  # --- INPUT HANDSHAKE ---
+  input_schema:
+    type: object
+    properties:
+      query:
+        type: string
+        default: "Federal Reserve"
+        description: "Focus area for the news scan (e.g., Inflation, Geopolitics)."
+
+  # --- OUTPUT CONTRACT ---
+  # Note: The output is an array of news objects
+  output_schema:
+    type: array
+    description: "A list of news headlines and their sources."
+    items:
+      type: object
+      required: [source, headline]
+      properties:
+        source:
+          type: string
+        headline:
+          type: string
+
+# Mandate the presence of identity metadata and schemas
+required: [tool_name, description, input_schema, output_schema]

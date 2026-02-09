@@ -1,0 +1,37 @@
+type: object
+description: "Agnostic Tool Contract for Blockchain Network Fee Analysis"
+properties:
+  tool_name:
+    type: string
+    const: "get_gas_fees"
+  description:
+    type: string
+    const: "Retrieves current Gwei prices and network congestion status to estimate trade slippage and transaction costs."
+
+  # --- INPUT HANDSHAKE ---
+  input_schema:
+    type: object
+    properties:
+      network:
+        type: string
+        default: "ethereum"
+        enum: [ethereum, polygon, arbitrum, base, solana]
+        description: "The blockchain network to query for fee data."
+
+  # --- OUTPUT CONTRACT ---
+  output_schema:
+    type: object
+    required: [network, base_fee, status]
+    properties:
+      network:
+        type: string
+      base_fee:
+        type: string
+        description: "The current base fee in Gwei or network-specific units."
+      status:
+        type: string
+        enum: [Low, Moderate, High, Extreme]
+        description: "Congestion level relative to historical averages."
+
+# Mandate metadata and schema presence
+required: [tool_name, description, input_schema, output_schema]

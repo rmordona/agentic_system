@@ -4,20 +4,48 @@ import datetime
 # Initializing the Market MCP Server
 market_mcp = FastMCP("MarketIntelligence")
 
+import datetime
+
 @market_mcp.tool()
-async def get_market_regime_data() -> dict:
+async def get_market_regime_data(
+    market_data: dict, 
+    timestamp: str, 
+    risk_mode: str = "NORMAL"
+) -> dict:
     """
-    Fetches core macro-economic indicators including CPI, Fed Funds Rate, 
-    VIX (Volatility Index), and Yield Curve status.
+    Analyzes macro indicators and returns the structured regime state 
+    required by the MacroWatcher Agent.
     """
-    # Integration point: Financial Data Provider (e.g., Bloomberg, FRED)
-    return {
-        "timestamp": datetime.datetime.now().isoformat(),
-        "CPI_YoY": "3.1%",
-        "fed_funds_rate": "5.25-5.50%",
-        "VIX": 14.85,
-        "yield_curve": "inverted",
-        "market_status": "OPEN"
+    # 1. Internal Logic: Process raw indicators
+    vix = 14.85
+    yield_curve = "inverted"
+    
+    # 2. Logic to determine 'regime' based on indicators
+    # In a real system, this would be a sophisticated model
+    if vix < 20 and yield_curve != "inverted":
+        current_regime = "BULL_EXPANSION"
+    elif vix > 30:
+        current_regime = "VOLATILE_SIDEWAYS"
+    else:
+        # Default for your current 'inverted' yield curve example
+        current_regime = "VOLATILE_SIDEWAYS"
+
+    # 3. Logic to determine 'risk_index' [1-10]
+    # Inverted yield + high rates might mean higher risk
+    calculated_risk = 6 
+
+    # 4. Construct the response according to AGENT.md
+    return { "macro_analysis" :
+        {
+            "regime": current_regime,
+            "risk_index": calculated_risk,
+            "key_drivers": [
+                f"VIX at {vix}",
+                f"Yield curve is {yield_curve}",
+                f"Input price: {market_data.get('price')}"
+            ],
+            "trade_permission": True if calculated_risk < 7 else False
+        }
     }
 
 @market_mcp.tool()

@@ -4,9 +4,12 @@ from mcp import StdioServerParameters
 from mcp.client.stdio import stdio_client
 from mcp import ClientSession
 
+from runtime.logger import AgentLogger
+logger = AgentLogger.get_logger(component="system")
+
 class MCPManager:
-    def __init__(self, tools_dir="./tools"):
-        self.tools_dir = tools_dir
+    def __init__(self,  workspace_path: Path):
+        self.tools_dir = workspace_path / "tools" / "mcp"
         self.sessions = {}
         self.server_params = {}
 
@@ -20,10 +23,10 @@ class MCPManager:
                 # Assign parameters for Stdio transport
                 # We assume each file is a self-contained FastMCP server
                 self.server_params[server_name] = StdioServerParameters(
-                    command="python",
+                    command=sys.executable,
                     args=[file_path]
                 )
-                print(f"🔎 Discovered tool module: {server_name}")
+                logger.info(f"Discovered tool module: {server_name}")
 
     async def start_all(self):
         """Connects to every discovered server."""
@@ -34,9 +37,9 @@ class MCPManager:
                 session = ClientSession(read, write)
                 await session.initialize()
                 self.sessions[name] = session
-                print(f"🚀 Started MCP Session: {name}")
+                logger.info(f"Started MCP Session: {name}")
             except Exception as e:
-                print(f"❌ Failed to start {name}: {e}")
+                logger.info(f"Failed to start {name}: {e}")
 
     async def get_all_available_tools(self, allowed_names: list):
         """Fetches tool definitions across all sessions filtering by allowed list."""

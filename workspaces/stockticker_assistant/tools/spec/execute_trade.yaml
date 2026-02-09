@@ -1,0 +1,53 @@
+type: object
+description: "Agnostic Tool Contract for Live Brokerage Trade Execution"
+properties:
+  tool_name:
+    type: string
+    const: "execute_trade"
+  description:
+    type: string
+    const: "Submits a live order to the brokerage. Requires valid ticker, side, and quantity."
+
+  # --- INPUT HANDSHAKE ---
+  input_schema:
+    type: object
+    required: [ticker, side, qty]
+    properties:
+      ticker:
+        type: string
+        description: "The stock or asset symbol to trade."
+      side:
+        type: string
+        enum: [BUY, SELL]
+        description: "The direction of the trade."
+      qty:
+        type: integer
+        minimum: 1
+        description: "Number of units to trade."
+      order_type:
+        type: string
+        enum: [LIMIT, MARKET, STOP]
+        default: "LIMIT"
+
+  # --- OUTPUT CONTRACT ---
+  output_schema:
+    type: object
+    required: [status, order_id, ticker, qty, avg_price, timestamp]
+    properties:
+      status:
+        type: string
+        enum: [FILLED, PARTIAL, REJECTED, PENDING]
+      order_id:
+        type: string
+      ticker:
+        type: string
+      qty:
+        type: integer
+      avg_price:
+        type: number
+      timestamp:
+        type: string
+        format: date-time
+
+# Ensures the contract includes the identity metadata and the schemas
+required: [tool_name, description, input_schema, output_schema]

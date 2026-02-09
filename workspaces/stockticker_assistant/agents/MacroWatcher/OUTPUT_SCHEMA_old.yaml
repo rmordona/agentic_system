@@ -1,0 +1,16 @@
+type: object
+required: [regime, risk_index, key_drivers, trade_permission]
+properties:
+  regime:
+    type: string
+    enum: [BULL_EXPANSION, BEAR_CONTRACTION, VOLATILE_SIDEWAYS, CRISIS_MODE]
+  risk_index:
+    type: integer
+    minimum: 1
+    maximum: 10
+  key_drivers:
+    type: array
+    items: { type: string }
+  trade_permission:
+    type: boolean
+    description: "Global green light for the pipeline to proceed."

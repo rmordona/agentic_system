@@ -187,7 +187,7 @@ class AgentRunner:
         # The LLM is "primed" with a menu of actions.
         self.llm = llm.bind_tools(context.get_runtime_tools())
 
-    def enforce_stage(self, agent_name, stage_meta: StageSchema):
+    def enforce_allowed_agents(self, agent_name, stage_meta: StageSchema):
         if agent_name not in stage_meta.allowed_agents:
             raise Exception(f"{agent_name} not allowed in stage {stage_meta.name}")
 
@@ -197,31 +197,47 @@ class AgentRunner:
 
         logger.info(f"************* Agent Runner is being called (Agent: {state.agent})...")
 
-        '''
-        logger.info("Let's force an HITL")
-        return {
-                 "workflow_metadata" : {
-                 "status": "SUSPENDED", 
-                 "user_intent" : state.user_intent,
-                 "agent" : state.agent,
-                 "role" : state.control_raw.role,
-                 "initial_timestamp": datetime.now(UTC).isoformat()
-                }
-            }
-        '''
-
         logger.info(f"State received: {state}")
 
         stage      = state.stage        # Received from AgentPlanner
         agent_name = state.agent        # Received from AgentPlanner
         task       = state.task         # Received from AgentPlanner
 
-        # Get Agent Context
-        agent_ctx = state.agentContext[agent_name]
-        artifact = agent_ctx.control_raw
+        logger.info(f"Current Stage: {stage}")
+        logger.info(f"Task Received: {task}")
 
         stage_meta = self.stage_manager.get(stage)
-        self.enforce_stage(agent_name, stage_meta)
+        self.enforce_allowed_agents(agent_name, stage_meta)
+
+        # Get Agent Context
+        agent_ctx = state.agentContext[agent_name]
+        logger.info(f"Agent Context: {agent_ctx}")
+
+        # Get Agent Profile
+        agent_profile = self.agent_manager.get_agent_profile(agent_name)
+        logger.info(f"Agent Profile: {agent_profile}")
+
+        # Get Agent Profile Input Schema (Granting we are dealing with a Single-Task Non-MCP Tool perspective)
+        schema = agent_profile.input_schema
+
+        # Get Agent Context Data Raw Input
+        raw_data_obj = agent_ctx.data_raw.payload.input
+
+        # Convert the Pydantic model to a dict so we can iterate
+        source_data = raw_data_obj.model_dump() if hasattr(raw_data_obj, "model_dump") else raw_data_obj.__dict__
+
+        # Get Raw Data, constrained only around what's specified in Input Schema
+        execution_payload = {}
+        for prop in schema.get("properties", {}):
+            if prop in source_data:
+                execution_payload[prop] = source_data[prop]
+            else:
+                logger.warning(f"Property {prop} defined in schema but missing in data_raw.payload.input")
+
+        logger.info(f"Execution Payload: {execution_payload}")
+
+        # Get The Artifact for State Control
+        artifact = agent_ctx.control_raw
 
         # Extract tasks to be executed
         artifact.open_tasks = [
@@ -229,10 +245,24 @@ class AgentRunner:
             if not t.depends_on
         ]
 
-        for task in artifact.open_tasks:
-            result = self.execute_task(task, state)
+        logger.info(f"Open Tasks: {len(artifact.open_tasks)}")
+
+        logger.info(f"Tool type: {task.execution}, tool_name: {task.tool_name}")
 
 
+        logger.info(f"Task: {task.id}, description: {task.description}")
+        result = await self.execute_task(task, state, execution_payload)
+
+        if isinstance(result, ToolEnvelope):
+            logger.info(f"Result (ToolEnvelope): {result}")
+            logger.info(f"type(agent_ctx) = {type(agent_ctx)}")
+            logger.info(f"agent_ctx.tool_raw = {agent_ctx.tool_raw}")
+            agent_ctx.tool_raw.append(result)
+            state.agentContext[agent_name] =agent_ctx
+
+        logger.info(f"agent_ctx.tool_raw: {agent_ctx.tool_raw}")
+
+        '''
         #------
         # 1. Get Agent Prompt (AGENT.md with template to input {task} and {conversation_history}).
         #    The AGENT.md also includes JSON schema for output. This will be the result as payload.
@@ -295,17 +325,18 @@ class AgentRunner:
         # Only place holders, will not get sent
         state.agentContext[agent_name].data_raw = new_data_envelope
         state.agentContext[agent_name].tool_raw = new_tool_envelopes
+        '''
 
         # Partial Update,  note: graph.astream should have the stream="update"
         return {  "agentContext": state.agentContext }
 
 
-    async def execute_task(self, task: Task, state: StateSchema) -> None:
+    async def execute_task(self, task: Task, state: StateSchema, execution_payload: dict) -> ToolEnvelope:
         """
         Execute a single task.
         Mutates task.status and task.result ONLY.
         """
-
+        logger.info(f"Executing task 1: {task.id}, {execution_payload}")
         agent_ctx = state.agentContext[state.agent]
 
         try:
@@ -316,17 +347,26 @@ class AgentRunner:
                 "agent": agent_ctx.agent_name,
                 "stage": agent_ctx.stage,
                 "task_id": task.id,
+                "execution" : execution_payload,
+                "tool_name" : task.tool_name,
                 "task_description": task.description,
                 "control": agent_ctx.control_raw,
                 "data": agent_ctx.data_raw,
             }
 
-            # -------------------------------------------------
+            # --------------------------------------------------------------------------------------------
             # 2. Decide execution mode (tool vs LLM)
-            # -------------------------------------------------
-            if self._requires_tool(task):
-                result = await self._execute_with_tool(task, instruction)
-            else:
+            # --------------------------------------------------------------------------------------------
+            # Always have a second guardrail (_requires_tool) to assist the LLM generated (task.execution)
+            result = {}
+            if task.execution == "tool":
+                try:
+                    result =  await self._execute_with_tool(task, instruction)
+                    logger.info(f"Task Result: {result}")
+                except BaseException as e:
+                    logger.exception("BaseException escaped from _execute_with_tool", exc_info=e)
+                    raise
+            elif task.execution == "llm":
                 result = await self._execute_with_llm(task, instruction)
 
             # -------------------------------------------------
@@ -335,8 +375,12 @@ class AgentRunner:
             task.result = result
             task.status = "done"
 
+            logger.info(f"Result: {task.result}")
+
             # Optional: append execution trace
             agent_ctx.result_summary = f"Task {task.id} completed successfully"
+
+            return result
 
         except Exception as e:
             # -------------------------------------------------
@@ -353,24 +397,48 @@ class AgentRunner:
     # Internal helpers
     # ---------------------------------------------------------
 
-    def _requires_tool(self, task: Task) -> bool:
-        """
-        Decide whether a task needs a tool.
-        This should be deterministic and fast.
-        """
-        tool_keywords = ["fetch", "call", "query", "retrieve", "send"]
-        return any(k in task.description.lower() for k in tool_keywords)
+    async def _execute_with_tool(self, task: Task, instruction: dict) -> ToolEnvelope:
 
-    async def _execute_with_tool(self, task: Task, instruction: dict) -> dict:
-        tool_name = self._select_tool(task)
+        '''
+        logger.info("Let's force an HITL")
+        return {
+                "workflow_metadata" : {
+                "status": "SUSPENDED", 
+                "user_intent" : state.user_intent,
+                "agent" : state.agent,
+                "role" : state.control_raw.role,
+                "initial_timestamp": datetime.now(UTC).isoformat()
+                }
+            }
+        '''
+        logger.info(f"Entering Execution with Tools: {task.tool_name}")
 
-        tool = self.tool_registry.get(tool_name)
-        if not tool:
-            raise RuntimeError(f"Tool '{tool_name}' not registered")
+        tool_adapter = await self.context.tool_manager.get_adapter(task.tool_name)
+        logger.info(f"Registered tool adapter {tool_adapter}")
+        if not tool_adapter:
+            raise RuntimeError(f"Tool Adapter for '{tool_name}' not registered")
 
-        return await tool.run(instruction)
+        return await tool_adapter.execute(task.tool_name, instruction)
 
     async def _execute_with_llm(self, task: Task, instruction: dict) -> dict:
+
+
+       #------
+        # 1. Get Agent Prompt (AGENT.md with template to input {task} and {conversation_history}).
+        #    The AGENT.md also includes JSON schema for output. This will be the result as payload.
+        agent_prompt = self.agent_manager.get_agent_prompt(agent_name)
+
+        # 2. Hydrate Context
+        data_adapter = self.context.data_manager.get_adapter(agent_name)
+        data_envelope = agent_ctx.data_raw # DataEnvelope.model_validate_json(state.data_raw)
+        
+        # 3. LLM Inference 
+        prompt = self.compose_agent_prompt(state)
+
+        logger.info(f"[AgentRunner] Prompt:  {prompt}")
+        response = await self.llm.ainvoke(prompt)
+
+        logger.info(f"Get Tool from Tool Manager: {task.tool_name}")
         response = await self.llm.complete(
             system=f"You are {instruction['agent']} executing a task.",
             user=instruction["task_description"],
@@ -381,15 +449,6 @@ class AgentRunner:
             "output": response,
         }
 
-    def _select_tool(self, task: Task) -> str:
-        """
-        Tool selection must be deterministic.
-        NEVER let the LLM pick tools implicitly.
-        """
-        if "fetch" in task.description.lower():
-            return "http_fetch"
-        if "query" in task.description.lower():
-            return "database_query"
 
         raise RuntimeError("No suitable tool found")
 
@@ -491,8 +550,10 @@ class ArtifactValidator:
         # 3. Task completeness
         # -------------------------------
         if artifact.current_plan:
-            open_tasks = [t for t in artifact.current_plan if t.status != "completed" ]
+            open_tasks = [t for t in artifact.current_plan if t.status not in ["completed", "done" ]]
             artifact.open_tasks.extend(open_tasks)
+
+        logger.info(f"**** Open Tasks: {artifact.open_tasks}")
 
         # -------------------------------
         # 4. Tool evidence checks
@@ -559,35 +620,40 @@ class AgentPlanner:
 
             return await self.compose_initial_plan(state)
 
-        logger.info(f"Current Stage: {state.stage}")
-        stage_meta = self.stage_manager.get(state.stage)
+        logger.info(f"Beyond the first Iteration now with Current Stage: {state.stage}")
 
-        logger.info(f"Switch to the agent context")
-        state_ctx = self.switch_agent_context(state)
+        stage_meta = self.stage_manager.get(state.stage)
 
         # ----------------------------------------------------------
         # 1. Determine exit condition to transition to next stage
         # ----------------------------------------------------------
+        logger.info(f"Determine exit condition to transition to next stage [validate_route_exit_condition].")
         next_stage = self.validate_route_exit_condition(state)
         if next_stage:
+            logger.info(f"It appears we have to transition to next stage:{next_stage}")
             return next_stage
+
+        if not next_stage:
+            logger.info(f"No transition to next stage yet ...")
+            next_stage = state.stage
+
+        logger.info(f"Current Stage {state.stage},  Next Stage: {next_stage}")
 
         # ---------------------------------------------------------------------
         # 2. Determine if there are more open tasks to complete for this agent
         # ----------------------------------------------------------------------
+        logger.info(f"Determine if there are more open tasks to complete for this agent [validate_route_next_open_task].")
         next_task =  self.validate_route_next_open_task(state)
         if next_task:
+            logger.info(f"It appears we have a next task to complete:{next_task}")
             return next_task
-        # ----------------------------------------------------------
-        # 3. Determine next agent in the same stage
-        # ----------------------------------------------------------
-        next_agent = self.validate_route_next_agent(state)
-        if next_agent:
-            return next_agent
 
         # ------------------------------------------------------------------------
         # 4. If no open task or no next agent, then let's transition to next stage
         # -------------------------------------------------------------------------
+        logger.info(f"Switch to the agent context [switch_agent_context]")
+        state_ctx = self.switch_agent_context(state)
+
         logger.info(f"Determine Next Stages: {stage_meta.next_stages}")
         for transition in stage_meta.next_stages:
             logger.info(f"Transition (next stage): {transition}")
@@ -661,7 +727,7 @@ class AgentPlanner:
 
         decision = not artifact.validation_errors and bool(artifact.open_tasks)
 
-        logger.info(f"Should Continue? - open tasks: {open_tasks} len: {len(open_tasks)}, decision: {decision}")
+        logger.info(f"Open tasks: {open_tasks} len: {len(open_tasks)}, decision: {decision}")
 
         ArtifactFactory.show_tasks(open_tasks)
 
@@ -686,33 +752,47 @@ class AgentPlanner:
         logger.info("Acquiring the first stage")
         first_stage = self.stage_manager.get_entry_stage()
 
+        logger.info(f"First Stage Acquired: {first_stage}")
+
         # 2. Find the first agent
         logger.info("Acquiring the first agent")
         first_agent = self.find_the_first_agent(state.domain, first_stage)
+        logger.info(f"First Agent Acquired: {first_agent}")
 
         portfolio  = await self.retrieve_agent_portfolio(state, first_agent)
 
-        data_envelope = portfolio["data_envelope"]
-        tool_envelope = portfolio["tool_envelope"]
+        data_envelope = portfolio["data_envelope"] 
         artifact = portfolio["artifact"]
+
+        # 3. Update current stage into the portfolio
+        artifact.current_stage = first_stage
 
         logger.info(f"Acquiring data_envelope: {data_envelope}")
         logger.info(f"Acquiring artifact: {artifact}")
 
+        if artifact.current_plan:
+            logger.info(f"Current Plan: {artifact.current_plan}")
+            artifact.open_tasks = list(artifact.current_plan)
+
+        if not artifact.open_tasks:
+            return None
+
+        next_task = artifact.open_tasks.pop(0)
+
+        logger.info(f"Next Task: {next_task}")
+
         # When finished, next agent is created
-        runner_context = AgentContext(
+        state.agentContext[first_agent] = AgentContext(
             agent_name=first_agent,
             stage=first_stage,
             control_raw=artifact,
             data_raw=data_envelope, 
-            tool_raw=tool_envelope
+            tool_raw=[]
         )
-        
-        state.agentContext[first_agent] = runner_context
 
         # Given the user’s goal, what is the next concrete responsibility for this agent in this stage?
         return {
-            "task" : artifact.open_tasks.pop(0), 
+            "task" : next_task, 
             "stage" : first_stage,
             "agent" : first_agent,
             "agentContext" : state.agentContext
@@ -723,16 +803,14 @@ class AgentPlanner:
     ################################################################################
     async def retrieve_agent_portfolio(self, state: StateSchema, agent: str):
 
-       # 3. Compose the relevent data source (data envelope) and tools (tool_envelope)
+        # 3. Compose the relevent data source (data envelope) and tools (tool_envelope)
         logger.info("Acquiring the relevant data source (data envelope)")
         data_envelope = self.context.data_manager.get_initial_envelope(agent)
 
         logger.info("Acquiring the relevant tools set (tool envelope)")
         tool_envelope = self.context.tool_manager.get_initial_envelope(agent)
 
-        # 4. Compose the initial task
-        logger.info("Composing the initial task ...")
-        
+        # 4. Get agent profile to build the artifact.
         logger.info("Get the agent profile ...")
         agent_profile = self.agent_manager.get_agent_profile(agent)
         logger.info(f"Agent's Profile: {agent_profile}")
@@ -742,8 +820,9 @@ class AgentPlanner:
         artifact = await self.build_initial_artifact(state, agent_profile)
 
         return {
+            "artifact" : artifact,
             "data_envelope" : data_envelope,
-            "artifact" : artifact
+            "tool_envelope" : tool_envelope
         }
 
     ####################################################################################################
@@ -807,33 +886,87 @@ class AgentPlanner:
         # 2. Get the RAW TASKS from the LLM
         # The LLM only sees the Instructions and the Goal.
 
+        '''
         logger.info("LLM Model Call ...")
         raw_tasks = await _call_llm(prompt=system_prompt, user_intent=state.user_intent, model_manager=self.llm)
         logger.info("LLM Model Call complete ...")
 
         logger.info(f"raw_tasks: {raw_tasks.content.strip()}") # Response is an AIMessage(content="...")
 
-        artifact = ArtifactFactory.initialize_from_agent(profile, state.session_id)
-
         task_dict = self.extract_json_from_markdown(raw_tasks.content.strip())
 
         logger.info(f"task dict: {task_dict}")
 
+
         for task in task_dict:
             artifact.current_plan.append(Task(
                 id=task.get("id"),
+                execution=task.get("execution"),
+                tool_name=task.get("tool_name"),
                 description=task.get("description"),
                 status="pending",
                 stage=state.stage
             ))
+        '''
 
+        artifact = ArtifactFactory.initialize_from_agent(profile, state.session_id)
+
+        # Just for now temporarily
+        artifact.current_plan = []
+        artifact.current_plan.append(
+            Task(
+                id='1',
+                execution='tool',
+                tool_name='get_market_regime_data',
+                description='Calculate the current market value of NVIDIA stock based on its historical price data and volume history.',
+                status="pending",
+                stage=state.stage
+            )
+        )
+        artifact.current_plan.append(
+            Task(
+                id='2',
+                execution='tool',
+                tool_name='search_ticker_news',
+                description='Search for the latest news headlines related to NVIDIA stock volatility.',
+                status="pending",
+                stage=state.stage
+            )
+        )
+        artifact.current_plan.append(
+            Task(
+                id='3',
+                execution='tool',
+                tool_name='analyze_earnings_call',
+                description='Analyze earnings calls of recent NVIDIA stock calls.',
+                status="pending",
+                stage=state.stage
+            )
+        )       
 
         logger.info(f"Initial Artifact: {artifact}")
 
         return artifact
 
     def extract_json_from_markdown(self, md: str) -> list:
-        return json.loads(md)
+        # This pattern looks for ```json (optional) ... content ... ```
+        # It uses a non-greedy match (.*?) to find the first block
+        pattern = r"```(?:json)?\s*(.*?)\s*```"
+        match = re.search(pattern, md, re.DOTALL | re.IGNORECASE)
+        
+        if match:
+            json_str = match.group(1).strip()
+        else:
+            # Fallback: maybe there are no fences at all
+            json_str = md.strip()
+            
+        try:
+            return json.loads(json_str)
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to parse extracted string: {json_str}")
+            raise e
+
+            return json.loads(json_str)
 
 
 
@@ -880,6 +1013,8 @@ class AgentPlanner:
         agent_ctx = state.agentContext[state.agent]
         artifact = agent_ctx.control_raw
 
+        logger.info(f"Artifact: {artifact}")
+
         # 1. If artifact is blocked or completed → stop
         if artifact.status in ("blocked", "completed", "aborted"):
             return {"next": "end" }
@@ -891,7 +1026,6 @@ class AgentPlanner:
             return {
                 "next": "runner",
                 "task": next_task,
-                "agent": next_task.assigned_agent,
                 "stage": artifact.current_stage
             }
 

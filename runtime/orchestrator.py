@@ -105,7 +105,7 @@ class Orchestrator:
         # Configuration: The 'thread_id' allows for state persistence
         config = {
             "configurable": {"thread_id": "session_123"},
-            "recursion_limit": 50  # Safety valve: Max 50 node transitions
+            "recursion_limit": 5  # Safety valve: Max 50 node transitions
         }
 
         async for event in self._graph.astream(self.initial_state, config, stream_mode="updates"):

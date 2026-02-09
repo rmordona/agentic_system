@@ -1,0 +1,32 @@
+type: object
+description: "Agnostic Tool Contract for Earnings Call Transcription and Analysis"
+properties:
+  tool_name:
+    type: string
+    const: "analyze_earnings_call"
+  description:
+    type: string
+    const: "Retrieves and summarizes the latest earnings call transcript, highlighting key executive sentiment and forward guidance."
+
+  # --- INPUT HANDSHAKE ---
+  input_schema:
+    type: object
+    required: [ticker]
+    properties:
+      ticker:
+        type: string
+        description: "The stock symbol for which the earnings call should be analyzed."
+
+  # --- OUTPUT CONTRACT ---
+  output_schema:
+    type: object
+    required: [summary, ticker]
+    properties:
+      ticker:
+        type: string
+      summary:
+        type: string
+        description: "A consolidated narrative of the call including guidance and sentiment."
+
+# Explicitly require the metadata and schemas for a valid 'Root' object
+required: [tool_name, description, input_schema, output_schema]

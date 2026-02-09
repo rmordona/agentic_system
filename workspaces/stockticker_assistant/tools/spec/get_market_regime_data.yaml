@@ -1,0 +1,53 @@
+type: object
+description: "Agnostic Tool Contract for Market Regime Analysis"
+properties:
+  tool_name: 
+    type: string
+    const: "get_market_regime_data"
+  description: 
+    type: string
+    const: "Analyzes macro-economic indicators to determine market regime and risk."
+
+  # --- INPUT HANDSHAKE ---
+  input_schema:
+    type: object
+    required: [market_data, timestamp]
+    properties:
+      market_data:
+        type: object
+        required: [price, volume]
+        properties:
+          price: { type: number }
+          volume: { type: number }
+      timestamp:
+        type: string
+        format: date-time
+      risk_mode:
+        type: string
+        enum: [CONSERVATIVE, NORMAL, AGGRESSIVE]
+
+  # --- OUTPUT CONTRACT ---
+  output_schema:
+    type: object
+    required: [macro_analysis]
+    properties:
+      macro_analysis:
+        type: object
+        required: [regime, risk_index, key_drivers, trade_permission]
+        properties:
+          regime:
+            type: string
+            enum: [BULL_EXPANSION, BEAR_CONTRACTION, VOLATILE_SIDEWAYS, CRISIS_MODE]
+          risk_index:
+            type: integer
+            minimum: 1
+            maximum: 10
+          key_drivers:
+            type: array
+            items: { type: string }
+          trade_permission:
+            type: boolean
+            description: "Global green light for the pipeline to proceed."
+
+# Explicitly require the metadata and the schemas at the root level
+required: [tool_name, description, input_schema, output_schema]

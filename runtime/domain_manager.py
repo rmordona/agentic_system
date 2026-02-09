@@ -66,8 +66,9 @@
 #          └────────────────────────────┘
 ############################################################
 
-
+import re
 import os
+import sys
 import uuid
 import hashlib
 import json
@@ -90,11 +91,17 @@ from functools import wraps
 
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
+from contextlib import AsyncExitStack
+
+from runtime.tools.mcp_client import MCPClient
+from runtime.tools.mcp_manager import MCPManager
 
 from runtime.artifact_factory import ArtifactSchema
 
 from runtime.agent_manager import AgentManager
-from runtime.agent_profiler import AgentOutput
+from runtime.agent_profiler import AgentOutput, AgentProfiler
+
+
 
 from runtime.logger import AgentLogger
 logger = AgentLogger.get_logger(component="system")
@@ -221,7 +228,7 @@ class AgentContext:
         # ------------------------------------------------------------------
         # Tool Plane (append-only execution records)
         # ------------------------------------------------------------------
-        tool_raw: List[ToolEnvelope[DomainType]] = Field(default_factory=list)
+        tool_raw: List[ToolEnvelope[DomainType]] = field(default_factory=list)
         # ------------------------------------------------------------------
         timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
         result_summary: str | None = None          # optional result / status
@@ -463,12 +470,13 @@ class ToolCall(TypedDict):
 class ToolEnvelope(BaseModel, Generic[DomainType]):
     id: str
     tool_name: str
-    tool_version: Optional[str]
+    tool_version: Optional[str] = None
     agent_role: str
     stage: str
     intent: str 
     input: Dict[str, Any] 
-    output: Optional[Dict[AgentOutput, Any]] = None
+    #output: Optional[Dict[AgentOutput, Any]] = None
+    output: Optional[Any] = None
     error: Optional[str] = None
     started_at: str = Field(default_factory=lambda: datetime.now(UTC).isoformat())
     completed_at: Optional[str] = None
@@ -476,12 +484,16 @@ class ToolEnvelope(BaseModel, Generic[DomainType]):
 
 
 class ToolAdapter:
-    def __init__(self, name: str, description: str, schema: dict, tool_file: Path, mcp_caller: callable):
+    def __init__(self, name: str, description: str, schema: dict, tool_file: Path):
         self.name = name
         self.description = description
         self.parameters = schema  # The MCP inputSchema (e.g., ticker, qty)
         self.tool_file = tool_file
-        self.mcp_caller = mcp_caller # The logic to run the MCP command
+        # self.mcp_caller = mcp_caller # The logic to run the MCP command
+
+        # This keeps the connections alive
+        self._session_cache: Dict[Path, ClientSession] = {}
+        self._exit_stack: Dict[Path, AsyncExitStack] = {}
         
         logger.info(f"ToolAdapter initialized | tool={name}")
 
@@ -498,42 +510,177 @@ class ToolAdapter:
             }
         }
 
-    async def execute(self, agent_role: str, stage: str, intent: str, **kwargs) -> ToolEnvelope:
-        logger.info(f"Executing tool '{self.name}' | agent={agent_role} stage={stage}")
+    async def execute(self, tool_name: str, instruction: dict) -> ToolEnvelope:
+        """
+        Receives the standardized instruction block and executes the MCP call.
+        """
+        logger.info(f"Executing tool '{tool_name}' via instruction block")
         start_time = datetime.now(UTC).isoformat()
 
-        try:
-            # 1. Call the tool
-            raw_result = await self.mcp_caller(kwargs) # Note: we pass kwargs here
-            
-            # 2. Extract the data (Cleaning for the LLM)
-            # We look for 'text' blocks first, then 'data' or 'structured_content'
-            if hasattr(raw_result, 'content'):
-                output = "\n".join([c.text for c in raw_result.content if hasattr(c, 'text')])
-            else:
-                output = str(raw_result)
+        # Extract values from the instruction dictionary for the Envelope
+        agent_role = instruction.get("agent", "unknown")
+        stage = instruction.get("stage", "unknown")
 
+        # The actual arguments for the MCP tool are inside 'execution'
+        mcp_args = instruction.get("execution", {}) 
+        
+        logger.info(f"Tool Adapter Parameters: {self.parameters}")
+
+        try:
+            # We call the mcp_caller (the bridge we built) 
+            # using the arguments extracted from the instruction
+            output = await self.mcp_caller(self.tool_file, tool_name, mcp_args)
             success = True
             error = None
         except Exception as e:
             output = None
             success = False
             error = str(e)
-            logger.exception(f"Tool '{self.name}' execution failed: {e}")
+            logger.exception(f"Tool execution failed: {e}")
+
+        logger.info(f"Execution Completed ...")
 
         return ToolEnvelope(
             id=generate_uuid(),
-            tool_name=self.name,
+            tool_name=tool_name,
             agent_role=agent_role,
             stage=stage,
-            intent=intent or self.description,
-            input=kwargs,
-            output=output, # Now this is a clean string/object
+            intent=instruction.get("task_description", self.description),
+            input=mcp_args, # We log the specific tool args, not the whole instruction
+            output=output,
             error=error,
             started_at=start_time,
             completed_at=datetime.now(UTC).isoformat(),
             success=success
         )
+
+    async def mcp_caller(self, tool_file: Path, tool_name: str, args: dict):
+        """
+        The bridge logic. Now with session persistence to keep 
+        the 'Agnostic OS' snappy.
+        """
+        logger.info(f"Entering the mcp caller: {tool_name} for {tool_file}")
+        logger.info(f"Arguments: {args}")
+
+        # 1. Check if we already have a live session (if we have an open pipe with an mcp server) for this file
+        if tool_file in self._session_cache:
+            session = self._session_cache[tool_file]
+            result = await session.call_tool(tool_name, arguments=args) # Makes a JSON-RPC call
+            return result.content
+
+        # 2. If not, spin it up (Your original logic)
+        logger.info(f"Starting persistent session for {tool_file.name}")
+        
+        # We use AsyncExitStack to keep the 'async with' contexts alive
+        # This is a "cleanup bucket." MCP uses async with blocks. Normally, when that block ends, 
+        # the process dies. By putting the context into a stack and saving it to self, we prevent the process from closing.
+        stack = AsyncExitStack()
+        self._exit_stack[tool_file] = stack
+
+        server_params = StdioServerParameters(
+            command=sys.executable,
+            args=[str(tool_file.absolute())],
+            env=None
+        )
+
+        # Entering the contexts
+        # This spawns the sub-process. read and write are the STDIN and STDOUT streams (the pipes).
+        logger.info(f"Spawning sub-process for mcp server")
+        read, write = await stack.enter_async_context(stdio_client(server_params))
+        # This "pins" the connection open so it stays alive after this function finishes.
+        session = await stack.enter_async_context(ClientSession(read, write))
+        
+        # The "Handshake." The engine says "Hello," and mcp_server.py replies with "I am MCP Server, and I have these 3 tools."
+        logger.info(f"Session Initialization")
+        await session.initialize()
+        # We save this session. Next time this tool is called, we will stop at Step 1.
+        self._session_cache[tool_file] = session
+
+        #  Sample payloads (Temporarily hardcoded for demo purposes only)
+        payload = get_sample_payload(tool_name)
+        input_args = self.construct_and_validate_mcp_payload(self.parameters, payload)
+
+        logger.info(f"Payload: {payload}")
+        logger.info(f"Input Args: {input_args}")
+        # 3. Call the tool.  This finally executes the function inside your script 
+        # and returns the list of content (text, images, or JSON) back to your ToolAdapter.
+        logger.info(f"Now Calling the tool {tool_name} with the following payload: {input_args}")
+        result = await session.call_tool(tool_name, arguments=input_args)
+        logger.info(f"Received result: {result.content}")
+        return result.content
+
+    # --- Application in your code ---
+    # Suppose the Agent only provides: {"ticker": "AAPL"}
+    # And the contract for 'execute_trade' has a default order_type: "LIMIT"
+    # Usage:
+    #    final_args = construct_and_validate_mcp_payload(trade_contract, {"ticker": "AAPL", "qty": 10, "side": "BUY"})
+    #
+    # Now the call is safe and complete:
+    # result = await session.call_tool("execute_trade", arguments=final_args)
+    def construct_and_validate_mcp_payload(self, schema_node: dict, payload: dict = None) -> dict:
+        if payload is None:
+            payload = {}
+            
+        # NORMALIZE SCHEMA: Handle the nesting issue
+        # If we are looking at the root contract, dive into properties -> input_schema
+        if "properties" in schema_node and "input_schema" in schema_node["properties"]:
+            schema_node = schema_node["properties"]["input_schema"]
+        # Or if we were passed the input_schema wrapper directly
+        elif "input_schema" in schema_node:
+            schema_node = schema_node["input_schema"]
+
+        def validate_constraints(val, sub_schema, path):
+            if isinstance(val, (int, float)):
+                if "minimum" in sub_schema and val < sub_schema["minimum"]:
+                    raise ValueError(f"Range Error at '{path}': {val} < {sub_schema['minimum']}")
+                if "maximum" in sub_schema and val > sub_schema["maximum"]:
+                    raise ValueError(f"Range Error at '{path}': {val} > {sub_schema['maximum']}")
+            if "enum" in sub_schema and val not in sub_schema["enum"]:
+                raise ValueError(f"Enum Error at '{path}': '{val}' not in {sub_schema['enum']}")
+            if "pattern" in sub_schema and isinstance(val, str):
+                if not re.match(sub_schema["pattern"], val):
+                    raise ValueError(f"Pattern Error at '{path}': Fails regex {sub_schema['pattern']}")
+
+        def build(node, data, path="root"):
+            # The core of the issue: ensure we are looking at the 'properties' of the schema object
+            if node.get("type") == "object":
+                obj = {}
+                props = node.get("properties", {})
+                required = node.get("required", [])
+
+                for key, sub_schema in props.items():
+                    current_path = f"{path}.{key}"
+                    
+                    # Extraction
+                    val = data.get(key) if isinstance(data, dict) else None
+                    if val is None:
+                        val = sub_schema.get("default")
+                    
+                    # Validation
+                    if val is None and key in required:
+                        raise ValueError(f"Missing required field: '{current_path}'")
+
+                    if val is not None:
+                        validate_constraints(val, sub_schema, current_path)
+                        
+                        if sub_schema.get("type") == "object":
+                            # Recurse with the nested data slice
+                            obj[key] = build(sub_schema, val or {}, current_path)
+                        else:
+                            obj[key] = val
+                return obj
+            return {} # Return empty dict instead of None
+
+        return build(schema_node, payload)
+
+    # Invoked from ToolManager.shutdown
+    async def shutdown(self):
+        """Cleanly close all MCP processes at engine stop."""
+        for path, stack in self._exit_stack.items():
+            logger.info(f"Closing MCP server: {path.name}")
+            await stack.aclose()
+        self._session_cache.clear()
+        self._exit_stack.clear()
 
 
 class ToolManager:
@@ -542,6 +689,7 @@ class ToolManager:
         self.agent_manager = agent_manager
 
         self.tool_map: Dict[str, ToolAdapter] = {}
+
         logger.info(f"ToolManager initialized")
 
         # This keeps the connections alive
@@ -572,7 +720,7 @@ class ToolManager:
                         description=tool_data["description"],
                         schema=tool_data["arguments"],
                         tool_file=tool_file,
-                        mcp_caller=self.call_mcp_tool
+                        # mcp_caller=self.call_mcp_tool
                     )
                     
                     # Register in the map
@@ -584,6 +732,33 @@ class ToolManager:
                 logger.error(f"Failed to register tools from {tool_file.name}: {e}", exc_info=True)
 
         logger.info(f"Agent scan complete. Total registered tools: {len(self.tool_map)}")
+
+    async def scan_and_register_tools_spec(self, workspace_path: Path) -> None:
+        self.tools_spec_dir = workspace_path / "tools" / "spec"
+
+        logger.info(f"Scanning for agents tools spec {self.tools_spec_dir}")
+
+        if not self.tools_spec_dir.exists() or not self.tools_spec_dir.is_dir():
+            raise ValueError(f"Invalid agent base path: {self.tools_spec_dir}")
+
+        for tool_spec_file in self.tools_spec_dir.iterdir():
+            if tool_spec_file.suffix != ".yaml": # Avoid temp files or __pycache__
+                continue
+            try:
+                tool_name = tool_spec_file.stem
+                logger.info(f"Reading tools spec ({tool_name}) from {tool_spec_file}") 
+                schema_result = AgentProfiler._load_schema(tool_spec_file)
+                if schema_result.get("success"):
+                    self.input_schema = schema_result.get("schema")
+                    self.tool_map[tool_name].parameters = self.input_schema
+                    logger.info(f"Tool Adapater: {self.tool_map[tool_name]}")
+                else:
+                    raise Exception(schema_result.get("error"))
+
+            except Exception as e:
+                logger.error(f"Failed to register tools from {tool_spec_file.name}: {e}", exc_info=True)
+
+        logger.info(f"Tool Spec scan complete. Total registered tools spec: {len(self.tool_map)}")
 
     async def extract_tools_via_protocol(self, tool_file: Path) -> list[dict]:
         import sys
@@ -607,6 +782,7 @@ class ToolManager:
                         await session.initialize()
                         response = await session.list_tools()
                         for tool in response.tools:
+                            logger.info(f"tool: {tool}")
                             registry.append({
                                 "name": tool.name,
                                 "description": tool.description or "",
@@ -629,41 +805,13 @@ class ToolManager:
             
         return registry
 
-    async def call_mcp_tool(self, tool_file: Path, tool_name: str, args: dict):
-        """
-        The bridge logic. Now with session persistence to keep 
-        the 'Agnostic OS' snappy.
-        """
-        # 1. Check if we already have a live session for this file
-        if tool_file in self._session_cache:
-            session = self._session_cache[tool_file]
-            result = await session.call_tool(tool_name, arguments=args)
-            return result.content
+    async def get_adapter(self, tool_name: str) -> ToolAdapter:
+        tool_adapter = self.tool_map[tool_name]
+        if tool_adapter:
+            return tool_adapter
+        return None
 
-        # 2. If not, spin it up (Your original logic)
-        logger.info(f"Starting persistent session for {tool_file.name}")
-        
-        # We use AsyncExitStack to keep the 'async with' contexts alive
-        stack = AsyncExitStack()
-        self._exit_stack[tool_file] = stack
-
-        server_params = StdioServerParameters(
-            command=sys.executable,
-            args=[str(tool_file.absolute())],
-            env=None
-        )
-
-        # Entering the contexts
-        read, write = await stack.enter_async_context(stdio_client(server_params))
-        session = await stack.enter_async_context(ClientSession(read, write))
-        
-        await session.initialize()
-        self._session_cache[tool_file] = session
-
-        # 3. Call the tool
-        result = await session.call_tool(tool_name, arguments=args)
-        return result.content
-
+    # Invoked from CoreEngine.shutdown
     async def shutdown(self):
         """Cleanly close all MCP processes at engine stop."""
         for path, stack in self._exit_stack.items():
@@ -671,6 +819,9 @@ class ToolManager:
             await stack.aclose()
         self._session_cache.clear()
         self._exit_stack.clear()
+
+        for tool in self.tool_map:
+            await tool.shutdown()
 
     def get_llm_tool_definitions(self):
         """
@@ -692,7 +843,6 @@ class ToolManager:
         keys = self.tool_map.keys()
         result = ", ".join(keys)
         return result
-
 
     def auto_envelope_wrapper(func, agent_role: str, stage: str):
         @wraps(func)
@@ -758,11 +908,14 @@ class SystemContext:
         logger.info("Initializing SystemContext via Async Factory")
         instance = cls(template_repo, workspace_path, agent_manager)
         
-        # 1. Sync registration
+        # 1. Sync registration For Data
         instance.data_manager.scan_and_register_schema()
         
-        # 2. Async registration (now we can safely await)
+        # 2. Async registration For Tool 
         await instance.tool_manager.scan_and_register_tools(instance.workspace_path)
+
+        # 3. Async registration For Tool Spec
+        await instance.tool_manager.scan_and_register_tools_spec(instance.workspace_path)
         
         logger.info("SystemContext initialization complete")
         return instance
@@ -773,3 +926,49 @@ class SystemContext:
         logger.info(f"Exposed {len(schemas)} tools to runtime")
         return schemas
 
+
+################################## SAMPLE INPUT PAYLOAD
+
+def get_sample_payload(tool_name: str):
+    if tool_name == "get_market_regime_data":
+        return {
+            "market_data": {
+                "price": 182.45,
+                "volume": 55200000
+            },
+            "timestamp": "2026-02-08T23:45:00Z",
+            "risk_mode": "NORMAL"
+            }
+    if tool_name == "analyze_earnings_call":
+        return {
+        "ticker": "NVDA"
+        }
+    if tool_name == "calculate_var":
+        return {
+        "ticker": "NVDA",
+        "position_size": 25000.00
+        }
+    if tool_name == "execute_trade":    
+        return {
+        "ticker": "NVDA",
+        "side": "BUY",
+        "qty": 135,
+        "order_type": "LIMIT"
+        }
+    if tool_name == "get_gas_fees":  
+        return {
+        "network": "polygon"
+        }
+    if tool_name == "get_ticker_stats":  
+        return {
+        "ticker": "AAPL"
+        }
+    if tool_name == "search_macro_news":  
+        return {
+        "query": "CPI Inflation Data"
+        }
+    if tool_name == "search_ticker_news":  
+        return  {
+        "ticker": "TSLA"
+        }
+    return ""

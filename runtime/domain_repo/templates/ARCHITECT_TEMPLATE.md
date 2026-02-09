@@ -47,5 +47,3 @@ Rules:
 
 1. **Mandatory Closing**: Every JSON response MUST be a complete, valid object. You must explicitly verify the presence of closing braces and brackets before ending the turn.
 2. **No Truncation**: If the payload is large, prioritize structural integrity over content length. Never "cut off" a JSON object to save tokens.
-
-]

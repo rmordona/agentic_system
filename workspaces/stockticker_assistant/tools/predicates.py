@@ -1,3 +1,6 @@
+import json
+from runtime.logger import AgentLogger
+logger = AgentLogger.get_logger(component="system")
 from runtime.policy_registry import Predicates, StageEvalContext
 
 class Policies:
@@ -104,9 +107,14 @@ class Policies:
     @Predicates.policy()
     def macro_regime_is_defined(ctx: StageEvalContext) -> bool:
         """Checks if MacroWatcher has categorized the market volatility."""
-        data = ctx.get("macro_analysis", {})
+        data = Predicates.process(ctx)
+        logger.info(f"Data: {data}")
+        macro_analysis = data.get("macro_analysis", {})
+
         # Must have a recognized regime and a risk index to proceed
-        return bool(data.get("regime") and "risk_index" in data)
+        logger.info(f"Evaluating predicate (macro_regime_is_defined)")
+        logger.info(f"Data: {macro_analysis}")
+        return bool(macro_analysis.get("regime") and "risk_index" in macro_analysis)
 
     @Predicates.policy()
     def active_ticker_context_initialized(ctx: StageEvalContext) -> bool:
