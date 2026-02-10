@@ -15,40 +15,32 @@ properties:
     properties:
       ticker:
         type: string
-        description: "The stock symbol (e.g., AAPL, NVDA, TSLA)."
         pattern: "^[A-Z]{1,5}$"
+        description: "The stock symbol (e.g., AAPL, NVDA, TSLA)."
 
   # --- OUTPUT CONTRACT ---
   output_schema:
     type: object
-    required: 
-      - ticker
-      - current_price
-      - MA50
-      - MA200
-      - RSI
-      - volatility_z_score
-      - daily_volume
+    required: [ticker, current_price, MA50, MA200, RSI, volatility_z_score, daily_volume]
     properties:
       ticker: { type: string }
       current_price: { type: number }
-      MA50:
-        type: number
-        description: "50-day Simple Moving Average"
-      MA200:
-        type: number
-        description: "200-day Simple Moving Average"
-      RSI:
-        type: number
-        minimum: 0
-        maximum: 100
-        description: "Relative Strength Index (Momentum indicator)"
-      volatility_z_score:
-        type: number
-        description: "Standard deviations from the mean price"
-      daily_volume:
-        type: integer
-        minimum: 0
+      MA50: { type: number }
+      MA200: { type: number }
+      RSI: { type: number, minimum: 0, maximum: 100 }
+      volatility_z_score: { type: number }
+      daily_volume: { type: integer, minimum: 0 }
 
-# Mandate the presence of identity metadata and schemas
-required: [tool_name, description, input_schema, output_schema]
+  # --- GATEKEEPER PREDICATES ---
+  validation_rules:
+    # Ensure RSI is physically possible and volume is significant
+    - "RSI >= 0 AND RSI <= 100"
+    - "current_price > 0 AND daily_volume > 0"
+  
+  # Exit Condition: THE MOMENTUM GATE
+  # Example: Only proceed if the stock is in a Golden Cross (MA50 > MA200)
+  # AND not "Overbought" (RSI < 70) 
+  # AND volatility is not in an extreme outlier state (Z-Score < 3)
+  stage_exit_trigger: "MA50 > MA200 AND RSI < 70 AND volatility_z_score < 3.0"
+
+required: [tool_name, description, input_schema, output_schema, validation_rules]

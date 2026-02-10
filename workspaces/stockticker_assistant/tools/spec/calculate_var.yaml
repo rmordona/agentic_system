@@ -15,27 +15,39 @@ properties:
     properties:
       ticker:
         type: string
-        description: "The stock or asset ticker symbol."
+        pattern: "^[A-Z]{1,5}$"
       position_size:
         type: number
+        minimum: 0
         description: "The total dollar value of the proposed position."
 
   # --- OUTPUT CONTRACT ---
   output_schema:
     type: object
-    required: [ticker, position_value, VaR_95, risk_percentage]
+    required: [ticker, position_value, VaR_95, risk_percentage, is_within_limits]
     properties:
-      ticker:
-        type: string
-      position_value:
-        type: number
-        description: "The verified position size used for the calculation."
+      ticker: { type: string }
+      position_value: { type: number }
       VaR_95:
         type: number
         description: "The maximum expected loss at a 95% confidence level."
       risk_percentage:
-        type: string
-        description: "The percentage of the total position at risk (e.g., '3.5%')."
+        type: number
+        description: "The numerical risk percentage (e.g., 0.035 for 3.5%)."
+      is_within_limits:
+        type: boolean
+        description: "Internal check against firm-wide volatility constraints."
 
-# Ensures the contract includes the identity metadata and the schemas
-required: [tool_name, description, input_schema, output_schema]
+  # --- GATEKEEPER PREDICATES ---
+  # Validation: VaR should never be greater than the total position.
+  # Also ensures ticker consistency.
+  validation_rules:
+    - "VaR_95 < position_value"
+    - "risk_percentage >= 0 AND risk_percentage <= 1"
+  
+  # Exit Condition: THE TRADE GATE
+  # We only exit the Risk Stage if the risk is under 5% AND the tool 
+  # explicitly confirms 'is_within_limits'.
+  stage_exit_trigger: "risk_percentage < 0.05 AND is_within_limits == True"
+
+required: [tool_name, description, input_schema, output_schema, validation_rules]

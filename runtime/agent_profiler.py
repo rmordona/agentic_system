@@ -239,47 +239,96 @@ class AgentProfiler:
     # Validate Integrity of schema.
     # -------------------------------------------------------------------------
     @staticmethod
-    def validate_schema_integrity(schema: Dict[str, Any], path: str = "root", definitions: Optional[Dict[str, Any]] = None):
+    def validate_schema_integrity(
+        schema: Any,
+        path: str = "root",
+        definitions: Optional[Dict[str, Any]] = None
+    ) -> bool:
         """
-        Scans a YAML schema for broken $refs or missing 'type' keys 
+        Scans a JSON Schema for broken $refs or missing 'type' keys
         that cause Pydantic construction failures.
+
+        Non-dict nodes (lists, strings, etc.) are treated as leaf metadata
+        and ignored.
         """
+
+        # ------------------------------------------------------------------
+        # 0. Ignore non-schema nodes (fixes list / string crashes)
+        # ------------------------------------------------------------------
+        if not isinstance(schema, dict):
+            return True
+
+        # Initialize shared definitions once
         if definitions is None:
             definitions = schema.get("definitions", {})
 
-        # 1. Check for missing type or ref at current level
+        # ------------------------------------------------------------------
+        # 1. Structural validity at current node
+        # ------------------------------------------------------------------
         s_type = schema.get("type")
         s_ref = schema.get("$ref")
 
         if not s_type and not s_ref:
-            logger.error(f"ERROR: Field at '{path}' has no 'type' and no '$ref'.")
+            logger.error(
+                f"ERROR: Field at '{path}' has no 'type' and no '$ref'."
+            )
             return False
 
+        # ------------------------------------------------------------------
         # 2. Validate $ref resolution
+        # ------------------------------------------------------------------
         if s_ref:
             ref_key = s_ref.split("/")[-1]
             if ref_key not in definitions:
-                logger.error(f"ERROR: Broken Reference at '{path}'. '{ref_key}' not found in definitions.")
+                logger.error(
+                    f"ERROR: Broken Reference at '{path}'. "
+                    f"'{ref_key}' not found in definitions."
+                )
                 return False
-            # Recurse into the definition using the same definitions dict
-            return AgentProfiler.validate_schema_integrity(definitions[ref_key], f"{path} -> {ref_key}", definitions)
 
-        # 3. Recurse into Objects
+            return AgentProfiler.validate_schema_integrity(
+                definitions[ref_key],
+                f"{path} -> {ref_key}",
+                definitions
+            )
+
+        # ------------------------------------------------------------------
+        # 3. Recurse into object properties
+        # ------------------------------------------------------------------
         if s_type == "object":
             props = schema.get("properties", {})
+
             if not props and not schema.get("additionalProperties"):
-                logger.warning(f"WARNING: Object at '{path}' has no properties defined.")
+                logger.warning(
+                    f"WARNING: Object at '{path}' has no properties defined."
+                )
 
             for prop_name, prop_schema in props.items():
-                AgentProfiler.validate_schema_integrity(prop_schema, f"{path}.{prop_name}", definitions)
+                if isinstance(prop_schema, dict):
+                    if not AgentProfiler.validate_schema_integrity(
+                        prop_schema,
+                        f"{path}.{prop_name}",
+                        definitions
+                    ):
+                        return False
 
-        # 4. Recurse into Arrays
+        # ------------------------------------------------------------------
+        # 4. Recurse into arrays
+        # ------------------------------------------------------------------
         elif s_type == "array":
             items = schema.get("items")
+
             if not items:
-                logger.error(f"ERROR: Array at '{path}' is missing 'items' definition.")
+                logger.error(
+                    f"ERROR: Array at '{path}' is missing 'items' definition."
+                )
                 return False
-            AgentProfiler.validate_schema_integrity(items, f"{path}[]", definitions)
+
+            return AgentProfiler.validate_schema_integrity(
+                items,
+                f"{path}[]",
+                definitions
+            )
 
         return True
 

@@ -16,7 +16,7 @@ Available tools:
 {available_tools}
 
 Objective:
-Using the assigned agent's task style, generate three (3) tasks. 
+Using the assigned agent's task style, generate three (3) tasks. Given the following tool definitions, generate an execution plan. For each task, identify the tool to use and the specific JSON key or condition that must be met to consider the task successful (the predicate)."
 
 Requirements:
 
@@ -26,6 +26,8 @@ Requirements:
    - "description": concise text describing the task
    - "execution": one of ["tool", "llm"]
    - "tool_name": optional string, required if "execution" is "tool"
+   - "exit_condition": predicates
+   - "failure_policy" : one of ["retry", "halt", "hitl"]
 3. Tasks must be ordered in the sequence they should be executed.
 4. Ensure tasks are actionable and match the agent's capabilities.
 5. Tasks must use the agent's specific tools/capabilities.

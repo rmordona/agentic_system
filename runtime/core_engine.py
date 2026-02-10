@@ -20,7 +20,7 @@ from runtime.artifact_factory import ArtifactFactory
 from llm.model_manager import ModelManager
 from runtime.stage_manager import StageSchema, StageManager
 from runtime.agent_manager import AgentManager
-from runtime.policy_registry import PolicyRegistry
+from runtime.policy_registry import PolicyRegistry, PredicateEngine
 
 from runtime.agent_profiler import AgentProfile
 
@@ -195,7 +195,7 @@ class AgentRunner:
     async def __call__(self, state: StateSchema):
         """The Node function for LangGraph"""
 
-        logger.info(f"************* Agent Runner is being called (Agent: {state.agent})...")
+        logger.info("<<<<<<<<<<<<<<<<<<<<< **********************  AgentRunner is being called ************* >>>>>>>>>>>>>>>>>>>")
 
         logger.info(f"State received: {state}")
 
@@ -218,6 +218,7 @@ class AgentRunner:
         logger.info(f"Agent Profile: {agent_profile}")
 
         # Get Agent Profile Input Schema (Granting we are dealing with a Single-Task Non-MCP Tool perspective)
+        # We'll use this for LLM tools
         schema = agent_profile.input_schema
 
         # Get Agent Context Data Raw Input
@@ -257,8 +258,9 @@ class AgentRunner:
             logger.info(f"Result (ToolEnvelope): {result}")
             logger.info(f"type(agent_ctx) = {type(agent_ctx)}")
             logger.info(f"agent_ctx.tool_raw = {agent_ctx.tool_raw}")
-            agent_ctx.tool_raw.append(result)
-            state.agentContext[agent_name] =agent_ctx
+            agent_ctx.tool_raw.append(result)  # Now preserve the ToolEnvelope
+            state.agentContext[agent_name] = agent_ctx
+            logger.info(f"-------------------------- agentContext: {agent_ctx}")
 
         logger.info(f"agent_ctx.tool_raw: {agent_ctx.tool_raw}")
 
@@ -339,6 +341,9 @@ class AgentRunner:
         logger.info(f"Executing task 1: {task.id}, {execution_payload}")
         agent_ctx = state.agentContext[state.agent]
 
+        # For now, use a SAMPLE PAYLOAD for DEMO purposes
+        execution_payload = get_sample_payload(task.tool_name)
+
         try:
             # -------------------------------------------------
             # 1. Build execution prompt / instruction
@@ -347,7 +352,7 @@ class AgentRunner:
                 "agent": agent_ctx.agent_name,
                 "stage": agent_ctx.stage,
                 "task_id": task.id,
-                "execution" : execution_payload,
+                "payload" : execution_payload,
                 "tool_name" : task.tool_name,
                 "task_description": task.description,
                 "control": agent_ctx.control_raw,
@@ -412,6 +417,7 @@ class AgentRunner:
             }
         '''
         logger.info(f"Entering Execution with Tools: {task.tool_name}")
+
 
         tool_adapter = await self.context.tool_manager.get_adapter(task.tool_name)
         logger.info(f"Registered tool adapter {tool_adapter}")
@@ -507,11 +513,11 @@ class AgentRunner:
 
 
 # -----------------------------------------------------------------------------
-# ArtifactValidator
+# AgentValidator
 # -----------------------------------------------------------------------------
 # Deterministic validation layer responsible for enforcing artifact correctness.
 #
-# ArtifactValidator:
+# AgentValidator:
 #   - Evaluates the control artifact against structural and policy rules
 #   - Derives validation_errors, warnings, and open_tasks
 #   - Correlates recent ToolEnvelopes as execution evidence
@@ -522,10 +528,14 @@ class AgentRunner:
 #   but enforces truth, consistency, and completion guarantees
 #   before control is returned to the AgentPlanner.
 # -----------------------------------------------------------------------------
-class ArtifactValidator:
+class AgentValidator:
+
+    def __init__(self):
+        self.predicate_engine = PredicateEngine()
+
     def __call__(self, state: StateSchema) -> dict:
 
-        logger.info("*************  Artifact Validator is being called ...")
+        logger.info("<<<<<<<<<<<<<<<<<<<<< **********************  AgentValidator is being called ************* >>>>>>>>>>>>>>>>>>>")
 
         logger.info(f"Received state from agent '{state.agent}': {state}")
 
@@ -565,7 +575,14 @@ class ArtifactValidator:
                 )
 
         # -------------------------------
-        # 5. Status update
+        # 5. Validate Rules
+        # -------------------------------
+        logger.info(f"Artifact Validation Errors 1: {artifact.validation_errors}")
+        self.validate(state)
+        logger.info(f"Artifact Validation Errors 2: {artifact.validation_errors}")
+
+        # -------------------------------
+        # 6. Status update
         # -------------------------------
         if artifact.validation_errors:
             artifact.status = "blocked"
@@ -579,6 +596,115 @@ class ArtifactValidator:
         state.agentContext[state.agent].control_raw = artifact
 
         return {"agentContext": state.agentContext}
+
+
+    def validate(self, state: StateSchema):
+        # -------------------------------
+        # 4.5 Validation rule checks
+        # -------------------------------
+        agent_ctx = state.agentContext[state.agent]
+
+        context = self._build_context(agent_ctx)
+
+        logger.info(f"Context: {context}")
+
+        artifact = agent_ctx.control_raw
+
+        for tool in agent_ctx.tool_raw:
+            rules = tool.validation_rules or []
+
+            for rule in rules:
+                try:
+                    gate = self.predicate_engine.parse_predicate(rule)
+                    passed = self.predicate_engine.verify(gate, context)
+                    if not passed:
+                        artifact.validation_errors.append(
+                            f"Validation rule failed: {rule}"
+                        )
+                    logger.info(f"Pass rule: {rule}, verdict: {passed}")
+                except Exception as e:
+                    artifact.validation_errors.append(
+                        f"Invalid validation rule '{rule}': {e}"
+                    )
+
+
+        # -------------------------------
+        # 4.6 Stage exit trigger
+        # -------------------------------
+        artifact.stage_exit_allowed = True  # default
+
+        for tool in agent_ctx.tool_raw:
+            trigger = tool.stage_exit_trigger
+            if not trigger:
+                continue
+
+            try:
+                gate = self.predicate_engine.parse_predicate(trigger)
+                artifact.stage_exit_allowed = self.predicate_engine.verify(gate, context)
+                logger.info(f"Pass stage exit trigger: {trigger}, verdict: {artifact.stage_exit_allowed}")
+            except Exception:
+                artifact.stage_exit_allowed = False
+
+
+    def _build_context(self, agent_ctx: AgentContext) -> dict:
+        """
+        Constructs a context dictionary for predicate evaluation.
+        Combines:
+        1. Structured data from the DataEnvelope (input/output)
+        2. Tool outputs from the last N ToolEnvelope records (authoritative)
+        """
+        context = {}
+
+        # -------------------------------
+        # 1. Data Plane (structured input/output)
+        # -------------------------------
+        if agent_ctx.data_raw and agent_ctx.data_raw.payload:
+            payload_dict = agent_ctx.data_raw.payload.model_dump()
+            context.update(payload_dict.get("input", {}))
+            context.update(payload_dict.get("output", {}))
+
+        # -------------------------------
+        # 2. Tool Plane (authoritative outputs)
+        # -------------------------------
+        for tool in agent_ctx.tool_raw[-3:]:  # last 3 tools
+            if not tool.output:
+                continue
+
+            outputs = tool.output if isinstance(tool.output, list) else [tool.output]
+
+            for item in outputs:
+                # Case 1: TextContent (legacy MCP)
+                if hasattr(item, "text"):
+                    try:
+                        parsed = json.loads(item.text)
+                        if isinstance(parsed, dict):
+                            context.update(parsed)
+                        else:
+                            context[f"raw_output_{tool.tool_name}"] = parsed
+                    except Exception:
+                        context[f"raw_output_{tool.tool_name}"] = item.text
+
+                # Case 2: dict -> merge directly
+                elif isinstance(item, dict):
+                    context.update(item)
+
+                # Case 3: str -> parse JSON if possible
+                elif isinstance(item, str):
+                    try:
+                        parsed = json.loads(item)
+                        if isinstance(parsed, dict):
+                            context.update(parsed)
+                        else:
+                            context[f"raw_output_{tool.tool_name}"] = parsed
+                    except Exception:
+                        context[f"raw_output_{tool.tool_name}"] = item
+
+                # Case 4: any other type -> store as-is
+                else:
+                    context[f"raw_output_{tool.tool_name}"] = item
+
+        return context
+
 
 # -----------------------------------------------------------------------------
 # AgentPlanner
@@ -612,7 +738,7 @@ class AgentPlanner:
         """
         The Supervisor Node function for LangGraph / Orchestrator Runtime.
         """
-        logger.info("************* Agent Planner is being called ...")
+        logger.info("<<<<<<<<<<<<<<<<<<<<< **********************  AgentPlanner is being called ************* >>>>>>>>>>>>>>>>>>>")
 
         if state.task.id == INIT_TASK:
 
@@ -1302,9 +1428,15 @@ class CoreEngine:
         # --------------------------------------------------
         # 6. Engine Hemispheres
         # --------------------------------------------------
-        self.runner  = AgentRunner(self.context, self.stage_manager, self.agent_manager, self.agent_llm)
-        self.planner = AgentPlanner(self.context, self.stage_manager, self.agent_manager, self.architect_llm)
-        self.validator = ArtifactValidator()
+        #    Planner → creates intent
+        #    Runner → executes tools
+        #    Validator → enforces truth
+        #    PredicateEngine → is the law
+        #    _should_continue → just checks the verdict
+
+        self.validator = AgentValidator()
+        self.runner    = AgentRunner(self.context, self.stage_manager, self.agent_manager, self.agent_llm)
+        self.planner   = AgentPlanner(self.context, self.stage_manager, self.agent_manager, self.architect_llm)
 
     # --------------------------------------------------
     # Shutdown MCP sessions when done.
@@ -1448,4 +1580,49 @@ async def _call_llm(prompt: str, user_intent: str, model_manager: ModelManager) 
         reflect=False
     )
 
- 
+
+ ################################## SAMPLE INPUT PAYLOAD FOR MCP TOOLS
+
+def get_sample_payload(tool_name: str):
+    if tool_name == "get_market_regime_data":
+        return {
+            "market_data": {
+                "price": 182.45,
+                "volume": 55200000
+            },
+            "timestamp": "2026-02-08T23:45:00Z",
+            "risk_mode": "NORMAL"
+            }
+    if tool_name == "analyze_earnings_call":
+        return {
+        "ticker": "NVDA"
+        }
+    if tool_name == "calculate_var":
+        return {
+        "ticker": "NVDA",
+        "position_size": 25000.00
+        }
+    if tool_name == "execute_trade":    
+        return {
+        "ticker": "NVDA",
+        "side": "BUY",
+        "qty": 135,
+        "order_type": "LIMIT"
+        }
+    if tool_name == "get_gas_fees":  
+        return {
+        "network": "polygon"
+        }
+    if tool_name == "get_ticker_stats":  
+        return {
+        "ticker": "AAPL"
+        }
+    if tool_name == "search_macro_news":  
+        return {
+        "query": "CPI Inflation Data"
+        }
+    if tool_name == "search_ticker_news":  
+        return  {
+        "ticker": "TSLA"
+        }
+    return ""

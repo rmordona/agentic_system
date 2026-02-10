@@ -1,9 +1,11 @@
+import re
 import ast
 import json
 import inspect
 import importlib
 from pathlib import Path
-from typing import Any, Callable, Dict, Set
+from typing import Any, Callable, Dict, Set, Union
+
 from dataclasses import dataclass
 
 from runtime.logger import AgentLogger
@@ -119,6 +121,131 @@ class PolicyRegistry:
             stage=state_ctx.get("stage", "unknown") if state_ctx else "unknown",
         )
         return self.evaluator.evaluate(compiled_expr, ctx_obj)
+
+################################################################################
+# Predicate Translator and Evaluator
+################################################################################
+class PredicateEngine:
+    """
+    Unified validation engine:
+    - Phase 1: Parse string predicates into JSON logic
+    - Phase 2: Evaluate JSON logic against context dict
+    """
+
+    OP_MAP = {
+        ast.Gt: ">",
+        ast.Lt: "<",
+        ast.GtE: ">=",
+        ast.LtE: "<=",
+        ast.Eq: "==",
+        ast.NotEq: "!=",
+        ast.In: "in"
+    }
+
+    def __init__(self):
+        # Atomic operations for verification
+        self._logic_ops = {
+            "==": lambda a, b: a == b,
+            "!=": lambda a, b: a != b,
+            ">":  lambda a, b: a > b,
+            "<":  lambda a, b: a < b,
+            ">=": lambda a, b: a >= b,
+            "<=": lambda a, b: a <= b,
+            "in": lambda a, b: a in b,
+            "exists": lambda a, _: a is not None
+        }
+
+    # ----------------------
+    # PHASE 1: STRING -> JSON
+    # ----------------------
+    def parse_predicate(self, expr: Union[str, dict]) -> dict:
+        """
+        Converts string predicates into JSON gate.
+        Supports:
+        - "field exists"
+        - standard comparisons with AND/OR
+        - nested fields using dot notation
+        """
+        if isinstance(expr, dict):
+            return expr  # already JSON
+
+        expr = expr.strip()
+
+        # --- Special case: 'exists' ---
+        if re.match(r".+ exists$", expr):
+            field_name = expr.split()[0]
+            return {"field": field_name, "op": "exists", "value": True}
+
+        # --- Normal Python expressions ---
+        clean_expr = expr.replace(" AND ", " and ").replace(" OR ", " or ")
+        try:
+            tree = ast.parse(clean_expr, mode="eval")
+            return self._node_to_dict(tree.body)
+        except Exception as e:
+            raise ValueError(f"Failed to parse predicate string '{expr}': {e}")
+
+    def _node_to_dict(self, node):
+        if isinstance(node, ast.BoolOp):
+            op_key = "and" if isinstance(node.op, ast.And) else "or"
+            return {op_key: [self._node_to_dict(v) for v in node.values]}
+
+        if isinstance(node, ast.Compare):
+            if len(node.ops) > 1:
+                raise ValueError("Chained comparisons not supported")
+
+            left = self._resolve_name(node.left)
+            op_type = type(node.ops[0])
+            op = self.OP_MAP.get(op_type)
+            if op is None:
+                raise ValueError(f"Unsupported operator: {op_type}")
+
+            right = ast.literal_eval(node.comparators[0])
+            return {"field": left, "op": op, "value": right}
+
+        raise ValueError(f"Unsupported AST node type: {type(node).__name__}")
+
+    def _resolve_name(self, node):
+        if isinstance(node, ast.Name):
+            return node.id
+        if isinstance(node, ast.Attribute):
+            return f"{self._resolve_name(node.value)}.{node.attr}"
+        raise ValueError(f"Unsupported node for field name: {type(node).__name__}")
+
+    # ----------------------
+    # PHASE 2: EVALUATION
+    # ----------------------
+    def verify(self, gate: dict, context: dict) -> bool:
+        """
+        Recursively evaluate the JSON gate against a context dictionary.
+        """
+        # Logical AND
+        if "and" in gate:
+            return all(self.verify(sub, context) for sub in gate["and"])
+
+        # Logical OR
+        if "or" in gate:
+            return any(self.verify(sub, context) for sub in gate["or"])
+
+        # Atomic gate
+        field_path = gate.get("field")
+        op = gate.get("op", "exists")
+        expected = gate.get("value")
+
+        actual = context
+        try:
+            for key in field_path.split('.'):
+                actual = actual[key] if isinstance(actual, dict) else None
+        except (KeyError, TypeError):
+            actual = None
+
+        operation = self._logic_ops.get(op)
+        if not operation:
+            raise ValueError(f"Unknown operator: {op}")
+
+        try:
+            return operation(actual, expected)
+        except Exception:
+            return False
 
 
 ################################################################################

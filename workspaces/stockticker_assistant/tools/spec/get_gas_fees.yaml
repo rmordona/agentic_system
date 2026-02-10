@@ -21,17 +21,28 @@ properties:
   # --- OUTPUT CONTRACT ---
   output_schema:
     type: object
-    required: [network, base_fee, status]
+    required: [network, base_fee_gwei, status]
     properties:
-      network:
-        type: string
-      base_fee:
-        type: string
-        description: "The current base fee in Gwei or network-specific units."
+      network: { type: string }
+      base_fee_gwei:
+        type: number
+        description: "The current base fee converted to a numeric float for logic comparison."
       status:
         type: string
         enum: [Low, Moderate, High, Extreme]
-        description: "Congestion level relative to historical averages."
+      priority_fee_suggestion:
+        type: number
+        description: "Suggested tip for miners/validators."
 
-# Mandate metadata and schema presence
-required: [tool_name, description, input_schema, output_schema]
+  # --- GATEKEEPER PREDICATES ---
+  validation_rules:
+    # Ensure we didn't get a negative fee or a null response
+    - "base_fee_gwei >= 0"
+    - "network exists"
+  
+  # Exit Condition: THE COST GATE
+  # We only proceed to the next stage if the network is not in an 'Extreme' state
+  # AND the base fee is under a specific threshold (e.g., 80 Gwei for Ethereum)
+  stage_exit_trigger: "status != 'Extreme' AND base_fee_gwei < 80"
+
+required: [tool_name, description, input_schema, output_schema, validation_rules]

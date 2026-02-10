@@ -15,6 +15,7 @@ properties:
     properties:
       ticker:
         type: string
+        pattern: "^[A-Z]{1,5}$"
         description: "Stock symbol to investigate (e.g., TSLA, BTC)."
 
   # --- OUTPUT CONTRACT ---
@@ -25,11 +26,21 @@ properties:
       type: object
       required: [headline, sentiment]
       properties:
-        headline:
-          type: string
+        headline: { type: string }
         sentiment:
           type: string
           enum: [Bullish, Bearish, Neutral]
 
-# Mandate the presence of identity metadata and schemas
-required: [tool_name, description, input_schema, output_schema]
+  # --- GATEKEEPER PREDICATES ---
+  validation_rules:
+    # Ensure the tool actually returned a list
+    - "search_ticker_news exists"
+    # Content check: The first news item must have a valid sentiment
+    - "search_ticker_news.0.sentiment exists"
+  
+  # Exit Condition: THE SENTIMENT CONSENSUS GATE
+  # We only proceed if we have at least 2 news items (Index 1 exists)
+  # AND the most recent news item (Index 0) is NOT 'Bearish'.
+  stage_exit_trigger: "search_ticker_news.1 exists AND search_ticker_news.0.sentiment != 'Bearish'"
+
+required: [tool_name, description, input_schema, output_schema, validation_rules]

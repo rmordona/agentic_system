@@ -18,7 +18,7 @@ properties:
         description: "Focus area for the news scan (e.g., Inflation, Geopolitics)."
 
   # --- OUTPUT CONTRACT ---
-  # Note: The output is an array of news objects
+  # The Gatekeeper will evaluate the array itself or its specific indices
   output_schema:
     type: array
     description: "A list of news headlines and their sources."
@@ -26,10 +26,17 @@ properties:
       type: object
       required: [source, headline]
       properties:
-        source:
-          type: string
-        headline:
-          type: string
+        source: { type: string }
+        headline: { type: string }
 
-# Mandate the presence of identity metadata and schemas
-required: [tool_name, description, input_schema, output_schema]
+  # --- GATEKEEPER PREDICATES ---
+  validation_rules:
+    # Ensure the tool actually returned an array (not a null or error string)
+    - "search_macro_news exists"
+  
+  # Exit Condition: THE DATA DENSITY GATE
+  # We use the 'exists' check on the first element to ensure the list isn't empty.
+  # If we want at least 3 news items, we check for index [2].
+  stage_exit_trigger: "search_macro_news.0 exists AND search_macro_news.2 exists"
+
+required: [tool_name, description, input_schema, output_schema, validation_rules]

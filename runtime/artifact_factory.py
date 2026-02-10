@@ -234,6 +234,9 @@ class ArtifactSchema(BaseModel):
         "aborted"
     ]
 
+    # ---- Used per tool to determine stage-exit policy
+    stage_exit_allowed: bool
+
     # ---- Planning ----
     current_stage: str
     current_plan: List[Task] = Field(default_factory=list)
@@ -328,6 +331,9 @@ class ArtifactFactory:
             role=agent_profile.role,
             purpose=agent_profile.description,
             mission=f"Execute task as {agent_profile.name}",
+
+            # Stage Exit
+            stage_exit_allowed = False,
             
             # Session & State
             session_id=session_id or str(uuid4()),

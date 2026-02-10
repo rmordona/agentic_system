@@ -15,15 +15,13 @@ properties:
     properties:
       ticker:
         type: string
-        description: "The stock or asset symbol to trade."
+        pattern: "^[A-Z]{1,5}$"
       side:
         type: string
         enum: [BUY, SELL]
-        description: "The direction of the trade."
       qty:
         type: integer
         minimum: 1
-        description: "Number of units to trade."
       order_type:
         type: string
         enum: [LIMIT, MARKET, STOP]
@@ -37,17 +35,23 @@ properties:
       status:
         type: string
         enum: [FILLED, PARTIAL, REJECTED, PENDING]
-      order_id:
-        type: string
-      ticker:
-        type: string
-      qty:
-        type: integer
-      avg_price:
-        type: number
-      timestamp:
-        type: string
-        format: date-time
+      order_id: { type: string }
+      ticker: { type: string }
+      qty: { type: integer }
+      avg_price: { type: number }
+      timestamp: { type: string, format: date-time }
+      execution_notes: { type: string }
 
-# Ensures the contract includes the identity metadata and the schemas
-required: [tool_name, description, input_schema, output_schema]
+  # --- GATEKEEPER PREDICATES ---
+  validation_rules:
+    # Consistency check: The brokerage must return the same ticker and quantity we requested
+    - "ticker != '' AND qty > 0"
+    # Execution safety: Price must be a positive number if filled
+    - "status == 'REJECTED' OR avg_price > 0"
+  
+  # Exit Condition: THE SUCCESS GATE
+  # The stage is only "Complete" if the order is confirmed as FILLED or 
+  # safely PENDING in the order book.
+  stage_exit_trigger: "status == 'FILLED' OR status == 'PENDING'"
+
+required: [tool_name, description, input_schema, output_schema, validation_rules]

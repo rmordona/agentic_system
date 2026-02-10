@@ -474,13 +474,15 @@ class ToolEnvelope(BaseModel, Generic[DomainType]):
     agent_role: str
     stage: str
     intent: str 
-    input: Dict[str, Any] 
+    input: Dict[str, Any] = Field(default_factory=dict)
     #output: Optional[Dict[AgentOutput, Any]] = None
     output: Optional[Any] = None
     error: Optional[str] = None
     started_at: str = Field(default_factory=lambda: datetime.now(UTC).isoformat())
     completed_at: Optional[str] = None
     success: bool = False
+    validation_rules: Optional[List[str]] = None
+    stage_exit_trigger: Optional[str] = None
 
 
 class ToolAdapter:
@@ -522,14 +524,14 @@ class ToolAdapter:
         stage = instruction.get("stage", "unknown")
 
         # The actual arguments for the MCP tool are inside 'execution'
-        mcp_args = instruction.get("execution", {}) 
-        
+        mcp_payload = instruction.get("payload", {}) 
+  
         logger.info(f"Tool Adapter Parameters: {self.parameters}")
 
         try:
             # We call the mcp_caller (the bridge we built) 
             # using the arguments extracted from the instruction
-            output = await self.mcp_caller(self.tool_file, tool_name, mcp_args)
+            _input, output = await self.mcp_caller(self.tool_file, tool_name, mcp_payload)
             success = True
             error = None
         except Exception as e:
@@ -540,32 +542,44 @@ class ToolAdapter:
 
         logger.info(f"Execution Completed ...")
 
+
+        logger.info(f"Wrapping output into a ToolEnvelope")
+        logger.info(f"Tool Adapter parameter: {self.parameters}")
+
+        props = self.parameters.get("properties", {})
+        validation_rules = props.get("validation_rules")
+        stage_exit_trigger = props.get("stage_exit_trigger")
+
+        logger.info(f"Validation Rules: {validation_rules}")
+        logger.info(f"Stage Exit Trigger: {stage_exit_trigger}")
         return ToolEnvelope(
             id=generate_uuid(),
             tool_name=tool_name,
             agent_role=agent_role,
             stage=stage,
             intent=instruction.get("task_description", self.description),
-            input=mcp_args, # We log the specific tool args, not the whole instruction
+            input=_input, # We log the specific tool args, not the whole instruction
             output=output,
             error=error,
             started_at=start_time,
             completed_at=datetime.now(UTC).isoformat(),
-            success=success
+            success=success,
+            validation_rules=validation_rules,
+            stage_exit_trigger=stage_exit_trigger
         )
 
-    async def mcp_caller(self, tool_file: Path, tool_name: str, args: dict):
+    async def mcp_caller(self, tool_file: Path, tool_name: str, payload: dict):
         """
         The bridge logic. Now with session persistence to keep 
         the 'Agnostic OS' snappy.
         """
         logger.info(f"Entering the mcp caller: {tool_name} for {tool_file}")
-        logger.info(f"Arguments: {args}")
+        logger.info(f"Arguments: {payload}")
 
         # 1. Check if we already have a live session (if we have an open pipe with an mcp server) for this file
         if tool_file in self._session_cache:
             session = self._session_cache[tool_file]
-            result = await session.call_tool(tool_name, arguments=args) # Makes a JSON-RPC call
+            result = await session.call_tool(tool_name, arguments=payload) # Makes a JSON-RPC call
             return result.content
 
         # 2. If not, spin it up (Your original logic)
@@ -596,8 +610,7 @@ class ToolAdapter:
         # We save this session. Next time this tool is called, we will stop at Step 1.
         self._session_cache[tool_file] = session
 
-        #  Sample payloads (Temporarily hardcoded for demo purposes only)
-        payload = get_sample_payload(tool_name)
+        # Validate and Reconstruct Payload
         input_args = self.construct_and_validate_mcp_payload(self.parameters, payload)
 
         logger.info(f"Payload: {payload}")
@@ -607,7 +620,7 @@ class ToolAdapter:
         logger.info(f"Now Calling the tool {tool_name} with the following payload: {input_args}")
         result = await session.call_tool(tool_name, arguments=input_args)
         logger.info(f"Received result: {result.content}")
-        return result.content
+        return input_args, result.content
 
     # --- Application in your code ---
     # Suppose the Agent only provides: {"ticker": "AAPL"}
@@ -748,10 +761,11 @@ class ToolManager:
                 tool_name = tool_spec_file.stem
                 logger.info(f"Reading tools spec ({tool_name}) from {tool_spec_file}") 
                 schema_result = AgentProfiler._load_schema(tool_spec_file)
+                logger.info(f"Schema Result: {schema_result}")
                 if schema_result.get("success"):
                     self.input_schema = schema_result.get("schema")
                     self.tool_map[tool_name].parameters = self.input_schema
-                    logger.info(f"Tool Adapater: {self.tool_map[tool_name]}")
+                    logger.info(f"Tool Adapter: {self.tool_map[tool_name]}")
                 else:
                     raise Exception(schema_result.get("error"))
 
@@ -925,50 +939,3 @@ class SystemContext:
         schemas = [adapter.get_schema() for adapter in self.tool_manager.tool_map.values()]
         logger.info(f"Exposed {len(schemas)} tools to runtime")
         return schemas
-
-
-################################## SAMPLE INPUT PAYLOAD
-
-def get_sample_payload(tool_name: str):
-    if tool_name == "get_market_regime_data":
-        return {
-            "market_data": {
-                "price": 182.45,
-                "volume": 55200000
-            },
-            "timestamp": "2026-02-08T23:45:00Z",
-            "risk_mode": "NORMAL"
-            }
-    if tool_name == "analyze_earnings_call":
-        return {
-        "ticker": "NVDA"
-        }
-    if tool_name == "calculate_var":
-        return {
-        "ticker": "NVDA",
-        "position_size": 25000.00
-        }
-    if tool_name == "execute_trade":    
-        return {
-        "ticker": "NVDA",
-        "side": "BUY",
-        "qty": 135,
-        "order_type": "LIMIT"
-        }
-    if tool_name == "get_gas_fees":  
-        return {
-        "network": "polygon"
-        }
-    if tool_name == "get_ticker_stats":  
-        return {
-        "ticker": "AAPL"
-        }
-    if tool_name == "search_macro_news":  
-        return {
-        "query": "CPI Inflation Data"
-        }
-    if tool_name == "search_ticker_news":  
-        return  {
-        "ticker": "TSLA"
-        }
-    return ""
