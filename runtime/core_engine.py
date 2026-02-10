@@ -1143,7 +1143,7 @@ class AgentPlanner:
 
         # 1. If artifact is blocked or completed → stop
         if artifact.status in ("blocked", "completed", "aborted"):
-            return {"next": "end" }
+            return {"next": "end", "reason" : artifact.status }
 
         # 2. If there are open tasks → route to agent runner
         if artifact.open_tasks:
