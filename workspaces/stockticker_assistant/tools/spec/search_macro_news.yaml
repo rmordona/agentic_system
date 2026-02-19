@@ -29,14 +29,33 @@ properties:
         source: { type: string }
         headline: { type: string }
 
-  # --- GATEKEEPER PREDICATES ---
-  validation_rules:
-    # Ensure the tool actually returned an array (not a null or error string)
-    - "search_macro_news exists"
-  
-  # Exit Condition: THE DATA DENSITY GATE
-  # We use the 'exists' check on the first element to ensure the list isn't empty.
-  # If we want at least 3 news items, we check for index [2].
-  stage_exit_trigger: "search_macro_news.0 exists AND search_macro_news.2 exists"
+# --- GATEKEEPER PREDICATES ---
+validation_rules:
+  # Ensure the tool actually returned an array (not a null or error string)
+  - "search_macro_news exists"
 
-required: [tool_name, description, input_schema, output_schema, validation_rules]
+# --- HITL ESCALATION POLICY ---
+hitl_policy:
+  trigger_conditions:
+    # 1. Low Density: We have news, but fewer than 5 items (potential search failure)
+    - condition: "NOT search_macro_news.4 exists"
+      reason: "INSUFFICIENT_NEWS_DENSITY"
+
+    # 2. Source Concentration: All news is coming from the same source (echo chamber risk)
+    # Note: Requires a custom predicate function 'is_diversified'
+    - condition: "is_diversified(search_macro_news) == False"
+      reason: "SOURCE_BIAS_DETECTED"
+
+    # 3. Keyword Redundancy: 80% of headlines contain the exact same string 
+    # (Suggests a single news event is drowning out broader macro context)
+    - condition: "semantic_overlap(search_macro_news) > 0.8"
+      reason: "REDUNDANT_NEWS_SIGNAL"
+
+  interaction_mode: "CURATE_AND_REFILTER"
+  allow_state_mutation: true
+
+# --- UPDATED GATEKEEPER EXIT ---
+# Stage exits if we have at least 3 items AND no quality flags were raised.
+stage_exit_trigger: "search_macro_news.2 exists AND requires_intervention == False"
+
+required: [tool_name, description, input_schema, output_schema, validation_rules, hitl_policy]

@@ -20,6 +20,10 @@
 # -----------------------------------------------------------------------------
 
 from __future__ import annotations
+
+import sys
+import time
+import itertools
 import asyncio
 from typing import Any, Dict, Optional
 from events.event_bus import EventBus
@@ -105,21 +109,26 @@ class Orchestrator:
         # Configuration: The 'thread_id' allows for state persistence
         config = {
             "configurable": {"thread_id": "session_123"},
-            "recursion_limit": 5  # Safety valve: Max 50 node transitions
+            "recursion_limit": 8  # Safety valve: Max 50 node transitions
         }
 
+        iter = 0
         async for event in self._graph.astream(self.initial_state, config, stream_mode="updates"):
+            iter = iter + 1
+            first_key = list(event)[0]
+            logger.info( "=====================================================================================================")
+            logger.info(f" (R)   Iteration {iter}:   We completed {first_key} from graph.astream, and an event is emitted.     ")
+            logger.info( "=====================================================================================================")
 
-            logger.info("<-------------------- We are inside graph.astream - an event is emitted ... -------------------> ")
-            logger.info(f"Event yield: {event}")
-            logger.console(f"State: {self.initial_state}")
+            logger.info(f"Event yield: {first_key}")
 
-            self.hitl_loop(event)
+            # self.hitl_loop(event)
 
-            logger.info("Emitting graph_event ...")
+
+            self.spinner_task()
 
             await self.event_bus.emit("graph_event", event)
-            logger.info("Now waiting for graph_event response")
+            logger.info("Now running next iteration and waiting for graph_event response")
 
         logger.info("Exited from graph.astream")
 
@@ -133,6 +142,16 @@ class Orchestrator:
             )
 
         return self.initial_state
+
+    def spinner_task(self):
+        spinner = itertools.cycle(['-', '/', '|', '\\'])
+        print("\rProcessing... ", end="")
+        
+        for _ in range(20): # Simulate a task
+            sys.stdout.write(next(spinner))
+            sys.stdout.flush()
+            time.sleep(0.1)
+            sys.stdout.write('\b') # Backspace to overwrite the character
 
     def hitl_loop(self, event: Any):
 

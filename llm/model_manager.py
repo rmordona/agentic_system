@@ -45,8 +45,11 @@
 #   © 2026 Raymond M.O. Ordona. All rights reserved.
 # -----------------------------------------------------------------------------
 
+from pathlib import Path
 from typing import Optional, Dict, Tuple, Any
 from datetime import datetime
+
+from langchain_core.prompts import PromptTemplate
 
 from llm.chatmodels.chatmodel_factory import ChatModelFactory
 from llm.embeddings.embedding_factory import EmbeddingFactory
@@ -72,13 +75,18 @@ class ModelSchema:
 '''
 
 class ModelManager:
+
+    RUNTIME_TEMPLATE = Path(__file__).parent.parent / 'runtime' / 'domain_repo' / 'templates'
+
     def __init__(
         self,
         chatmodel_provider: str,
         embedding_provider: str,
         store_provider: str,
-        llm_config_dir: str
     ):
+
+        self.llm_dir = Path(__file__).parent  
+        logger.info(f"LLM Path: {self.llm_dir}")
 
         self.bound_tools = None
 
@@ -88,14 +96,14 @@ class ModelManager:
         # 1. Embeddings
         # -----------------------
         logger.info("Loading Embedding Factory")
-        EmbeddingFactory.load_config(llm_config_dir / "embeddings/config.json")
+        EmbeddingFactory.load_config(self.llm_dir / "embeddings/config.json")
         self.embedding_client = EmbeddingFactory.get(embedding_provider)
 
         # -----------------------
         # 2. Stores
         # -----------------------
         logger.info("Loading Store Factory")
-        StoreFactory.load_config(llm_config_dir / "stores/config.json")
+        StoreFactory.load_config(self.llm_dir / "stores/config.json")
         self.store = StoreFactory.get(store_provider, self.embedding_client) 
 
         logger.info(f"Loading reflection prompt")
@@ -115,7 +123,7 @@ class ModelManager:
         # -----------------------
         # Load chatmodel config once at platform startup
         logger.info("Loading Chat Model Factory")
-        ChatModelFactory.load_config(llm_config_dir / "chatmodels/config.json")
+        ChatModelFactory.load_config(self.llm_dir / "chatmodels/config.json")
         self.llm = ChatModelFactory.get(chatmodel_provider)
 
 
@@ -147,6 +155,34 @@ class ModelManager:
         # We store these to include them in the payload during _generate
         self.bound_tools = tools
         return self
+
+    # --------------------------------------------------
+    # LLM Model Helper Functions
+    # --------------------------------------------------
+    @staticmethod
+    def spin_model():
+        return ModelManager(
+            chatmodel_provider="ollama:qwen2:0.5b",
+            embedding_provider="ollama:nomic-embed-text:latest",
+            store_provider="in-memory-ollama",  
+        )
+
+    @staticmethod
+    def hydrate(template: str, variables: Dict[str, Any]) -> str:
+        logger.info("Hydrating ...")
+        prompt_template = PromptTemplate.from_template(template)
+        return prompt_template.invoke(variables).to_string()
+
+    @staticmethod
+    def read_prompt_template(template_dir: str, file_path: str):
+
+        template = template_dir / file_path
+
+        if not template.exists():
+            logger.error(f"Template path '{template}' does not exist")
+            raise FileNotFoundError(f"File path '{template}' does not exist")
+
+        return template.read_text(encoding="utf-8")
 
     # -----------------------------------------------------------------------------
     # async def ainvoke

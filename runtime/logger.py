@@ -83,7 +83,7 @@ class AgentLogger:
         if not cls._initialized:
             cls.initialize()
 
-        if component not in {"system", "runtime", "module"}:
+        if component not in {"system", "runtime", "module", "macro_services"}:
             raise ValueError("component must be 'system' or 'runtime'")
 
         if component == "runtime" and not workspace:

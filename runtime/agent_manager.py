@@ -61,8 +61,8 @@ class AgentManager:
             agent_md_path = subdir / "AGENT.md"
 
             # Agent Contracts
-            input_schema_yaml_path = subdir / "INPUT_SCHEMA.yaml"
-            output_schema_yaml_path = subdir / "OUTPUT_SCHEMA.yaml"
+            #input_schema_yaml_path = subdir / "INPUT_SCHEMA.yaml"
+            #output_schema_yaml_path = subdir / "OUTPUT_SCHEMA.yaml"
 
             if not agent_md_path.exists():
                 logger.warning(
@@ -70,6 +70,7 @@ class AgentManager:
                 )
                 continue
 
+            '''
             if not input_schema_yaml_path.exists():
                 logger.warning(
                     f"Skipping agent '{agent_name}': INPUT_SCHEMA.yaml not found"
@@ -81,6 +82,7 @@ class AgentManager:
                     f"Skipping agent '{agent_name}': OUTPUT_SCHEMA.yaml not found"
                 )
                 continue
+            '''
 
             # Register Agent
             try:
@@ -104,6 +106,8 @@ class AgentManager:
             # Read the Default Input Schema <--- Input and Output schema moved to ToolManager
             # We will be using this schema from a non-mcp call, e.g. producing json formats based on given 
             # input parameters (not from a multi-task agent perspective, but for a single-task agent perspective).
+
+            '''
             try:
 
                 input_result = AgentProfiler._load_schema(input_schema_yaml_path)
@@ -134,11 +138,13 @@ class AgentManager:
                     f"Failed to retrieve output schema for agent '{agent_name}': {e}",
                     exc_info=True,
                 )
+            '''
 
             # Profile the agent
             try:
 
-                self._profiles[agent_name] = AgentProfiler._compile_md(md_text, self.input_schema, self.output_schema)
+                self._profiles[agent_name] = AgentProfiler._compile_md(md_text)
+                #self._profiles[agent_name] = AgentProfiler._compile_md(md_text, self.input_schema, self.output_schema)
 
                 logger.info(f"Agent '{agent_name} is now profiled: {self._profiles[agent_name].role}")
 

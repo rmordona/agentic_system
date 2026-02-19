@@ -1,4 +1,4 @@
 git config --global http.postBuffer 524288000
 git add --all
-git commit -m "(POC) Clamping validation rule and stage exit triggers into MCP tools."
+git commit -m "(POC) Refactoring AgentRunner, AgentValidator, AgentPlanner, and AgentHITL - also cleared validation_rules."
 git push -u origin main

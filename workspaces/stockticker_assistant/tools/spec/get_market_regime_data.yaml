@@ -1,5 +1,7 @@
 type: object
 description: "Agnostic Tool Contract for Market Regime Analysis"
+
+# --- DATA SCHEMA (For AgentRunner) ---
 properties:
   tool_name: 
     type: string
@@ -41,13 +43,34 @@ properties:
           key_drivers: { type: array, items: { type: string } }
           trade_permission: { type: boolean }
 
-  # --- GATEKEEPER PREDICATES ---
-  # These strings will be parsed by Gatekeeper.parse_predicate()
-  validation_rules:
-    - "macro_analysis.risk_index >= 1 AND macro_analysis.risk_index <= 10"
-    - "macro_analysis.regime exists"
-  
-  # The "Green Light" condition for the overall Pipeline Stage
-  stage_exit_trigger: "macro_analysis.trade_permission == True"
 
-required: [tool_name, description, input_schema, output_schema, validation_rules]
+# --- GATEKEEPER PREDICATES ---
+# These strings will be parsed by PredicateEngine.parse_predicate()
+validation_rules:
+  - "macro_analysis.risk_index >= 1 AND macro_analysis.risk_index <= 10"
+  - "macro_analysis.regime exists"
+
+# --- HITL ESCALATION POLICY ---
+# This defines WHEN the conditional edge should route to AgentHITL
+hitl_policy:
+  trigger_conditions:
+    # 1. Uncertainty: LLM self-reports low confidence
+    - condition: "metadata.confidence_score < 0.85"
+      reason: "LOW_CONFIDENCE"
+    
+    # 2. Risk: The tool suggests a high-risk regime
+    - condition: "macro_analysis.risk_index > 8"
+      reason: "HIGH_RISK_THRESHOLD"
+    
+    # 3. Conflict: The regime is CRISIS_MODE but trade_permission is True
+    - condition: "macro_analysis.regime == 'CRISIS_MODE' AND macro_analysis.trade_permission == True"
+      reason: "POLICY_VIOLATION"
+
+  # Define what the human is allowed to do in the HITL node
+  interaction_mode: "REVIEW_AND_OVERRIDE" 
+  allow_state_mutation: true
+
+# The "Green Light" condition for the overall Pipeline Stage
+stage_exit_trigger: "macro_analysis.trade_permission == True AND hitl_flag == False"
+
+required: [tool_name, description, input_schema, output_schema, validation_rules, hitl_policy]

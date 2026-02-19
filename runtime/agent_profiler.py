@@ -65,7 +65,8 @@ class AgentProfiler:
     # Parse a single AGENT.md and produce AgentProfile
     # -------------------------------------------------------------------------
     @staticmethod
-    def _compile_md(md_text: str, input_schema: dict, output_schema: dict) -> AgentProfile:
+    def _compile_md(md_text: str) -> AgentProfile:
+    # def _compile_md(md_text: str, input_schema: dict, output_schema: dict) -> AgentProfile:
 
         logger.info("About to compile md ...")
 
@@ -77,8 +78,8 @@ class AgentProfiler:
         data = AgentProfiler._ast_to_dict(ast)
 
         # Add Input and Output Schema
-        data["input_schema"] = input_schema
-        data["output_schema"] = output_schema
+        #data["input_schema"] = input_schema
+        #data["output_schema"] = output_schema
 
         logger.info(f"Raw Data parsed: {data}")
 
@@ -206,34 +207,26 @@ class AgentProfiler:
             return val
 
     # -------------------------------------------------------------------------
-    # Retrieve Schema
+    # Retrieve Manifests
     # -------------------------------------------------------------------------
     @staticmethod
-    def _load_schema(schema_path: str) -> dict:
+    def _load_manifest(manifest_path: str) -> dict:
         try:
-            with open(schema_path, "r") as f:
-                schema = yaml.safe_load(f)
-                AgentProfiler.validate_schema_integrity(schema)
+            with open(manifest_path, "r") as f:
+                manifest = yaml.safe_load(f)
+            
+            # GATE 1: Standard JSON Schema Integrity (Recursively checks 'properties')
+            if not AgentProfiler.validate_schema_integrity(manifest):
+                raise ValueError("Data Schema Integrity Failed")
 
-            return {
-                "success": True,
-                "schema": schema,
-                "error": None,
-            }
+            # GATE 2: Custom Policy Integrity (Checks HITL and Rules)
+            if not AgentProfiler.validate_policy_integrity(manifest):
+                raise ValueError("Orchestration Policy Integrity Failed")
 
-        except FileNotFoundError:
-            return {
-                "success": False,
-                "schema": None,
-                "error": f"Schema file not found: {schema_path}",
-            }
+            return {"success": True, "manifest": manifest, "error": None}
 
         except Exception as e:
-            return {
-                "success": False,
-                "schema": None,
-                "error": f"Failed to load schema: {str(e)}",
-            }
+            return {"success": False, "manifest": None, "error": str(e)}
 
     # -------------------------------------------------------------------------
     # Validate Integrity of schema.
@@ -253,7 +246,7 @@ class AgentProfiler:
         """
 
         # ------------------------------------------------------------------
-        # 0. Ignore non-schema nodes (fixes list / string crashes)
+        # 1. Ignore non-schema nodes (fixes list / string crashes)
         # ------------------------------------------------------------------
         if not isinstance(schema, dict):
             return True
@@ -262,8 +255,16 @@ class AgentProfiler:
         if definitions is None:
             definitions = schema.get("definitions", {})
 
+        # 2. Check Root-Level Requirements
+        # This uses your 'required' list to ensure the manifest is complete
+        required_keys = schema.get("required", [])
+        for key in required_keys:
+            if key not in schema and key not in schema.get("properties", {}):
+                logger.error(f"ERROR: Manifest missing required field: '{key}'")
+                return False
+
         # ------------------------------------------------------------------
-        # 1. Structural validity at current node
+        # 3. Structural validity at current node
         # ------------------------------------------------------------------
         s_type = schema.get("type")
         s_ref = schema.get("$ref")
@@ -275,7 +276,7 @@ class AgentProfiler:
             return False
 
         # ------------------------------------------------------------------
-        # 2. Validate $ref resolution
+        # 4. Validate $ref resolution
         # ------------------------------------------------------------------
         if s_ref:
             ref_key = s_ref.split("/")[-1]
@@ -293,7 +294,7 @@ class AgentProfiler:
             )
 
         # ------------------------------------------------------------------
-        # 3. Recurse into object properties
+        # 5. Recurse into object properties
         # ------------------------------------------------------------------
         if s_type == "object":
             props = schema.get("properties", {})
@@ -313,7 +314,7 @@ class AgentProfiler:
                         return False
 
         # ------------------------------------------------------------------
-        # 4. Recurse into arrays
+        # 6. Recurse into arrays
         # ------------------------------------------------------------------
         elif s_type == "array":
             items = schema.get("items")
@@ -332,3 +333,44 @@ class AgentProfiler:
 
         return True
 
+    # -------------------------------------------------------------------------
+    # Validate Policy Integrity
+    # -------------------------------------------------------------------------
+    @staticmethod
+    def validate_policy_integrity(manifest: dict) -> bool:
+        """
+        Validates the non-JSON-Schema metadata: 
+        hitl_policy, validation_rules, and stage_exit_trigger.
+        """
+        # 1. Validate validation_rules (must be a list of strings)
+        rules = manifest.get("validation_rules", [])
+        if not isinstance(rules, list) or not all(isinstance(r, str) for r in rules):
+            logger.error("ERROR: 'validation_rules' must be a list of strings.")
+            return False
+
+        # 2. Validate hitl_policy structure
+        hitl = manifest.get("hitl_policy")
+        if hitl:
+            if not isinstance(hitl, dict):
+                logger.error("ERROR: 'hitl_policy' must be a dictionary.")
+                return False
+            
+            # Check interaction mode
+            if "interaction_mode" not in hitl:
+                logger.error("ERROR: 'hitl_policy' missing 'interaction_mode'.")
+                return False
+
+            # Check trigger conditions
+            triggers = hitl.get("trigger_conditions", [])
+            for i, trig in enumerate(triggers):
+                if not all(k in trig for k in ("condition", "reason")):
+                    logger.error(f"ERROR: HITL trigger at index {i} missing 'condition' or 'reason'.")
+                    return False
+        
+        # 3. Validate stage_exit_trigger (must be a string)
+        exit_trigger = manifest.get("stage_exit_trigger")
+        if exit_trigger and not isinstance(exit_trigger, str):
+            logger.error("ERROR: 'stage_exit_trigger' must be a string predicate.")
+            return False
+
+        return True

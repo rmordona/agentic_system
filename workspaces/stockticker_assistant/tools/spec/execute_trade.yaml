@@ -42,16 +42,40 @@ properties:
       timestamp: { type: string, format: date-time }
       execution_notes: { type: string }
 
-  # --- GATEKEEPER PREDICATES ---
-  validation_rules:
-    # Consistency check: The brokerage must return the same ticker and quantity we requested
-    - "ticker != '' AND qty > 0"
-    # Execution safety: Price must be a positive number if filled
-    - "status == 'REJECTED' OR avg_price > 0"
-  
-  # Exit Condition: THE SUCCESS GATE
-  # The stage is only "Complete" if the order is confirmed as FILLED or 
-  # safely PENDING in the order book.
-  stage_exit_trigger: "status == 'FILLED' OR status == 'PENDING'"
+# --- GATEKEEPER PREDICATES ---
+validation_rules:
+  # Consistency check: The brokerage must return the same ticker and quantity we requested
+  - "ticker != '' AND qty > 0"
+  # Execution safety: Price must be a positive number if filled
+  - "status == 'REJECTED' OR avg_price > 0"
 
-required: [tool_name, description, input_schema, output_schema, validation_rules]
+# --- HITL ESCALATION POLICY ---
+hitl_policy:
+  trigger_conditions:
+    # 1. Verification: Every 'BUY' order over a certain quantity requires a human signature
+    - condition: "side == 'BUY' AND qty > metadata.max_auto_qty"
+      reason: "SIZE_THRESHOLD_EXCEEDED"
+
+    # 2. Safety: The agent attempts a 'MARKET' order (high slippage risk)
+    - condition: "order_type == 'MARKET'"
+      reason: "MARKET_ORDER_RISK_ADVISORY"
+
+    # 3. Anomaly: The trade was REJECTED by the broker
+    # Instead of the agent retrying blindly, a human must investigate the rejection reason.
+    - condition: "status == 'REJECTED'"
+      reason: "BROKER_REJECTION_INVESTIGATION"
+
+    # 4. Contextual Drift: The agent is selling a ticker that isn't in the current portfolio_state
+    - condition: "side == 'SELL' AND ticker NOT IN state.portfolio_holdings"
+      reason: "SHORT_SELL_ATTEMPT_DETECTED"
+
+  # Interaction: The human must provide an MFA-style confirmation or manual override
+  interaction_mode: "MANDATORY_SIGN_OFF"
+  allow_state_mutation: true
+
+# --- UPDATED GATEKEEPER EXIT ---
+# No trade is ever considered "Exited" from this stage without 
+# either a clean automated fill or a human-cleared intervention flag.
+stage_exit_trigger: "(status == 'FILLED' OR status == 'PENDING') AND requires_intervention == False"
+
+required: [tool_name, description, input_schema, output_schema, validation_rules, hitl_policy]

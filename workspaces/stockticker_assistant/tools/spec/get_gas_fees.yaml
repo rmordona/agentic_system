@@ -34,15 +34,34 @@ properties:
         type: number
         description: "Suggested tip for miners/validators."
 
-  # --- GATEKEEPER PREDICATES ---
-  validation_rules:
-    # Ensure we didn't get a negative fee or a null response
-    - "base_fee_gwei >= 0"
-    - "network exists"
-  
-  # Exit Condition: THE COST GATE
-  # We only proceed to the next stage if the network is not in an 'Extreme' state
-  # AND the base fee is under a specific threshold (e.g., 80 Gwei for Ethereum)
-  stage_exit_trigger: "status != 'Extreme' AND base_fee_gwei < 80"
+# --- GATEKEEPER PREDICATES ---
+validation_rules:
+  # Ensure we didn't get a negative fee or a null response
+  - "base_fee_gwei >= 0"
+  - "network exists"
 
-required: [tool_name, description, input_schema, output_schema, validation_rules]
+# --- HITL ESCALATION POLICY ---
+hitl_policy:
+  trigger_conditions:
+    # 1. Congestion Guard: Status is 'Extreme'
+    # The agent is blocked by the exit trigger, but HITL allows a human to say "Pay it anyway."
+    - condition: "status == 'Extreme'"
+      reason: "NETWORK_CONGESTION_CRITICAL"
+
+    # 2. Economic Anomaly: Gas fee is > 15% of the intended trade value (requires state context)
+    - condition: "(base_fee_gwei * metadata.estimated_gas_units) > (state.target_trade_value * 0.15)"
+      reason: "GAS_FEE_UNPROFITABLE"
+
+    # 3. Volatility Spike: Fee is 2x higher than the last_cached_fee in state
+    - condition: "base_fee_gwei > (state.last_gas_price * 2.0)"
+      reason: "GAS_PRICE_SPIKE_DETECTED"
+
+  # Interaction: Human can 'Snooze' (wait 5 mins), 'Force Proceed', or 'Cancel Stage'
+  interaction_mode: "THRESHOLD_OVERRIDE"
+  allow_state_mutation: true
+
+# --- UPDATED GATEKEEPER EXIT ---
+# Stage exits if fees are low OR if a human has manually cleared the 'Extreme' warning.
+stage_exit_trigger: "(status != 'Extreme' AND base_fee_gwei < 80) OR (requires_intervention == False AND hitl_override == True)"
+
+required: [tool_name, description, input_schema, output_schema, validation_rules, hitl_policy]

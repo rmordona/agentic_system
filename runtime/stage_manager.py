@@ -161,6 +161,8 @@ class StageManager:
 
         self._order: List[str] = []
 
+        self.policy_registry: PolicyRegistry = None
+
     def load_pipeline_stages(self):
         # Instantiate the PipelineAdapter
         self.pipeline_adapter = PipelineAdapter(

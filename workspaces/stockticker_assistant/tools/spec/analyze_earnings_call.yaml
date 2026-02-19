@@ -36,14 +36,32 @@ properties:
         type: boolean
         description: "Whether the transcript contained future financial targets."
 
-  # --- GATEKEEPER PREDICATES ---
-  # Validation: Ensuring the analysis is mathematically sound and has data
-  validation_rules:
-    - "sentiment_score >= -1 AND sentiment_score <= 1"
-    - "summary exists AND ticker != ''"
-  
-  # Exit Condition: Only proceed to 'Valuation' if guidance was provided
-  # and sentiment isn't critically bearish (e.g., > -0.8)
-  stage_exit_trigger: "has_forward_guidance == True AND sentiment_score > -0.8"
+# --- GATEKEEPER PREDICATES ---
+# Validation: Ensuring the analysis is mathematically sound and has data
+validation_rules:
+  - "sentiment_score >= -1 AND sentiment_score <= 1"
+  - "summary exists AND ticker != ''"
 
-required: [tool_name, description, input_schema, output_schema, validation_rules]
+# --- HITL ESCALATION POLICY ---
+hitl_policy:
+  trigger_conditions:
+    # 1. Extraction Quality: Summary is too brief for an earnings call (likely a scraper error)
+    - condition: "len(summary) < 200"
+      reason: "POTENTIAL_DATA_TRUNCATION"
+
+    # 2. Extreme Sentiment: Sentiment is +/- 0.9 (Very rare in corporate speak; check for hallucination)
+    - condition: "abs(sentiment_score) > 0.9"
+      reason: "EXTREME_SENTIMENT_ANOMALY"
+
+    # 3. Discrepancy: Summary mentions "Growth" but sentiment_score is Negative
+    - condition: "summary.contains('growth') AND sentiment_score < 0"
+      reason: "SEMANTIC_DISCREPANCY"
+
+  interaction_mode: "REVIEW_AND_REWRITE"
+  allow_state_mutation: true
+
+# Exit Condition: Only proceed to 'Valuation' if guidance was provided
+# and sentiment isn't critically bearish (e.g., > -0.8)
+stage_exit_trigger: "has_forward_guidance == True AND sentiment_score > -0.8 AND requires_intervention == False"
+
+required: [tool_name, description, input_schema, output_schema, validation_rules, hitl_policy]

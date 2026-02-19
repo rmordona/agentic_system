@@ -65,6 +65,7 @@
 #          │ - Updates artifact         │
 #          └────────────────────────────┘
 ############################################################
+from __future__ import annotations
 
 import re
 import os
@@ -76,6 +77,7 @@ import inspect
 import importlib.util
 import asyncio
 import yaml
+import copy
 from jsonschema import validate, ValidationError
 
 from pathlib import Path
@@ -89,19 +91,22 @@ from pydantic import BaseModel, Field, create_model
 from pydantic_core import PydanticUndefined
 from functools import wraps
 
+from contextlib import AsyncExitStack
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
-from contextlib import AsyncExitStack
+from mcp.client.streamable_http import streamablehttp_client
 
 from runtime.tools.mcp_client import MCPClient
 from runtime.tools.mcp_manager import MCPManager
-
 from runtime.artifact_factory import ArtifactSchema
-
 from runtime.agent_manager import AgentManager
 from runtime.agent_profiler import AgentOutput, AgentProfiler
 
-
+import logging
+# SILENCE THE NOISE
+logging.basicConfig(level=logging.WARNING) # Set global default
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("mcp").setLevel(logging.WARNING)
 
 from runtime.logger import AgentLogger
 logger = AgentLogger.get_logger(component="system")
@@ -203,7 +208,174 @@ class SchemaFactory:
 
         raise ValueError(f"Unsupported schema type: {schema_type}")
 
+    @staticmethod
+    def class_to_json_schema(model_class: type) -> str:
+        """
+        Convert a dynamically generated Pydantic model class into a JSON Schema string.
+        
+        Args:
+            model_class: The Pydantic model class (created by create_class_from_json)
+        
+        Returns:
+            JSON string representing the schema
+        """
+        if not issubclass(model_class, BaseModel):
+            raise ValueError("model_class must be a subclass of pydantic.BaseModel")
 
+        # Use Pydantic's built-in method to get JSON schema dict
+        schema_dict = model_class.model_json_schema()
+        
+        # Convert dict to JSON string
+        return json.dumps(schema_dict, indent=2)
+
+    @staticmethod
+    def class_to_payload(model_class: type) -> dict:
+        """
+        Convert a Pydantic model class into a payload dictionary template.
+        Recursively handles nested models, enums, defaults, arrays, and $refs.
+        """
+        if not issubclass(model_class, BaseModel):
+            raise ValueError("model_class must be a subclass of pydantic.BaseModel")
+
+        schema = model_class.model_json_schema()
+        defs = schema.get("$defs", {})
+
+        def _resolve(node):
+            if isinstance(node, dict):
+                if "$ref" in node:
+                    ref_path = node["$ref"]
+                    if ref_path.startswith("#/$defs/"):
+                        ref_name = ref_path.split("/")[-1]
+                        if ref_name not in defs:
+                            raise ValueError(f"Reference {ref_name} not found in $defs")
+                        return _resolve(copy.deepcopy(defs[ref_name]))
+                if "properties" in node:
+                    return {k: _resolve(v) for k, v in node["properties"].items()}
+                elif "enum" in node:
+                    return node["enum"][0] if node["enum"] else None
+                elif "default" in node:
+                    return node["default"]
+                elif node.get("type") == "array":
+                    items = node.get("items", {})
+                    return [_resolve(items)]
+                else:
+                    return None
+            elif isinstance(node, list):
+                return [_resolve(item) for item in node]
+            else:
+                return None
+
+        schema_copy = copy.deepcopy(schema)
+        schema_copy.pop("$defs", None)
+        return _resolve(schema_copy)
+
+    # --- Application in your code ---
+    # Suppose the Agent only provides: {"ticker": "AAPL"}
+    # And the contract for 'execute_trade' has a default order_type: "LIMIT"
+    # Usage:
+    #    final_args = construct_and_validate_payload(trade_contract, {"ticker": "AAPL", "qty": 10, "side": "BUY"})
+    #
+    # Now the call is safe and complete:
+    # result = await session.call_tool("execute_trade", arguments=final_args)
+    @staticmethod
+    def construct_and_validate_payload(schema_node: dict, payload: dict = None, branch: str = "input") -> dict:
+
+        logger.info(f"Schema Node: {schema_node}")
+        if not isinstance(schema_node, dict):
+            raise TypeError(
+                f"schema_node must be dict, got {type(schema_node).__name__}: {schema_node}"
+            )
+
+        if payload is None:
+            payload = {}
+
+        if not isinstance(payload, dict):
+            raise TypeError(
+                f"payload must be dict, got {type(payload).__name__}"
+            )
+
+        defs = schema_node.get("$defs", {})
+
+        # Select the correct schema branch
+        if ( "properties" in schema_node  and branch in schema_node["properties"]):
+            schema_node = SchemaFactory._resolve_ref( schema_node["properties"][branch], defs)
+
+
+        def resolve_ref(node):
+            return SchemaFactory._resolve_ref(node, defs)
+
+        def validate_constraints(val, sub_schema, path):
+            if isinstance(val, (int, float)):
+                if "minimum" in sub_schema and val < sub_schema["minimum"]:
+                    raise ValueError(f"Range Error at '{path}': {val} < {sub_schema['minimum']}")
+                if "maximum" in sub_schema and val > sub_schema["maximum"]:
+                    raise ValueError(f"Range Error at '{path}': {val} > {sub_schema['maximum']}")
+
+            if "enum" in sub_schema and val not in sub_schema["enum"]:
+                raise ValueError(f"Enum Error at '{path}': '{val}' not in {sub_schema['enum']}")
+
+            if "pattern" in sub_schema and isinstance(val, str):
+                if not re.match(sub_schema["pattern"], val):
+                    raise ValueError(f"Pattern Error at '{path}': Fails regex {sub_schema['pattern']}")
+
+        def build(node, data, path="root"):
+
+            node = resolve_ref(node)
+
+            if node.get("type") == "object":
+                obj = {}
+                props = node.get("properties", {})
+                required = node.get("required", [])
+
+                for key, sub_schema in props.items():
+                    current_path = f"{path}.{key}"
+
+                    sub_schema = resolve_ref(sub_schema)
+
+                    val = data.get(key) if isinstance(data, dict) else None
+                    if val is None:
+                        val = sub_schema.get("default")
+
+                    if val is None and key in required:
+                        raise ValueError(f"Missing required field: '{current_path}'")
+
+                    if val is not None:
+                        validate_constraints(val, sub_schema, current_path)
+
+                        if sub_schema.get("type") == "object":
+                            obj[key] = build(sub_schema, val or {}, current_path)
+                        elif sub_schema.get("type") == "array":
+                            if not isinstance(val, list):
+                                raise ValueError(f"Type Error at '{current_path}': Expected array")
+                            obj[key] = val
+                        else:
+                            obj[key] = val
+
+                return obj
+
+            return {}
+
+        return build(schema_node, payload)
+
+    @staticmethod
+    def _resolve_ref(node, defs):
+        if not isinstance(node, dict):
+            raise TypeError(f"_resolve_ref expected dict, got {type(node).__name__}")
+
+        if "$ref" not in node:
+            return node
+
+        ref = node["$ref"]
+
+        if not ref.startswith("#/$defs/"):
+            raise ValueError(f"Unsupported $ref format: {ref}")
+
+        def_name = ref.split("/")[-1]
+
+        if def_name not in defs:
+            raise ValueError(f"$ref target not found in $defs: {def_name}")
+
+        return defs[def_name]
 
 
 
@@ -233,18 +405,88 @@ class AgentContext:
         timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
         result_summary: str | None = None          # optional result / status
 
-##################################################################
+########################################################################################
 # DATA ENVELOPE
-##################################################################
-
+########################################################################################
+# What the Envelope adds to the Raw Tool Output:
+#     Traceability: request_id, parent_agent_id.
+#         Performance: latency_ms, token_usage.
+#         Reliability: confidence_score (crucial for your "Low Confidence" HITL trigger).
+#         Security: digital_signature to ensure the tool data wasn't tampered with.
+# ---------------------------------------------------------------------------------------
+# Note: To have a contract-centric architecture, and not agent-centric architecture,
+#       we bind DataAdapter and DataEnvelopt to a tool not an agent, specially when
+#       agents are replaceable but not tools. 
+# ---------------------------------------------------------------------------------------
+# Imagine you are running the get_market_regime_data tool:
+#
+#    AgentPlanner: Looks at the Manifest and says, "I need market data for $AAPL."
+#    DataAdapter (Input): Takes the Agent's state and formats it into the specific URL/JSON 
+#                required by the external AlphaVantage or Bloomberg API.
+#    External Tool: Returns messy, raw JSON.
+#    DataAdapter (Output): Cleans that JSON so it perfectly matches the output_schema defined 
+#                in your YAML.
+#    DataEnvelope: Wraps that clean data with a confidence_score and a timestamp.
+#    AgentValidator: Receives the Envelope. It reads the Manifest (YAML). It sees the data matches 
+#                the schema and checks the hitl_policy against the metadata in the envelope.
+########################################################################################
+################################################################################
+# DataAdapter / ToolManager vs DataEnvelope / ToolEnvelope Architecture
+#
+#                        ┌──────────────────────────────┐
+#                        │        Initialization        │
+#                        └──────────────────────────────┘
+#                                   │
+#           ┌───────────────────────┴───────────────────────┐
+#           │                                               │
+#  ┌──────────────────────┐                         ┌───────────────────────┐
+#  │     DataAdapter      │                         │      ToolManager      │
+#  │ (per tool, singleton)│                         │ (per tool, singleton) │
+#  │----------------------│                         │---------------------- │
+#  │ input_schema         │                         │ governance_policy     │
+#  │ output_schema        │                         │  - validation_rules   │
+#  │ validate_input()     │                         │  - hitl_policy        │
+#  │ validate_output()    │                         │  - stage_exit_trigger │
+#  └──────────────────────┘                         └───────────────────────┘
+#           │                                               │
+#           │                                               │
+#           ▼                                               ▼
+# ┌──────────────────────┐                             ┌───────────────────────┐
+# │   DataEnvelope       │                             │   ToolEnvelope        │
+# │ (per execution)      │                             │ (per execution)       │
+# │----------------------│                             │---------------------- │
+# │ input_data           │◀── validated by DataAdapter │ tool_name             │
+# │ output_data          │                             │ input_reference       │
+# │ runtime flags (opt)  │                             │ output_reference      │
+# │                      │                             │ runtime_state:        │
+# │                      │                             │  - hitl_required      │
+# │                      │                             │  - stage_complete     │
+# │                      │                             │  - validation_results │
+# │                      │                             │ governance_policy_ref │◀─── references ToolManager
+# └──────────────────────┘                             └───────────────────────┘
+#           │                                               │
+#           ▼                                               ▼
+#                 ┌───────────────────────────────┐
+#                 │         Execution             │
+#                 │ ToolAdapter.execute(input)    │
+#                 │ ToolManager.evaluate_governance│
+#                 └───────────────────────────────┘
+#
+# Key Points:
+# - DataAdapter: schemas, input/output validation
+# - ToolManager: static governance metadata loaded once
+# - DataEnvelope: per-execution validated input/output data
+# - ToolEnvelope: per-execution runtime state, references governance
+# - ToolAdapter: executes tool logic using envelope data
+################################################################################
 
 class DataEnvelope(BaseModel, Generic[DomainType]):
-    agent: str
+    tool: str
     type: str
     version: str
-    producer: str
+    producer: str # The Agent
     stage: str
-    created_at: datetime
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC).isoformat())
     payload: DomainType
     checksum: Optional[str]
     references: List[str] = []
@@ -267,20 +509,20 @@ class DataBridge:
 
 class DataAdapter(Generic[DomainType]):
     def __init__(self, 
-                agent_name: str, 
+                tool_name: str, 
                 schema_class: type[DomainType]):
-        self.agent_name = agent_name
+        self.tool_name = tool_name
         self.payload_schema = schema_class
-        logger.info(f"DataAdapter initialized for agent '{agent_name}'")
+        logger.info(f"DataAdapter initialized for agent '{tool_name}'")
 
     def create_envelope(
         self,
         payload:  Union[DomainType, dict],
-        producer: str,
+        producer: str,  # The Agent
         stage: str
     ) -> DataEnvelope[DomainType]:
         logger.info(
-            f"Creating DataEnvelope | domain={self.agent_name} producer={producer} stage={stage}"
+            f"Creating DataEnvelope | domain={self.tool_name} producer={producer} stage={stage}"
         )
         logger.debug(f"Validating payload against {self.payload_schema}")
 
@@ -295,18 +537,18 @@ class DataAdapter(Generic[DomainType]):
 
         # 2. Create typed envelope
         envelope = DataEnvelope[DomainType](
-            agent=self.agent_name,
+            tool=self.tool_name,
             type=self.payload_schema.__name__.lower(),
             version="1.0",
             producer=producer,
             stage=stage,
-            created_at=datetime.now(UTC),
+            # created_at=datetime.now(UTC),
             payload=payload_model,   
             checksum=checksum
         )
 
         logger.info(
-            f"DataEnvelope created | domain={envelope.agent} checksum={checksum}"
+            f"DataEnvelope created | domain={envelope.tool} checksum={checksum}"
         )
         return envelope
 
@@ -315,58 +557,67 @@ class DataManager:
 
         self.agent_manager = agent_manager
 
-        self.domain_map: Dict[str, DataAdapter] = {}
+        self.data_map: Dict[str, DataAdapter] = {}
         logger.info(f"DataManager initialized")
 
-    def scan_and_register_schema(self):
-        logger.info("Scanning schema domains for registered agents")
+    async def register_schema(self, manifests: dict):
+        logger.info("Scanning schema for tools")
 
-        agents = self.agent_manager.list_agents()
+        for tool_name in manifests:
 
-        for agent_name in agents:
-            logger.info(f"Agent name: {agent_name}")
-            profile = self.agent_manager.get_agent_profile(agent_name)
-            logger.info(f"Agent Profile: name={profile.name}, role={profile.role}")
-            logger.info(f"Agent Input Schema: {profile.input_schema}")
+            contract = manifests.get(tool_name)
+
+            properties = contract.get("properties")
+            if not isinstance(properties, dict):
+                raise ValueError("Invalid contract: missing 'properties' object")
+
+            input_schema = properties.get("input_schema")
+            output_schema = properties.get("output_schema")
+
+            if input_schema is None:
+                raise ValueError("Invalid contract: missing 'input_schema'")
+
+            if output_schema is None:
+                raise ValueError("Invalid contract: missing 'output_schema'")
+
+            validation_rules = contract.get("validation_rules", [])
+
+            hitl_policy = contract.get("hitl_policy", {})
+
+            stage_exit_trigger = contract.get("stage_exit_trigger", {})
+
 
             schema = {
                 "type": "object",
                 "required": ["input", "output"],
                 "properties": {
-                    "input": profile.input_schema,
-                    "output": profile.output_schema,
-                },
-                "definitions": {
-                    **profile.input_schema.get("definitions", {}),
-                    **profile.output_schema.get("definitions", {}),
-                },
-                "additionalProperties": False,
+                    "input": input_schema,
+                    "output": output_schema
+                }
             }
 
-            definitions = profile.input_schema.get("definitions", {})  # <-- extract definitions here
-
-            logger.info(f"Definition exists: {definitions}")
+            logger.info(f"Input/Output Schema for tool name ({tool_name}): {schema}")  
 
             try:
 
                 # 1. Usage in your Pipeline
-                DynamicAgentSchema: Type[DomainType] = SchemaFactory.create_class_from_json(f"{agent_name}Schema", schema, schema.get("definitions, {})"))
+                DynamicDataSchema: Type[DomainType] = SchemaFactory.create_class_from_json(f"{tool_name}Schema", schema, None)
 
-                logger.info(f"Dynamic Agent Model: {DynamicAgentSchema}")
+                logger.info(f"Dynamic Data Model: {DynamicDataSchema}")
 
-                if not DynamicAgentSchema:
-                    logger.warning(f"Schema class '{DynamicAgentSchema}'")
+                if not DynamicDataSchema:
+                    logger.warning(f"Schema class '{DynamicDataSchema}'")
                     continue
 
-                self.domain_map[agent_name] = DataAdapter(
-                    agent_name=agent_name,
-                    schema_class=DynamicAgentSchema # This is a schema class [type(DomainType)]
+                self.data_map[tool_name] = DataAdapter(
+                    tool_name=tool_name,
+                    schema_class=DynamicDataSchema # This is a schema class [type(DomainType)]
                 )
 
-                logger.info(f"Successfully registered data schema for '{agent_name}'")
+                logger.info(f"Successfully registered data schema for tool name: '{tool_name}'")
 
             except Exception as e:
-                logger.exception(f"Failed to load data for agent '{agent_name}': {e}")
+                logger.exception(f"Failed to load data for tool name: '{tool_name}': {e}")
 
 
     def get_default_for_type(self, field_type: Any) -> Any:
@@ -402,44 +653,157 @@ class DataManager:
 
 
     def get_adapter(self, agent_name: str) -> DataAdapter:
-        adapter = self.domain_map.get(agent_name)
+        adapter = self.data_map.get(agent_name)
         if not adapter:
             logger.error(f"DataAdapter not found for agent '{agent_name}'")
         return adapter
 
-    def get_initial_envelope(self, agent_name: str) -> DataEnvelope:
-        """
-        Leverages the registered DataAdapter to create a type-safe starting envelope.
-        """
-        # 1. Retrieve the adapter we found during scan_and_register
-        adapter = self.domain_map.get(agent_name)
+    async def process_input(self, tool_name: str, agent_name: str, stage: str, user_intent: str) -> DataEnvelope:
+        logger.info(f"To process input data, we need the tool to Run: {tool_name} by agent ({agent_name}) in stage ({stage})")
 
-        logger.info(f"Data Adapter for the given agent '{agent_name}': {adapter}")
+        # For now, use a SAMPLE PAYLOAD for DEMO purposes
+        execution_payload = await get_sample_payload(tool_name, user_intent)
 
-        if not adapter:
-            raise ValueError(f"Critical Error: Data agent '{agent_name}' is not registered.")
+        logger.info(f"Execution Payload: {execution_payload}")
+
+        data_adapter = self.data_map[tool_name]
 
         # 2. Use the adapter to create the envelope.
         # Passing an empty dict {} triggers the Pydantic schema's default values.
         # Producer is 'system' because this is the mission's 'Genesis' block.
-        instantiated_schema = self.instantiate_with_defaults(adapter.payload_schema)
-        initial_payload_dict = instantiated_schema.model_dump() # converts into a dict
+        instantiated_schema = self.instantiate_with_defaults(data_adapter.payload_schema)
+        instantiated_payload_dict = instantiated_schema.model_dump() # converts into a dict
 
         logger.info(
             f"Instantiated default payload | "
             f"type={type(instantiated_schema)} "
-            f"values={initial_payload_dict}"
+            f"values={instantiated_payload_dict}"
         )
 
+        payload_schema = data_adapter.payload_schema
+        logger.info(f"Payload Schema {payload_schema}")
+
+        json_schema  = SchemaFactory.class_to_json_schema(payload_schema)
+
+        # Validate and Reconstruct Payload
+        if isinstance(json_schema, str):
+            json_schema = json.loads(json_schema)
+
+        # Extract only the Input Structure form the Input Schema and populate it with Input Data
+        input_args = SchemaFactory.construct_and_validate_payload(json_schema, execution_payload, "input")
+        logger.info(f"Input Args: {input_args}")
+        instantiated_payload_dict["input"] = input_args
         try:
-            initial_envelope = adapter.create_envelope(
-                payload=initial_payload_dict, 
-                producer="system/genesis", 
-                stage="init"
+            data_env = data_adapter.create_envelope(
+                payload=instantiated_payload_dict, 
+                producer=agent_name, 
+                stage=stage
             )
-            return initial_envelope
+            return data_env
         except ValueError as e:
-            logger.error(f"Critical Error: Data domain '{agent_name}' schema, {e}")
+            logger.error(f"Critical Error: creating data envelope: agent '{agent_name}', stage '{stage}', tool '{tool_name}', {e}")
+
+
+    async def process_output(self, tool_name: str, tool_output: list, data_env: DataEnvelope) -> DataEnvelope:
+        logger.info(f"Tool Output: {tool_output}")
+
+        output_dict = {}
+        if tool_output and isinstance(tool_output, list):
+            first = tool_output[0]
+
+            logger.info(f"Text Output: {first.text}")
+            if isinstance(first.text, str):
+                output_dict = json.loads(first.text)
+        elif tool_output and isinstance(tool_output, dict):
+            output_dict = tool_output
+        logger.info(f"Output Dict: {output_dict}")
+
+        data_adapter = self.data_map[tool_name]
+        json_schema  = SchemaFactory.class_to_json_schema(data_adapter.payload_schema)
+
+        if isinstance(json_schema, str):
+            json_schema = json.loads(json_schema)
+        logger.info(f"json_schema: {json_schema}")
+
+        # Extract only the Input Structure form the Input Schema and populate it with Output Data
+        output_args = SchemaFactory.construct_and_validate_payload(json_schema, output_dict, "output")
+        logger.info(f"Output Args: {output_args}")
+
+        # Now update payload with the output
+        payload_dict = data_env.payload.model_dump()
+        payload_dict["output"] = output_args
+        data_env.payload = data_adapter.payload_schema(**payload_dict) 
+
+        data_env.checksum = generate_checksum(data_env.payload.model_dump())
+        logger.info(f"Payload dict: {data_env.payload.model_dump()}")
+        return data_env
+
+    def validate_output(self, raw_output: Any) -> BaseModel:
+        """
+        Validates tool execution output against the configured output_schema.
+
+        Supports:
+        - Pydantic model
+        - dict
+        - JSON string
+        - List[TextContent]
+        """
+
+
+
+        if raw_output is None:
+            raise ValueError("Tool returned None output")
+
+        #  Already validated model
+        if isinstance(raw_output, self.output_schema):
+            return raw_output
+
+        # If list (LLM-style output)
+        if isinstance(raw_output, list):
+            if not raw_output:
+                raise ValueError("Tool returned empty output list")
+
+            first = raw_output[0]
+
+            if not hasattr(first, "text"):
+                raise TypeError("Expected TextContent with .text field")
+
+            raw_output = first.text  # extract JSON string
+
+        # If JSON string
+        if isinstance(raw_output, str):
+            try:
+                raw_output = json.loads(raw_output)
+            except json.JSONDecodeError as e:
+                raise ValueError(f"Output is not valid JSON: {e}") from e
+
+        # If dict → validate with schema
+        if isinstance(raw_output, dict):
+            try:
+                return self.output_schema(**raw_output)
+            except ValidationError as e:
+                raise ValueError(
+                    f"Output validation failed: {e.errors()}"
+                ) from e
+
+        raise TypeError(
+            f"Invalid output type: expected dict, JSON string, "
+            f"TextContent list, or {self.output_schema.__name__}, "
+            f"got {type(raw_output).__name__}"
+        )
+
+    def list_available_input_schemas(self, tools: list) -> list:
+        schemas = []
+        for tool in tools:
+            logger.info(f"Loading schema for tool {tool}")
+            data_adapter = self.data_map.get(tool)
+            try:
+                json_payload  = SchemaFactory.class_to_payload(data_adapter.payload_schema)
+                schema = json_payload.get("input")
+                schemas.append(schema)
+            except Exception as e:
+                logger.info(f"- No Schema provided for tool {tool}")
+        return schemas
 
 
     def instantiate_with_defaults(self, model_class: Type[DomainType]) -> DomainType:
@@ -460,6 +824,7 @@ class DataManager:
 ##################################################################
 # TOOL ENVELOPE
 ##################################################################
+_URL_XHTTP = "http://127.0.0.1:8080/mcp"
 
 class ToolCall(TypedDict):
     agent: str
@@ -478,20 +843,21 @@ class ToolEnvelope(BaseModel, Generic[DomainType]):
     #output: Optional[Dict[AgentOutput, Any]] = None
     output: Optional[Any] = None
     error: Optional[str] = None
-    started_at: str = Field(default_factory=lambda: datetime.now(UTC).isoformat())
+    started_at: datetime = field(default_factory=lambda: datetime.now(UTC).isoformat())
     completed_at: Optional[str] = None
     success: bool = False
-    validation_rules: Optional[List[str]] = None
-    stage_exit_trigger: Optional[str] = None
-
+    governance_policy: Dict[str, Any] = Field(default_factory=dict)
 
 class ToolAdapter:
+
     def __init__(self, name: str, description: str, schema: dict, tool_file: Path):
         self.name = name
         self.description = description
         self.parameters = schema  # The MCP inputSchema (e.g., ticker, qty)
         self.tool_file = tool_file
         # self.mcp_caller = mcp_caller # The logic to run the MCP command
+
+        self.governance_policy: Dict[str, Any] = None 
 
         # This keeps the connections alive
         self._session_cache: Dict[Path, ClientSession] = {}
@@ -524,34 +890,34 @@ class ToolAdapter:
         stage = instruction.get("stage", "unknown")
 
         # The actual arguments for the MCP tool are inside 'execution'
-        mcp_payload = instruction.get("payload", {}) 
-  
-        logger.info(f"Tool Adapter Parameters: {self.parameters}")
+        payload_schema = instruction.get("payload", {}) 
+        logger.info(f"Payload Schema: {payload_schema}")
+        payload_dict = payload_schema.model_dump() # Turn into a dict
+        logger.info(f"Payload Dict: {payload_dict}")
+        mcp_payload = payload_dict.get("input")  
+        logger.info(f"MCP Payload: {mcp_payload}")
 
-        try:
-            # We call the mcp_caller (the bridge we built) 
-            # using the arguments extracted from the instruction
-            _input, output = await self.mcp_caller(self.tool_file, tool_name, mcp_payload)
+        # We call the mcp_caller (the bridge we built) 
+        # using the arguments extracted from the instruction
+        #_input, _output = await self.mcp_caller(self.tool_file, tool_name, mcp_payload)
+        _input  = mcp_payload
+        result = await ToolAdapter.mcp_xhttp_caller(_URL_XHTTP, tool_name, mcp_payload)
+
+        if result.get("status") == "success":
             success = True
             error = None
-        except Exception as e:
-            output = None
+            _output = result.get("output")
+        else:
+            _output = None
             success = False
-            error = str(e)
-            logger.exception(f"Tool execution failed: {e}")
+            error = result.get("message")
+            logger.exception(f"Tool execution failed: {error}")
 
         logger.info(f"Execution Completed ...")
 
-
         logger.info(f"Wrapping output into a ToolEnvelope")
-        logger.info(f"Tool Adapter parameter: {self.parameters}")
+        logger.info(f"Tool Adapter Governance Policy: {self.governance_policy}")
 
-        props = self.parameters.get("properties", {})
-        validation_rules = props.get("validation_rules")
-        stage_exit_trigger = props.get("stage_exit_trigger")
-
-        logger.info(f"Validation Rules: {validation_rules}")
-        logger.info(f"Stage Exit Trigger: {stage_exit_trigger}")
         return ToolEnvelope(
             id=generate_uuid(),
             tool_name=tool_name,
@@ -559,13 +925,12 @@ class ToolAdapter:
             stage=stage,
             intent=instruction.get("task_description", self.description),
             input=_input, # We log the specific tool args, not the whole instruction
-            output=output,
+            output=_output,
             error=error,
             started_at=start_time,
             completed_at=datetime.now(UTC).isoformat(),
             success=success,
-            validation_rules=validation_rules,
-            stage_exit_trigger=stage_exit_trigger
+            governance_policy = self.governance_policy
         )
 
     async def mcp_caller(self, tool_file: Path, tool_name: str, payload: dict):
@@ -574,7 +939,7 @@ class ToolAdapter:
         the 'Agnostic OS' snappy.
         """
         logger.info(f"Entering the mcp caller: {tool_name} for {tool_file}")
-        logger.info(f"Arguments: {payload}")
+        logger.info(f"Payload: {payload}")
 
         # 1. Check if we already have a live session (if we have an open pipe with an mcp server) for this file
         if tool_file in self._session_cache:
@@ -610,81 +975,88 @@ class ToolAdapter:
         # We save this session. Next time this tool is called, we will stop at Step 1.
         self._session_cache[tool_file] = session
 
-        # Validate and Reconstruct Payload
-        input_args = self.construct_and_validate_mcp_payload(self.parameters, payload)
-
         logger.info(f"Payload: {payload}")
-        logger.info(f"Input Args: {input_args}")
         # 3. Call the tool.  This finally executes the function inside your script 
         # and returns the list of content (text, images, or JSON) back to your ToolAdapter.
-        logger.info(f"Now Calling the tool {tool_name} with the following payload: {input_args}")
-        result = await session.call_tool(tool_name, arguments=input_args)
+        logger.info(f"Now Calling the tool {tool_name} with the following payload: {payload}")
+        result = await session.call_tool(tool_name, arguments=payload)
         logger.info(f"Received result: {result.content}")
-        return input_args, result.content
+        return payload, result.content
 
-    # --- Application in your code ---
-    # Suppose the Agent only provides: {"ticker": "AAPL"}
-    # And the contract for 'execute_trade' has a default order_type: "LIMIT"
-    # Usage:
-    #    final_args = construct_and_validate_mcp_payload(trade_contract, {"ticker": "AAPL", "qty": 10, "side": "BUY"})
-    #
-    # Now the call is safe and complete:
-    # result = await session.call_tool("execute_trade", arguments=final_args)
-    def construct_and_validate_mcp_payload(self, schema_node: dict, payload: dict = None) -> dict:
-        if payload is None:
-            payload = {}
-            
-        # NORMALIZE SCHEMA: Handle the nesting issue
-        # If we are looking at the root contract, dive into properties -> input_schema
-        if "properties" in schema_node and "input_schema" in schema_node["properties"]:
-            schema_node = schema_node["properties"]["input_schema"]
-        # Or if we were passed the input_schema wrapper directly
-        elif "input_schema" in schema_node:
-            schema_node = schema_node["input_schema"]
+    @classmethod
+    async def mcp_xhttp_caller(cls, url: str = _URL_XHTTP, tool_name: str = None, payload: dict = {}):
 
-        def validate_constraints(val, sub_schema, path):
-            if isinstance(val, (int, float)):
-                if "minimum" in sub_schema and val < sub_schema["minimum"]:
-                    raise ValueError(f"Range Error at '{path}': {val} < {sub_schema['minimum']}")
-                if "maximum" in sub_schema and val > sub_schema["maximum"]:
-                    raise ValueError(f"Range Error at '{path}': {val} > {sub_schema['maximum']}")
-            if "enum" in sub_schema and val not in sub_schema["enum"]:
-                raise ValueError(f"Enum Error at '{path}': '{val}' not in {sub_schema['enum']}")
-            if "pattern" in sub_schema and isinstance(val, str):
-                if not re.match(sub_schema["pattern"], val):
-                    raise ValueError(f"Pattern Error at '{path}': Fails regex {sub_schema['pattern']}")
+        logger.info(f"Entering the mcp xhttp caller: tool call ({tool_name}) for mcp endpoint ({url})")
+        logger.info(f"Payload: {payload}")
 
-        def build(node, data, path="root"):
-            # The core of the issue: ensure we are looking at the 'properties' of the schema object
-            if node.get("type") == "object":
-                obj = {}
-                props = node.get("properties", {})
-                required = node.get("required", [])
 
-                for key, sub_schema in props.items():
-                    current_path = f"{path}.{key}"
-                    
-                    # Extraction
-                    val = data.get(key) if isinstance(data, dict) else None
-                    if val is None:
-                        val = sub_schema.get("default")
-                    
-                    # Validation
-                    if val is None and key in required:
-                        raise ValueError(f"Missing required field: '{current_path}'")
 
-                    if val is not None:
-                        validate_constraints(val, sub_schema, current_path)
-                        
-                        if sub_schema.get("type") == "object":
-                            # Recurse with the nested data slice
-                            obj[key] = build(sub_schema, val or {}, current_path)
+        async with streamablehttp_client(url) as (read_stream, write_stream, _):
+            async with ClientSession(read_stream, write_stream) as session:
+                await session.initialize()
+
+                try:
+                    result = await session.call_tool(tool_name, payload)
+                    logger.info(f"Received xhttp result: {result}")
+
+                    if result.isError:
+                        return {
+                            "status": "error",
+                            "tool": tool_name,
+                            "message": result.content
+                        }
+
+                    # 1️⃣ Prefer structuredContent (best option)
+                    if getattr(result, "structuredContent", None):
+                        return {
+                            "status": "success",
+                            "tool": tool_name,
+                            "output": result.structuredContent
+                        }
+
+                    # 2️⃣ Handle content safely (could be single object or iterable)
+                    content = getattr(result, "content", None)
+
+                    if content:
+                        outputs = []
+
+                        # If it's iterable (list-like), iterate
+                        if isinstance(content, (list, tuple)):
+                            items = content
                         else:
-                            obj[key] = val
-                return obj
-            return {} # Return empty dict instead of None
+                            # Single content block case
+                            items = [content]
 
-        return build(schema_node, payload)
+                        for item in items:
+                            if hasattr(item, "text"):
+                                outputs.append(item.text)
+                            elif hasattr(item, "json"):
+                                outputs.append(item.json)
+                            else:
+                                outputs.append(str(item))
+
+                        return {
+                            "status": "success",
+                            "tool": tool_name,
+                            "output": outputs
+                        }
+
+                    # 3️⃣ Fallback
+                    return {
+                        "status": "success",
+                        "tool": tool_name,
+                        "output": None
+                    }
+
+                except Exception as e:
+                    return {
+                        "status": "error",
+                        "tool": tool_name,
+                        "message": str(e)
+                    }
+
+
+
 
     # Invoked from ToolManager.shutdown
     async def shutdown(self):
@@ -709,70 +1081,24 @@ class ToolManager:
         self._session_cache: Dict[Path, ClientSession] = {}
         self._exit_stack: Dict[Path, AsyncExitStack] = {}
 
-    async def scan_and_register_tools(self, workspace_path: Path) -> None:
-        self.tools_dir = workspace_path / "tools" / "mcp"
+    async def scan_and_register_tools(self) -> None:
 
-        logger.info(f"Scanning for agents tools {self.tools_dir}")
+        logger.info(f"Extracting agents tools from MCP endpoints ... ")
+        registry = await self.extract_tools_via_xhttp()
+        logger.info(f"Registration: {registry}")
 
-        if not self.tools_dir.exists() or not self.tools_dir.is_dir():
-            raise ValueError(f"Invalid agent base path: {self.tools_dir}")
-
-        for tool_file in self.tools_dir.iterdir():
-            if tool_file.suffix != ".py": # Avoid temp files or __pycache__
-                continue
-
-            try:
-                logger.info(f"Reading tools from {tool_file}")
-                # Registry is the list of dicts we just got working
-                registry = await self.extract_tools_via_protocol(tool_file)
-
-                for tool_data in registry:
-                    # Create the adapter
-                    adapter = ToolAdapter(
-                        name=tool_data["name"],
-                        description=tool_data["description"],
-                        schema=tool_data["arguments"],
-                        tool_file=tool_file,
-                        # mcp_caller=self.call_mcp_tool
-                    )
+        for tool_data in registry:
+            adapter = ToolAdapter(
+                    name=tool_data["name"],
+                    description=tool_data["description"],
+                    schema=tool_data["arguments"],
+                    tool_file="",
+                    # mcp_caller=self.call_mcp_tool
+                )
+            # Register in the map
+            self.tool_map[adapter.name] = adapter
                     
-                    # Register in the map
-                    self.tool_map[adapter.name] = adapter
-                    
-                logger.info(f"Successfully registered {len(registry)} tools from {tool_file.name}")
-
-            except Exception as e:
-                logger.error(f"Failed to register tools from {tool_file.name}: {e}", exc_info=True)
-
-        logger.info(f"Agent scan complete. Total registered tools: {len(self.tool_map)}")
-
-    async def scan_and_register_tools_spec(self, workspace_path: Path) -> None:
-        self.tools_spec_dir = workspace_path / "tools" / "spec"
-
-        logger.info(f"Scanning for agents tools spec {self.tools_spec_dir}")
-
-        if not self.tools_spec_dir.exists() or not self.tools_spec_dir.is_dir():
-            raise ValueError(f"Invalid agent base path: {self.tools_spec_dir}")
-
-        for tool_spec_file in self.tools_spec_dir.iterdir():
-            if tool_spec_file.suffix != ".yaml": # Avoid temp files or __pycache__
-                continue
-            try:
-                tool_name = tool_spec_file.stem
-                logger.info(f"Reading tools spec ({tool_name}) from {tool_spec_file}") 
-                schema_result = AgentProfiler._load_schema(tool_spec_file)
-                logger.info(f"Schema Result: {schema_result}")
-                if schema_result.get("success"):
-                    self.input_schema = schema_result.get("schema")
-                    self.tool_map[tool_name].parameters = self.input_schema
-                    logger.info(f"Tool Adapter: {self.tool_map[tool_name]}")
-                else:
-                    raise Exception(schema_result.get("error"))
-
-            except Exception as e:
-                logger.error(f"Failed to register tools from {tool_spec_file.name}: {e}", exc_info=True)
-
-        logger.info(f"Tool Spec scan complete. Total registered tools spec: {len(self.tool_map)}")
+        logger.info(f"Agent tool scan complete. Total registered tools: {len(self.tool_map)}")
 
     async def extract_tools_via_protocol(self, tool_file: Path) -> list[dict]:
         import sys
@@ -819,6 +1145,63 @@ class ToolManager:
             
         return registry
 
+
+    async def extract_tools_via_xhttp(self, url: str = _URL_XHTTP ) -> list[dict]:
+        async with streamablehttp_client(url) as (read_stream, write_stream, _):
+            async with ClientSession(read_stream, write_stream) as session:
+                await session.initialize()
+
+                # Get the list of tools
+                tools_list = await session.list_tools()
+
+                registry = []
+
+                for tool in tools_list.tools:
+                    # Get the original Python function for introspection
+                    func = getattr(tool, "func", None)
+                    params = []
+
+                    if func is not None:
+                        sig = inspect.signature(func)
+                        for name, param in sig.parameters.items():
+                            params.append({
+                                "name": name,
+                                "type": str(param.annotation) if param.annotation != inspect._empty else "Any",
+                                "default": param.default if param.default != inspect._empty else None
+                            })
+
+                    registry.append({
+                        "name" : tool.name,
+                        "description": getattr(tool, "description", ""),
+                        "arguments": params
+                    })
+                return registry
+
+    async def register_governance_policy(self, manifests: dict):
+        logger.info("Scanning schema for tools")
+
+        for tool_name in manifests:
+
+            contract = manifests.get(tool_name)
+
+            validation_rules = contract.get("validation_rules", [])
+
+            hitl_policy = contract.get("hitl_policy", {})
+
+            stage_exit_trigger = contract.get("stage_exit_trigger", {})
+
+            governance_policy = {
+                "validation_rules": validation_rules,
+                "hitl_policy": hitl_policy,
+                "stage_exit_trigger": stage_exit_trigger
+            }
+
+            logger.info(f"Governance Policy for tool name ({tool_name}): {governance_policy}")  
+
+            self.tool_map[tool_name].governance_policy = governance_policy
+
+            logger.info(f"Successfully registered governance policy for tool name: '{tool_name}'")
+
     async def get_adapter(self, tool_name: str) -> ToolAdapter:
         tool_adapter = self.tool_map[tool_name]
         if tool_adapter:
@@ -853,10 +1236,9 @@ class ToolManager:
             })
         return llm_tools
 
-    def list_available_tools(self):
+    def list_available_tools(self) -> list:
         keys = self.tool_map.keys()
-        result = ", ".join(keys)
-        return result
+        return list(keys)
 
     def auto_envelope_wrapper(func, agent_role: str, stage: str):
         @wraps(func)
@@ -893,13 +1275,6 @@ class ToolManager:
 
         return wrapper
 
-    def get_initial_envelope(self, agent_name: str) -> ToolEnvelope:
-        """
-        Leverages the registered DataAdapter to create a type-safe starting envelope.
-        """
-        # 1. Retrieve the adapter we found during scan_and_register
-        adapter = self.tool_map.get(agent_name)
-
 
 ##################################################################
 # SYSTEM CONTEXT
@@ -914,6 +1289,8 @@ class SystemContext:
         self.data_manager = DataManager(agent_manager)
         self.tool_manager = ToolManager(agent_manager)
 
+        self.manifests: Dict[str, Any] = {}
+
     @classmethod
     async def create(cls, template_repo: str, workspace_path: str, agent_manager: AgentManager):
         """
@@ -921,21 +1298,206 @@ class SystemContext:
         """
         logger.info("Initializing SystemContext via Async Factory")
         instance = cls(template_repo, workspace_path, agent_manager)
-        
-        # 1. Sync registration For Data
-        instance.data_manager.scan_and_register_schema()
-        
-        # 2. Async registration For Tool 
-        await instance.tool_manager.scan_and_register_tools(instance.workspace_path)
 
-        # 3. Async registration For Tool Spec
-        await instance.tool_manager.scan_and_register_tools_spec(instance.workspace_path)
-        
-        logger.info("SystemContext initialization complete")
+        # 1. Load Manifest
+        await cls.load_manifest(instance, workspace_path)
+                
+        # 2. Async registration For Tool
+        await instance.tool_manager.scan_and_register_tools()
+
+        # 3. ASync registration For Data Schema
+        await instance.data_manager.register_schema(instance.manifests)
+
+        # 4. Async registration For Governance
+        await instance.tool_manager.register_governance_policy(instance.manifests)
+
+
         return instance
+
+    async def load_manifest(self, workspace_path: Path) -> None:
+        self.manifest_dir = workspace_path / "tools" / "spec"
+
+        logger.info(f"Scanning Manifest {self.manifest_dir}")
+
+        if not self.manifest_dir.exists() or not self.manifest_dir.is_dir():
+            raise ValueError(f"Invalid agent base path: {self.manifest_dir}")
+
+        for manifest_file in self.manifest_dir.iterdir():
+            if manifest_file.suffix != ".yaml": # Avoid temp files or __pycache__
+                continue
+            try:
+                tool_name = manifest_file.stem
+                logger.info(f"Reading manifest for tool ({tool_name}) from {manifest_file}") 
+                manifest_result = AgentProfiler._load_manifest(manifest_file) 
+                if manifest_result.get("success"):
+                    self.manifests[tool_name] = manifest_result.get("manifest")
+                    logger.info(f"Tool Manifest: { self.manifests[tool_name]}")
+                else:
+                    raise Exception(manifest_result.get("error"))
+
+            except Exception as e:
+                logger.error(f"Failed to laod manifest for tool ({tool_name}) from {manifest_file.name}: {e}", exc_info=True)
+
+        logger.info(f"Tool Manifest scan complete. Total loaded manifests: {len(self.manifests)}")
 
     def get_runtime_tools(self):
         logger.debug("Collecting runtime tool schemas for LLM binding")
         schemas = [adapter.get_schema() for adapter in self.tool_manager.tool_map.values()]
         logger.info(f"Exposed {len(schemas)} tools to runtime")
         return schemas
+
+
+
+################################## SAMPLE INPUT PAYLOAD FOR MCP TOOLS
+from llm.model_manager import ModelManager
+
+async def get_sample_payload(tool_name: str, user_intent: str):
+    if tool_name == "get_market_regime_data":
+        _output = await ToolAdapter.mcp_xhttp_caller(_URL_XHTTP, 'fetch_alpaca_market')
+        logger.info(f"Result: {_output}")
+        if _output.get("status") == "success":
+            success = True
+            error = None
+            market_data =  _output.get("output")
+        else:
+            market_data = None
+            success = False
+            error = _output.get("message")
+            logger.exception(f"Tool execution failed: {error}")
+
+        logger.info(f"Result: {market_data}")
+        return market_data
+    if tool_name == "analyze_earnings_call":
+        return {
+        "ticker": "NVDA"
+        }
+    if tool_name == "calculate_var":
+        return {
+        "ticker": "NVDA",
+        "position_size": 25000.00
+        }
+    if tool_name == "execute_trade":    
+        return {
+        "ticker": "NVDA",
+        "side": "BUY",
+        "qty": 135,
+        "order_type": "LIMIT"
+        }
+    if tool_name == "get_gas_fees":  
+        return {
+        "network": "polygon"
+        }
+    if tool_name == "get_ticker_stats":  
+        return {
+        "ticker": "AAPL"
+        }
+    if tool_name == "search_macro_news":  
+        return {
+        "query": "CPI Inflation Data"
+        }
+    if tool_name == "search_ticker_news":  
+        logger.info(f"[Search Ticker News] fetch input ticker first (extract_ticker), with payload: {user_intent}")
+        _output = await ToolAdapter.mcp_xhttp_caller(_URL_XHTTP, 'extract_ticker', { "user_intent" : user_intent } )
+        logger.info(f"Result: {_output}")
+        if _output.get("status") == "success":
+            success = True
+            error = None
+            ticker = _output.get("output")
+        else:
+            ticker = None
+            success = False
+            error = _output.get("message")
+            logger.exception(f"Tool execution failed: {error}")
+
+        logger.info(f"Result: {ticker}")
+        return ticker
+
+        #articles = search_ticker_news("TSLA")
+        #return await classify_news(articles)
+        #ticker = await extract_ticker(user_intent)
+        #logger.info(f"Ticker: {ticker}")
+        #return ticker
+
+
+    return ""
+
+
+'''
+from runtime.config_api_manager import ConfigApiManager
+
+cfg = ConfigApiManager()
+_API_KEY = cfg.api_key
+_API_SECRET = cfg.api_secret
+
+
+
+from macro_services.macro_market import  HTTPMarketDataProvider, MacroMarketDataService
+def fetch_alpaca_market():
+    provider = HTTPMarketDataProvider(
+        api_key=_API_KEY,
+        api_secret=_API_SECRET
+    )
+    
+    macro_service = MacroMarketDataService(provider)
+
+    macro_payload = macro_service.fetch_macro_market_data()
+
+    logger.info(f"Macro Payload: {macro_payload}")
+
+    logger.info("SystemContext initialization complete")     
+
+    return macro_payload
+
+from macro_services.alpaca_news_provider import  AlpacaNewsProvider
+def search_ticker_news(ticker: str):
+    # To Call: asyncio.run(run_news_analysis("AAPL"))
+
+    # 1. Instantiate the class (creates the connection)
+    provider = AlpacaNewsProvider( api_key=_API_KEY, api_secret=_API_SECRET)
+    
+    # 2. Invoke the specific method
+    # This returns the DataEnvelope we designed earlier
+    envelope = provider.get_ticker_news(ticker, limit=3)
+    logger.info(f"Completed News Search: {envelope}")
+    # 3. Use the data
+    if envelope["metadata"]["status"] == "success":
+        articles = envelope["payload"]["articles"]
+        for news in articles:
+            logger.info(f"Found: {news['headline']} ({news['timestamp']})")
+        return articles
+    else:
+        logger.info(f"Error: {envelope['metadata']['details']}")
+
+    return []
+
+from macro_services.sentiment_classifiers import  SentimentClassifier, MarketSentiment, EmotionSentiment
+async def classify_news(articles: list) -> list:
+
+    llm = ModelManager.spin_model()
+
+    classifier = SentimentClassifier(llm_client=llm)
+
+    sentiments = []
+
+    for article in articles:
+
+        content = classifier.fetch_content(article["url"])
+
+        result = await classifier.classify(
+            headline=article["headline"],
+            content=content,
+            sentiment_enum=MarketSentiment
+        )
+        content = { 'headline': article["headline"], 'sentiment' : result.content }
+        logger.info(f"Classified header: {content}")
+        sentiments.append(content)
+
+    return { 'headlines' : sentiments }
+
+from macro_services.ticker_extractor import  TickerExtractor
+async def extract_ticker(user_intent: str):
+    llm = ModelManager.spin_model()
+    extractor = TickerExtractor(llm)
+    result = await extractor.extract(user_intent)
+    return { 'ticker' : result.content }
+'''

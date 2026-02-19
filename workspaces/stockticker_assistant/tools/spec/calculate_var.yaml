@@ -38,16 +38,35 @@ properties:
         type: boolean
         description: "Internal check against firm-wide volatility constraints."
 
-  # --- GATEKEEPER PREDICATES ---
-  # Validation: VaR should never be greater than the total position.
-  # Also ensures ticker consistency.
-  validation_rules:
-    - "VaR_95 < position_value"
-    - "risk_percentage >= 0 AND risk_percentage <= 1"
-  
-  # Exit Condition: THE TRADE GATE
-  # We only exit the Risk Stage if the risk is under 5% AND the tool 
-  # explicitly confirms 'is_within_limits'.
-  stage_exit_trigger: "risk_percentage < 0.05 AND is_within_limits == True"
+# --- GATEKEEPER PREDICATES ---
+# Validation: VaR should never be greater than the total position.
+# Also ensures ticker consistency.
+validation_rules:
+  - "VaR_95 < position_value"
+  - "risk_percentage >= 0 AND risk_percentage <= 1"
 
-required: [tool_name, description, input_schema, output_schema, validation_rules]
+# --- HITL ESCALATION POLICY ---
+hitl_policy:
+  trigger_conditions:
+    # 1. Concentration Risk: Position size is unusually large compared to the state's total AUM
+    - condition: "position_value > metadata.max_position_threshold"
+      reason: "EXCESSIVE_CONCENTRATION"
+
+    # 2. Boundary Condition: Risk is right on the edge (e.g., 4.9%)
+    - condition: "risk_percentage >= 0.045 AND risk_percentage < 0.05"
+      reason: "BOUNDARY_RISK_WARNING"
+
+    # 3. Anomaly: Internal check says 'False' but the AgentPlanner is still pushing the trade
+    - condition: "is_within_limits == False"
+      reason: "LIMIT_VIOLATION_REQUIRED_REVIEW"
+
+  # Define interaction: User must either 'APPROVE_EXCEPTION' or 'REJECT'
+  interaction_mode: "EXCEPTION_HANDLING"
+  allow_state_mutation: true
+
+# Exit Condition: THE TRADE GATE
+# We only exit the Risk Stage if the risk is under 5% AND the tool 
+# explicitly confirms 'is_within_limits'.
+stage_exit_trigger: "risk_percentage < 0.05 AND is_within_limits == True AND requires_intervention == False"
+
+required: [tool_name, description, input_schema, output_schema, validation_rules, hitl_policy]

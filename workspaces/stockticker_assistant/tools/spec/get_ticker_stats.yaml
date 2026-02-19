@@ -31,16 +31,35 @@ properties:
       volatility_z_score: { type: number }
       daily_volume: { type: integer, minimum: 0 }
 
-  # --- GATEKEEPER PREDICATES ---
-  validation_rules:
-    # Ensure RSI is physically possible and volume is significant
-    - "RSI >= 0 AND RSI <= 100"
-    - "current_price > 0 AND daily_volume > 0"
-  
-  # Exit Condition: THE MOMENTUM GATE
-  # Example: Only proceed if the stock is in a Golden Cross (MA50 > MA200)
-  # AND not "Overbought" (RSI < 70) 
-  # AND volatility is not in an extreme outlier state (Z-Score < 3)
-  stage_exit_trigger: "MA50 > MA200 AND RSI < 70 AND volatility_z_score < 3.0"
+# --- GATEKEEPER PREDICATES ---
+validation_rules:
+  # Ensure RSI is physically possible and volume is significant
+  - "RSI >= 0 AND RSI <= 100"
+  - "current_price > 0 AND daily_volume > 0"
 
-required: [tool_name, description, input_schema, output_schema, validation_rules]
+# --- HITL ESCALATION POLICY ---
+hitl_policy:
+  trigger_conditions:
+    # 1. Statistical Outlier: Volatility Z-Score is extremely high (> 3.0)
+    # This suggests a "Black Swan" or news-driven event that indicators can't model.
+    - condition: "volatility_z_score >= 3.0"
+      reason: "EXTREME_VOLATILITY_ANOMALY"
+
+    # 2. Indicator Divergence: Price is above MA50 but RSI is crashing (< 30)
+    # Suggests the trend is losing internal strength despite the price action.
+    - condition: "current_price > MA50 AND RSI < 30"
+      reason: "BULLISH_TREND_BEARISH_MOMENTUM_DIVERGENCE"
+
+    # 3. Liquidity Check: Volume is 50% lower than the rolling average in state
+    - condition: "daily_volume < (state.avg_ticker_volume * 0.5)"
+      reason: "LOW_LIQUIDITY_WARNING"
+
+  # Interaction: Human can 'Adjust Indicators', 'Acknowledge Risk', or 'Override Exit'
+  interaction_mode: "TECHNICAL_VALIDATION"
+  allow_state_mutation: true
+
+# --- UPDATED GATEKEEPER EXIT ---
+# Stage exits if momentum is confirmed OR if a human explicitly overrides the anomaly.
+stage_exit_trigger: "(MA50 > MA200 AND RSI < 70 AND volatility_z_score < 3.0) OR (requires_intervention == False AND hitl_override == True)"
+
+required: [tool_name, description, input_schema, output_schema, validation_rules, hitl_policy]

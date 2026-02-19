@@ -3,3 +3,5 @@ venv
 lib
 bin
 **/node_modules/
+mcp_server/config_api.yaml
+config_api.yaml

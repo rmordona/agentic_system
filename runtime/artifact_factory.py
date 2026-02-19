@@ -179,21 +179,15 @@ import re
 import mistune
 import json
 import hashlib
-from typing import Dict, Any, List, Optional
-from datetime import datetime
-from pydantic import BaseModel
-from uuid import uuid4
+from typing import Dict, Any, List, Optional, Literal
+from datetime import datetime, UTC
+from dataclasses import dataclass, field
 
-#from runtime.agent_profiler import AgentProfile
+from pydantic import BaseModel, Field
+from uuid import uuid4, UUID
 
 from runtime.logger import AgentLogger
 logger = AgentLogger.get_logger(component="system")
-
-
-from pydantic import BaseModel, Field
-from typing import List, Dict, Optional, Literal
-from datetime import datetime
-from uuid import UUID
 
 
 class Task(BaseModel):
@@ -213,6 +207,7 @@ class HITLState(BaseModel):
     required: bool = False
     approved: Optional[bool] = None
     comments: Optional[str] = None
+    requested_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 
 class ArtifactSchema(BaseModel):

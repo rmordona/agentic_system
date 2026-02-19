@@ -262,16 +262,10 @@ class Predicates:
 
     @staticmethod
     def process(ctx: StageEvalContext) -> dict:
-        logger.info(f"ctx: {ctx}")
         task_result = ctx.task.result
         logger.info(f"Task Result: {task_result}")
-        output = task_result.output
-        logger.info(f"Task Result Output: {output}")
+        data = task_result.get("output")
 
-        text_content_obj = output[0]
-        raw_text = text_content_obj.text
-
-        data = json.loads(raw_text)
         return data
 
 
