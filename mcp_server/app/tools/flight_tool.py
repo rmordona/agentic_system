@@ -1,4 +1,4 @@
-from app.mcp import mcp
+from app.mcp_instance import mcp
 from app.services.booking_service import booking_service
 
 @mcp.tool()

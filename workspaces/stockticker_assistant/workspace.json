@@ -1,5 +1,6 @@
 {
-  "assistant_id": "stock_ticker_intelligence_v1",
+  "assistant_id": "stock_ticker",
+  "name" : "stockticker_assistant",
   "domain": "financial_markets",
   "pipeline_template": "ticker_pipeline_template.md",
   "default_artifact_path": "artifacts/ticker_reports/",

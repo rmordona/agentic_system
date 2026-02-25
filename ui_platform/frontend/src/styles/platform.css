@@ -1,0 +1,94 @@
+/* Main platform wrapper */
+.platform {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #0f172a; /* midnight base */
+  overflow: hidden;
+}
+
+/* Topbar */
+.platform-topbar {
+  height: 100px;
+  flex-shrink: 0;
+  background-color: #111827; /* darker midnight */
+}
+
+/* Main content area (below topbar) */
+.platform-content {
+  flex: 1;
+  display: flex;
+  flex-direction: row;   /* force horizontal layout */
+  flex-wrap: nowrap;     /* 🔥 prevent wrapping */
+  overflow: hidden;
+  min-height: 0;         /* important for nested flex scroll */
+}
+
+/* Sidebar */
+.platform-sidebar {
+  width: 300px;
+  min-width: 300px;      /* 🔥 prevents shrinking */
+  max-width: 300px;      /* 🔥 prevents growing */
+  background-color: #1f2937;
+  overflow-y: auto;
+  flex-shrink: 0;        /* 🔥 critical */
+}
+
+/* Main panel */
+.platform-main {
+  flex: 1;
+  min-width: 0;          /* 🔥 prevents flex overflow issues */
+  min-height: 0; 
+  display: flex;
+  flex-direction: column;
+  background-color: #0f172a;
+  overflow: hidden;
+}
+
+/* Chat window area */
+.platform-chat-window {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;   /* 🔥 important for flex scroll */
+}
+
+/* Message input fixed at bottom of main panel */
+.platform-message-input {
+  padding: 1rem;
+  background-color: #111827;
+  border-top: 1px solid #374151;
+}
+
+/* RIGHT BAR */
+.platform-rightbar {
+  width: 500px;
+  min-width: 500px;
+  max-width: 300500pxpx;
+  background-color: #111827;  /* slightly darker */
+  border-left: 1px solid #1f2937;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.rightbar-content {
+  padding: 1rem;
+  color: white;
+}
+
+/* footer */
+.platform-footer {
+  height: 30px;
+  flex-shrink: 0;
+  background-color: #0b1120;
+  color: #9ca3af;              /* muted gray */
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  padding-left: 1.5rem;
+  border-top: 1px solid #1f2937;
+
+  font-size: 0.8rem;           /* 🔥 smaller text */
+  letter-spacing: 0.02em;      /* subtle refinement */
+}

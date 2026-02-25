@@ -1,0 +1,33 @@
+.rightpanel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1rem;
+  height: 100%;
+  overflow-y: auto;
+  background-color: #111827;
+  color: white;
+}
+
+.rightpanel-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.rightpanel-section h3 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #9ca3af;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Override textarea height for panel use */
+.rightpanel textarea {
+  width:95%;
+  min-height: 120px;
+  background-color: #1f2937;
+  border: 1px solid #374151;
+  color: white;
+}

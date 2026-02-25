@@ -20,6 +20,7 @@
 # -----------------------------------------------------------------------------
 
 from __future__ import annotations
+from core.paths import WORKSPACES_ROOT
 
 import sys
 import time
@@ -49,53 +50,39 @@ class Orchestrator:
 
     def __init__(
         self,
-        workspace_path: Path, 
+        workspace_name: str,
+        core_engine: CoreEngine, 
         session_id: None, 
         event_bus: EventBus,
-
         hitl_callback: Optional[Any] = None
     ):
 
-        self.workspace_path = workspace_path
-        self.workspace_name = workspace_path.name
+        self.workspace_path = WORKSPACES_ROOT /workspace_name
+        self.workspace_name = workspace_name
 
         self.session_id = session_id
         self.event_bus = event_bus
         self.hitl_callback = hitl_callback
 
-
-        # Get the graph once per orchestrator
-        #self.stage_graph = stage_manager.get(self.workspace_name)
         self.session_state: Dict[str, Any] = {}
 
-        # Bind workspace logger ONCE
-        #global logger
-        #logger = AgentLogger.get_logger( component="runtime", workspace = self.workspace_name)
+        self.core_engine = core_engine
+        self._graph = self.core_engine.compiled_graph
 
 
-    async def run(self, user_intent: str, workspace_meta: dict) -> Dict[str, Any]:
+    async def run(self, user_intent: str, session_id: str, workspace_meta: dict) -> Dict[str, Any]:
         """
         Run the session through the LangGraph.
         Returns final session state.
         """
 
-        # 1. Create the instance (sync)
-        logger.info("Just entered the Orchestrator... Now instantiating the Core Engine ...")
-        self.core_engine = CoreEngine(self.session_id, user_intent, workspace_meta, self.workspace_path)
-
-        # 2. Perform the async setup (MCP handshakes, tool scanning)
-        await self.core_engine.initialize()
-
-        # Compile the graph.
-        logger.info("Compile the Graph ...")
-        self._graph = self.core_engine.compile()
-
         # Get the initial State
-        self.initial_state = await self.core_engine.initialize_state(user_intent)
-        self.initial_state.model_rebuild()
-
+        logger.info('Acquiring new state')
+        self.initial_state = await self.core_engine.acquire_new_state(user_intent, session_id)
         logger.info(f"Start with an initial state: {self.initial_state}")
 
+        self.initial_state.model_rebuild()
+        
         await self.event_bus.emit(
                 "orchestrator_start",
                 {

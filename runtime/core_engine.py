@@ -1,4 +1,5 @@
 from __future__ import annotations
+from core.paths import RUNTIME_ROOT, WORKSPACES_ROOT, GLOBAL_CONFIG_PATH, TEMPLATE_ROOT
 
 import re
 import json
@@ -1426,15 +1427,12 @@ class AgentHITL:
         agent_ctx = state.agentContext[agent_name]
         artifact = agent_ctx.control_raw
 
-        logger.info(f"Passed 1")
         await self._request_hitl(state)
         # --------------------------------------------------------------
         # Guard: HITL only applies after successful validation
         # --------------------------------------------------------------
         if artifact.status != "ready_for_exit":
             return { "agentContext": state.agentContext }
-
-        logger.info(f"Passed 2")
 
         # --------------------------------------------------------------
         # Guard: HITL explicitly not required
@@ -1443,16 +1441,12 @@ class AgentHITL:
         if not hitl or not hitl.required:
             return {"agentContext": state.agentContext}
 
-        logger.info(f"Passed 3")
-
         # --------------------------------------------------------------
         # Auto-approve mode (tests / CI / replay)
         # --------------------------------------------------------------
         if self.auto_approve:
             self._approve(artifact, reason="auto_approve")
             return {"agentContext": state.agentContext}
-
-        logger.info(f"Passed 4")
 
         # --------------------------------------------------------------
         # Resume path: human has already responded
@@ -1469,8 +1463,6 @@ class AgentHITL:
             artifact.last_updated = self._now()
             return {"agentContext": state.agentContext}
 
-        logger.info(f"Passed 5")
-
         # --------------------------------------------------------------
         # Timeout handling
         # --------------------------------------------------------------
@@ -1481,8 +1473,6 @@ class AgentHITL:
                 self._approve(artifact, reason="HITL timeout auto-approve")
 
             return {"agentContext": state.agentContext}
-
-        logger.info(f"Passed 6")
 
         # --------------------------------------------------------------
         # Interrupt graph execution for human input
@@ -1611,42 +1601,42 @@ class CoreEngine:
     """
     def __init__(
         self, 
-        session_id: str,
-        user_intent: str,
+        workspace_name: str,
         workspace_meta: dict,
-        workspace_path: Path
     ):
-        self.workspace_path = workspace_path
-        self.workspace_name = workspace_path.name
-
-        self.session_id = session_id
-
-        self.user_intent = user_intent
+        self.workspace_path = WORKSPACES_ROOT / workspace_name
+        self.workspace_name = workspace_name
 
         self.domain = workspace_meta.get("domain")
 
-        self.template_repo = self.workspace_path.parent.parent / "runtime" / "domain_repo" / "templates" 
+        self.template_repo = TEMPLATE_ROOT
 
-        logger.info(f"Template Repo: {self.template_repo}")
-
+        self.session_id = None
+        self.user_intent = None
+        self.compiled_graph = None
+        
     async def initialize(self):
 
         # --------------------------------------------------
         # 1. Stage Management
         # --------------------------------------------------
-        self.stage_manager = StageManager(workspace_path=self.workspace_path)
+        logger.info("Initializing Stage Manager")
+        self.stage_manager = StageManager(workspace_name=self.workspace_name)
         self.stage_manager.register_stages()
+        logger.info("Stage Manager initialized")
 
         # --------------------------------------------------
         # 2. Agent Management
         # --------------------------------------------------
-        self.agent_manager = AgentManager(workspace_path=self.workspace_path)
+        logger.info("Initializing Agent Manager")
+        self.agent_manager = AgentManager(workspace_name=self.workspace_name)
         self.agent_manager.scan_and_register_agents()
+        logger.info("Agent Manager initialized")
 
         # --------------------------------------------------
         # 3. System Context
         # --------------------------------------------------
-        self.context = await SystemContext.create(template_repo = self.template_repo, workspace_path = self.workspace_path, agent_manager = self.agent_manager)
+        self.context = await SystemContext.create(template_repo = self.template_repo, workspace_name = self.workspace_name, agent_manager = self.agent_manager)
 
         # --------------------------------------------------
         # 4. Initial Data Raw Setup 
@@ -1657,6 +1647,7 @@ class CoreEngine:
         # --------------------------------------------------
         # 5. LLM Models
         # --------------------------------------------------
+        logger.info("Initializing LLM models")
         self.agent_llm = ModelManager.spin_model()
         self.architect_llm = ModelManager.spin_model()
         self.core_llm = ModelManager.spin_model()
@@ -1670,10 +1661,13 @@ class CoreEngine:
         #    PredicateEngine → is the law
         #    _should_continue → just checks the verdict
 
+        logger.info("Initializing Agent Nodes")
         self.validator = AgentValidator()
         self.runner    = AgentRunner(self.context, self.stage_manager, self.agent_manager, self.agent_llm)
         self.planner   = AgentPlanner(self.context, self.stage_manager, self.agent_manager, self.architect_llm)
         self.hitl      = AgentHITL(self.context, True, 10, True )
+
+        logger.info("Core Engine initialized successfully")
 
     # --------------------------------------------------
     # Shutdown MCP sessions when done.
@@ -1717,22 +1711,22 @@ class CoreEngine:
             }
         )
 
-
+        self.compiled_graph = workflow.compile()
         # Use a 'breakpoint' on the planner node if a human tool was called
-        return workflow.compile()
+        return self.compiled_graph
         #return workflow.compile(interrupt_before=["agent"] if self._check_hitl_needed else [])
 
-    # --------------------------------------------------
-    # State Instantiation invoked from orchestrator.py
-    # --------------------------------------------------
-    async def initialize_state(self, user_intent):
+    # -----------------------------------------------------
+    # Instantiate a new State, invoked from orchestrator.py
+    # ------------------------------------------------------
+    async def acquire_new_state(self, user_intent, session_id):
 
         init_task = Task(id=INIT_TASK, description="Initial Task", stage="")
 
         # Number one rule from AI: "The world looks different depending on who currently holds the token."
         # control_raw, data_raw, and tool_raw should be re-contextualized every time we switch agency
         return StateSchema(
-            session_id  = self.session_id,
+            session_id  = session_id,
             domain      = self.domain,
             agentContext = {},
             data_type   = "envelope",
@@ -1748,8 +1742,6 @@ class CoreEngine:
                  "initial_timestamp": datetime.now(UTC).isoformat()
                 }
         )
-
-
 
     # --------------------------------------------------
     # HITL detection

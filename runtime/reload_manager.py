@@ -4,7 +4,7 @@ from __future__ import annotations
 import asyncio
 from pathlib import Path
 from typing import Dict
-from runtime.workspace_loader import WorkspaceLoader
+from runtime.bootstrap.workspace_loader import WorkspaceLoader
 # from runtime.stage_manager import StageManager
 from runtime.logger import AgentLogger
 

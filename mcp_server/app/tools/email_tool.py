@@ -1,4 +1,4 @@
-from app.mcp import mcp
+from app.mcp_instance import mcp
 from app.services.email_service import email_service
 
 @mcp.tool()

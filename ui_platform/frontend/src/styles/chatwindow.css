@@ -1,0 +1,27 @@
+/* src/components/styles/chatwindow.css */
+
+.chat-window {
+  flex: 1;
+  min-height: 10px;
+  overflow-y: auto;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border-radius: 0.5rem;
+  background-color: #1f2937; /* slightly darker than main panel */
+  color: white;
+}
+
+.chat-message-user {
+  color: #d1d5db; /* gray-300 for user */
+  margin-bottom: 0.5rem;
+}
+
+.chat-message-assistant {
+  color: #60a5fa; /* blue-400 for assistant */
+  margin-bottom: 0.5rem;
+}
+
+.chat-typing {
+  font-style: italic;
+  color: #9ca3af; /* gray-400 */
+}

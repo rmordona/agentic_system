@@ -1,7 +1,10 @@
+from __future__ import annotations
+from core.paths import WORKSPACES_ROOT
+
 import inspect
 import importlib.util
 from pathlib import Path
-from typing import Dict
+from typing import Dict, List
 
 
 from runtime.agent_profiler import AgentProfile, AgentProfiler
@@ -36,9 +39,9 @@ class AgentManager:
     The AGENT.md file inside is loaded as the agent's prompt.
     """
 
-    def __init__(self, workspace_path: str ):
-        self.workspace_path = workspace_path
-        self.agents_dir = workspace_path / "agents"
+    def __init__(self, workspace_name: str):
+        self.workspace_path = WORKSPACES_ROOT / workspace_name
+        self.agents_dir = self.workspace_path / "agents"
         self._registry: Dict[str, RegisteredAgent] = {}
         self._profiles: Dict[str, AgentProfile] = {}
         self.input_schema: dict = {}

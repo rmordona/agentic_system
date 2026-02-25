@@ -1,4 +1,4 @@
-from app.mcp import mcp
+from app.mcp_instance import mcp
 
 @mcp.tool()
 async def calculate_var(ticker: str, position_size: float) -> dict:

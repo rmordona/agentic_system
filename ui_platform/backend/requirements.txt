@@ -1,0 +1,41 @@
+# Core framework
+fastapi==0.111.0
+uvicorn[standard]==0.30.1
+
+# Database
+sqlalchemy==2.0.30
+psycopg2-binary==2.9.9
+
+# Auth & Security & JWT
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+passlib[argon2]==1.7.4
+python-multipart==0.0.9
+
+# Environment config
+pydantic==2.7.4
+pydantic-settings==2.3.4
+
+# WebSocket support
+websockets==12.0
+
+# Observability
+prometheus-client==0.20.0
+
+# Utilities
+python-dotenv==1.0.1
+
+################## Required by Context Engr Platform (Agentic System) #############
+langgraph==1.0.9
+mistune==3.2.0
+langchain==1.2.10
+jsonschema=4.26.0
+mcp=1.26.0
+pathlib=1.0.1
+
+################## Required by MCP server ###############
+fastmcp==3.0.2
+alpaca==1.0.0
+alpaca-py==0.43.2
+pytz==2025.2
+bs4==0.0.2

@@ -48,10 +48,7 @@ class AgentLogger:
         config_path = runtime_dir / "bootstrap" / "config.json"
         workspaces_root = root_dir / "workspaces"
 
-        config = ConfigLoader(
-            global_config_path=config_path,
-            workspaces_root=workspaces_root,
-        ).load()
+        config = ConfigLoader().load()
 
         logging_cfg = config.get("logging", {})
         base_dir = logging_cfg.get("base_dir", "logs")

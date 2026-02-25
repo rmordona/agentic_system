@@ -7384,3 +7384,679 @@ Instructions:
 2026-02-19 00:34:50,473 | INFO    | system:global | ollama_chatmodel:205 | _generate | Raw Data: {'model': 'qwen2:0.5b', 'created_at': '2026-02-19T08:34:50.504789922Z', 'message': {'role': 'assistant', 'content': 'Neutral'}, 'done': True, 'done_reason': 'stop', 'total_duration': 614948391, 'load_duration': 90979881, 'prompt_eval_count': 265, 'prompt_eval_duration': 498346968, 'eval_count': 2, 'eval_duration': 16680510}
 2026-02-19 00:34:50,474 | INFO    | system:global | sentiment_classifiers:117 | classify | LLM response: content='Neutral' additional_kwargs={} response_metadata={} id='lc_run--019c7509-9b7c-7e03-9983-78a409683ce5-0'
 2026-02-19 00:34:50,474 | INFO    | system:global | market_service:88 | classify_news | Classified header: {'headline': '$1000 Invested In Tesla 15 Years Ago Would Be Worth This Much Today', 'sentiment': 'Neutral'}
+2026-02-19 01:01:32,677 | INFO    | system:global | macro_market:88 | fetch_macro_market_data | Starting macro market data fetch
+2026-02-19 01:01:33,162 | INFO    | system:global | macro_market:102 | fetch_macro_market_data | Macro market data fetched successfully
+2026-02-19 01:01:33,162 | INFO    | system:global | market_service:42 | fetch_alpaca_market | Macro Payload: {'market_data': {'price': 686.19, 'volume': 83951.0}, 'timestamp': '2026-02-19T09:01:33.162285+00:00', 'risk_mode': 'NORMAL'}
+2026-02-19 01:01:33,162 | INFO    | system:global | market_service:44 | fetch_alpaca_market | SystemContext initialization complete
+2026-02-19 01:01:33,162 | INFO    | system:global | market_tool:14 | fetch_alpaca_market | [fetch_alpaca_market] Result from mcp tool: {'market_data': {'price': 686.19, 'volume': 83951.0}, 'timestamp': '2026-02-19T09:01:33.162285+00:00', 'risk_mode': 'NORMAL'}
+2026-02-19 01:01:39,471 | INFO    | system:global | market_tool:29 | extract_ticker | [extract_ticker] Entering mcp tool: What is the value of TSLA Stock today?
+2026-02-19 01:01:39,471 | INFO    | system:global | model_manager:89 | __init__ | LLM Path: /Users/raymondordona/Workspace/ai/projects/agentic_system/llm
+2026-02-19 01:01:39,471 | INFO    | system:global | model_manager:98 | __init__ | Loading Embedding Factory
+2026-02-19 01:01:39,471 | INFO    | system:global | embedding_factory:115 | get | Provider and Model: 'ollama' and 'nomic-embed-text:latest'
+2026-02-19 01:01:39,471 | INFO    | system:global | embedding_factory:116 | get | Embedding Config chosen: {'module': 'llm.embeddings.adapters.ollama_embedding_client', 'class': 'OllamaEmbeddingClient', 'endpoint': 'http://localhost:11434/api/embed', 'models': ['nomic-embed-text:latest']}
+2026-02-19 01:01:39,472 | INFO    | system:global | ollama_embedding_client:62 | __init__ | OllamaEmbeddingClient initialized with model 'nomic-embed-text:latest' at http://localhost:11434/api/embed
+2026-02-19 01:01:39,472 | INFO    | system:global | model_manager:105 | __init__ | Loading Store Factory
+2026-02-19 01:01:39,472 | INFO    | system:global | store_factory:176 | get | Available parameters: {'dims': 1536}
+2026-02-19 01:01:39,472 | INFO    | system:global | inmemory_store:255 | __init__ | InMemoryStore initialized
+2026-02-19 01:01:39,472 | INFO    | system:global | model_manager:109 | __init__ | Loading reflection prompt
+2026-02-19 01:01:39,472 | INFO    | system:global | model_manager:115 | __init__ | Initializing Memory Manager
+2026-02-19 01:01:39,472 | INFO    | system:global | memory_manager:95 | __init__ | Memory Manager initialized
+2026-02-19 01:01:39,472 | INFO    | system:global | model_manager:125 | __init__ | Loading Chat Model Factory
+2026-02-19 01:01:39,472 | INFO    | system:global | chatmodel_factory:88 | get | Provider and Model: 'ollama' and 'qwen2:0.5b'
+2026-02-19 01:01:39,472 | INFO    | system:global | chatmodel_factory:89 | get | ChatModel Config chosen: {'module': 'llm.chatmodels.adapters.ollama_chatmodel', 'class': 'OllamaChatModel', 'endpoint': 'http://localhost:11434/api/chat', 'models': ['qwen2:0.5b', 'llama3.2', 'qwen2:1.5b-instruct', 'tinyllama', 'granite3-moe:1b'], 'temperature': 0.2, 'max_tokens': 2048, 'request_timeout': 120.0, 'apis': {'chat': {'uri': '/api/chat', 'payload_template': {'messages': [{'role': 'system', 'content': ''}, {'role': 'user', 'content': ''}], 'stream': False, 'options': {'num_predict': 4096}}, 'response_template': {'model': '', 'created_at': '', 'message': {'role': 'assistant', 'content': ''}, 'done': True, 'done_reason': 'stop', 'total_duration': 0, 'load_duration': 0, 'prompt_eval_count': 0, 'prompt_eval_duration': 0, 'eval_count': 0, 'eval_duration': 0}}, 'generate': {'uri': '/api/generate', 'payload_template': {'prompt': '', 'stream': False, 'options': {'num_predict': 4096}}, 'response_template': {'model': '', 'created_at': '', 'response': '', 'done': True, 'done_reason': 'stop', 'context': [], 'total_duration': 0, 'load_duration': 0, 'prompt_eval_count': 0, 'prompt_eval_duration': 0, 'eval_count': 0, 'eval_duration': 0}}, 'models': {'uri': '/api/tags', 'response_template': {'models': [{'name': '', 'model': '', 'size': ''}]}}}}
+2026-02-19 01:01:39,472 | INFO    | system:global | ollama_chatmodel:163 | model_post_init | OllamaChatModel initialized | model=qwen2:0.5b endpoint=http://localhost:11434/api/chat temperature=0.2 max_tokens=2048
+2026-02-19 01:01:39,472 | INFO    | system:global | market_service:97 | extract_ticker | Now Executing Extract Ticker: {'user_intent': 'What is the value of TSLA Stock today?'}
+2026-02-19 01:01:39,472 | INFO    | system:global | ticker_extractor:21 | extract | Reached this extract: {'user_intent': 'What is the value of TSLA Stock today?'}
+2026-02-19 01:01:39,472 | INFO    | system:global | ticker_extractor:39 | extract | Ticker Extractor Prompt: 
+Role:
+You are a Financial Entity Extraction specialist. Your task is to identify the primary US stock market ticker symbol from a user's natural language intent.
+
+User Intent:
+{'user_intent': 'What is the value of TSLA Stock today?'}
+
+Instructions:
+- Analyze the headline and content carefully.
+- Determine the primary ticker symbol.
+- Respond with ONLY ONE WORD.
+- Do not include punctuation.
+- Do not include explanations.
+- Do not include quotes.
+
+2026-02-19 01:01:39,473 | INFO    | system:global | ollama_chatmodel:193 | _generate | Building the payload ... {'model': 'qwen2:0.5b', 'stream': False, 'messages': [{'role': 'user', 'content': "\nRole:\nYou are a Financial Entity Extraction specialist. Your task is to identify the primary US stock market ticker symbol from a user's natural language intent.\n\nUser Intent:\n{'user_intent': 'What is the value of TSLA Stock today?'}\n\nInstructions:\n- Analyze the headline and content carefully.\n- Determine the primary ticker symbol.\n- Respond with ONLY ONE WORD.\n- Do not include punctuation.\n- Do not include explanations.\n- Do not include quotes.\n"}], 'options': {'temperature': 0.2, 'num_predict': 2048}}
+2026-02-19 01:01:41,784 | INFO    | system:global | ollama_chatmodel:200 | _generate | LLM Response status: <Response [200]>
+2026-02-19 01:01:41,784 | INFO    | system:global | ollama_chatmodel:205 | _generate | Raw Data: {'model': 'qwen2:0.5b', 'created_at': '2026-02-19T08:44:42.382991398Z', 'message': {'role': 'assistant', 'content': 'TSLA\n\nValue of TSLA Stock today is $1,405.63.'}, 'done': True, 'done_reason': 'stop', 'total_duration': 2307359127, 'load_duration': 1280861862, 'prompt_eval_count': 101, 'prompt_eval_duration': 493747606, 'eval_count': 23, 'eval_duration': 483442582}
+2026-02-19 01:01:41,785 | INFO    | system:global | ticker_extractor:41 | extract | LLM response: content='TSLA\n\nValue of TSLA Stock today is $1,405.63.' additional_kwargs={} response_metadata={} id='lc_run--019c7522-2b11-76b2-bd4a-7edf757f93c9-0'
+2026-02-19 01:01:41,785 | INFO    | system:global | market_tool:31 | extract_ticker | [extract_ticker] Result from mcp tool: {'ticker': 'TSLA\n\nValue of TSLA Stock today is $1,405.63.'}
+2026-02-19 01:01:42,295 | INFO    | system:global | alpaca_news_provider:37 | get_ticker_news | Raw response type: <class 'alpaca.data.models.news.NewsSet'>
+2026-02-19 01:01:42,295 | INFO    | system:global | alpaca_news_provider:38 | get_ticker_news | Has news attr: False
+2026-02-19 01:01:42,295 | INFO    | system:global | alpaca_news_provider:39 | get_ticker_news | Response contents: 0 headlines
+2026-02-19 01:01:42,295 | INFO    | system:global | market_service:57 | search_ticker_news | Completed News Search: {'agent': 'AlpacaNewsProvider', 'type': 'TickerNews', 'version': '1.0', 'created_at': '2026-02-19T09:01:42.295517', 'payload': {'ticker': 'TSLA\n\nValue of TSLA Stock today is $1,405.63.', 'articles': []}, 'metadata': {'count': 0, 'status': 'success'}}
+2026-02-19 01:01:42,296 | INFO    | system:global | model_manager:89 | __init__ | LLM Path: /Users/raymondordona/Workspace/ai/projects/agentic_system/llm
+2026-02-19 01:01:42,296 | INFO    | system:global | model_manager:98 | __init__ | Loading Embedding Factory
+2026-02-19 01:01:42,296 | INFO    | system:global | embedding_factory:115 | get | Provider and Model: 'ollama' and 'nomic-embed-text:latest'
+2026-02-19 01:01:42,296 | INFO    | system:global | embedding_factory:116 | get | Embedding Config chosen: {'module': 'llm.embeddings.adapters.ollama_embedding_client', 'class': 'OllamaEmbeddingClient', 'endpoint': 'http://localhost:11434/api/embed', 'models': ['nomic-embed-text:latest']}
+2026-02-19 01:01:42,296 | INFO    | system:global | ollama_embedding_client:62 | __init__ | OllamaEmbeddingClient initialized with model 'nomic-embed-text:latest' at http://localhost:11434/api/embed
+2026-02-19 01:01:42,296 | INFO    | system:global | model_manager:105 | __init__ | Loading Store Factory
+2026-02-19 01:01:42,296 | INFO    | system:global | store_factory:176 | get | Available parameters: {'dims': 1536}
+2026-02-19 01:01:42,297 | INFO    | system:global | inmemory_store:255 | __init__ | InMemoryStore initialized
+2026-02-19 01:01:42,297 | INFO    | system:global | model_manager:109 | __init__ | Loading reflection prompt
+2026-02-19 01:01:42,297 | INFO    | system:global | model_manager:115 | __init__ | Initializing Memory Manager
+2026-02-19 01:01:42,297 | INFO    | system:global | memory_manager:95 | __init__ | Memory Manager initialized
+2026-02-19 01:01:42,297 | INFO    | system:global | model_manager:125 | __init__ | Loading Chat Model Factory
+2026-02-19 01:01:42,297 | INFO    | system:global | chatmodel_factory:88 | get | Provider and Model: 'ollama' and 'qwen2:0.5b'
+2026-02-19 01:01:42,297 | INFO    | system:global | chatmodel_factory:89 | get | ChatModel Config chosen: {'module': 'llm.chatmodels.adapters.ollama_chatmodel', 'class': 'OllamaChatModel', 'endpoint': 'http://localhost:11434/api/chat', 'models': ['qwen2:0.5b', 'llama3.2', 'qwen2:1.5b-instruct', 'tinyllama', 'granite3-moe:1b'], 'temperature': 0.2, 'max_tokens': 2048, 'request_timeout': 120.0, 'apis': {'chat': {'uri': '/api/chat', 'payload_template': {'messages': [{'role': 'system', 'content': ''}, {'role': 'user', 'content': ''}], 'stream': False, 'options': {'num_predict': 4096}}, 'response_template': {'model': '', 'created_at': '', 'message': {'role': 'assistant', 'content': ''}, 'done': True, 'done_reason': 'stop', 'total_duration': 0, 'load_duration': 0, 'prompt_eval_count': 0, 'prompt_eval_duration': 0, 'eval_count': 0, 'eval_duration': 0}}, 'generate': {'uri': '/api/generate', 'payload_template': {'prompt': '', 'stream': False, 'options': {'num_predict': 4096}}, 'response_template': {'model': '', 'created_at': '', 'response': '', 'done': True, 'done_reason': 'stop', 'context': [], 'total_duration': 0, 'load_duration': 0, 'prompt_eval_count': 0, 'prompt_eval_duration': 0, 'eval_count': 0, 'eval_duration': 0}}, 'models': {'uri': '/api/tags', 'response_template': {'models': [{'name': '', 'model': '', 'size': ''}]}}}}
+2026-02-19 01:01:42,297 | INFO    | system:global | ollama_chatmodel:163 | model_post_init | OllamaChatModel initialized | model=qwen2:0.5b endpoint=http://localhost:11434/api/chat temperature=0.2 max_tokens=2048
+2026-02-19 12:53:18,215 | INFO    | system:global | config_api_manager:15 | __init__ | Path: /Users/raymondordona/Workspace/ai/projects/agentic_system/mcp_server/app/config_api_manager.py
+2026-02-19 12:55:53,422 | INFO    | system:global | macro_market:88 | fetch_macro_market_data | Starting macro market data fetch
+2026-02-19 12:55:55,658 | INFO    | system:global | macro_market:102 | fetch_macro_market_data | Macro market data fetched successfully
+2026-02-19 12:55:55,658 | INFO    | system:global | market_service:42 | fetch_alpaca_market | Macro Payload: {'market_data': {'price': 683.96, 'volume': 8074.0}, 'timestamp': '2026-02-19T20:55:55.658794+00:00', 'risk_mode': 'NORMAL'}
+2026-02-19 12:55:55,658 | INFO    | system:global | market_service:44 | fetch_alpaca_market | SystemContext initialization complete
+2026-02-19 12:55:55,659 | INFO    | system:global | market_tool:14 | fetch_alpaca_market | [fetch_alpaca_market] Result from mcp tool: {'market_data': {'price': 683.96, 'volume': 8074.0}, 'timestamp': '2026-02-19T20:55:55.658794+00:00', 'risk_mode': 'NORMAL'}
+2026-02-19 12:56:01,897 | INFO    | system:global | market_tool:29 | extract_ticker | [extract_ticker] Entering mcp tool: What is the value of TSLA Stock today?
+2026-02-19 12:56:01,897 | INFO    | system:global | model_manager:89 | __init__ | LLM Path: /Users/raymondordona/Workspace/ai/projects/agentic_system/llm
+2026-02-19 12:56:01,897 | INFO    | system:global | model_manager:98 | __init__ | Loading Embedding Factory
+2026-02-19 12:56:01,897 | INFO    | system:global | embedding_factory:72 | load_config | EmbeddingFactory config loaded
+2026-02-19 12:56:01,897 | INFO    | system:global | embedding_factory:115 | get | Provider and Model: 'ollama' and 'nomic-embed-text:latest'
+2026-02-19 12:56:01,897 | INFO    | system:global | embedding_factory:116 | get | Embedding Config chosen: {'module': 'llm.embeddings.adapters.ollama_embedding_client', 'class': 'OllamaEmbeddingClient', 'endpoint': 'http://localhost:11434/api/embed', 'models': ['nomic-embed-text:latest']}
+2026-02-19 12:56:01,898 | INFO    | system:global | ollama_embedding_client:62 | __init__ | OllamaEmbeddingClient initialized with model 'nomic-embed-text:latest' at http://localhost:11434/api/embed
+2026-02-19 12:56:01,898 | INFO    | system:global | model_manager:105 | __init__ | Loading Store Factory
+2026-02-19 12:56:01,898 | INFO    | system:global | store_factory:127 | load_config | StoreFactory config loaded
+2026-02-19 12:56:01,898 | INFO    | system:global | store_factory:176 | get | Available parameters: {'dims': 1536}
+2026-02-19 12:56:01,899 | INFO    | system:global | inmemory_store:255 | __init__ | InMemoryStore initialized
+2026-02-19 12:56:01,899 | INFO    | system:global | model_manager:109 | __init__ | Loading reflection prompt
+2026-02-19 12:56:01,899 | INFO    | system:global | store_factory:104 | load_reflection_prompt | Reflection prompt loaded from /Users/raymondordona/Workspace/ai/projects/agentic_system/prompts/reflection.md
+2026-02-19 12:56:01,899 | INFO    | system:global | model_manager:115 | __init__ | Initializing Memory Manager
+2026-02-19 12:56:01,899 | INFO    | system:global | memory_manager:95 | __init__ | Memory Manager initialized
+2026-02-19 12:56:01,899 | INFO    | system:global | model_manager:125 | __init__ | Loading Chat Model Factory
+2026-02-19 12:56:01,899 | INFO    | system:global | chatmodel_factory:55 | load_config | ChatModelFactory config loaded
+2026-02-19 12:56:01,899 | INFO    | system:global | chatmodel_factory:88 | get | Provider and Model: 'ollama' and 'qwen2:0.5b'
+2026-02-19 12:56:01,899 | INFO    | system:global | chatmodel_factory:89 | get | ChatModel Config chosen: {'module': 'llm.chatmodels.adapters.ollama_chatmodel', 'class': 'OllamaChatModel', 'endpoint': 'http://localhost:11434/api/chat', 'models': ['qwen2:0.5b', 'llama3.2', 'qwen2:1.5b-instruct', 'tinyllama', 'granite3-moe:1b'], 'temperature': 0.2, 'max_tokens': 2048, 'request_timeout': 120.0, 'apis': {'chat': {'uri': '/api/chat', 'payload_template': {'messages': [{'role': 'system', 'content': ''}, {'role': 'user', 'content': ''}], 'stream': False, 'options': {'num_predict': 4096}}, 'response_template': {'model': '', 'created_at': '', 'message': {'role': 'assistant', 'content': ''}, 'done': True, 'done_reason': 'stop', 'total_duration': 0, 'load_duration': 0, 'prompt_eval_count': 0, 'prompt_eval_duration': 0, 'eval_count': 0, 'eval_duration': 0}}, 'generate': {'uri': '/api/generate', 'payload_template': {'prompt': '', 'stream': False, 'options': {'num_predict': 4096}}, 'response_template': {'model': '', 'created_at': '', 'response': '', 'done': True, 'done_reason': 'stop', 'context': [], 'total_duration': 0, 'load_duration': 0, 'prompt_eval_count': 0, 'prompt_eval_duration': 0, 'eval_count': 0, 'eval_duration': 0}}, 'models': {'uri': '/api/tags', 'response_template': {'models': [{'name': '', 'model': '', 'size': ''}]}}}}
+2026-02-19 12:56:01,904 | INFO    | system:global | ollama_chatmodel:163 | model_post_init | OllamaChatModel initialized | model=qwen2:0.5b endpoint=http://localhost:11434/api/chat temperature=0.2 max_tokens=2048
+2026-02-19 12:56:01,904 | INFO    | system:global | market_service:97 | extract_ticker | Now Executing Extract Ticker: {'user_intent': 'What is the value of TSLA Stock today?'}
+2026-02-19 12:56:01,904 | INFO    | system:global | ticker_extractor:21 | extract | Reached this extract: {'user_intent': 'What is the value of TSLA Stock today?'}
+2026-02-19 12:56:01,905 | INFO    | system:global | ticker_extractor:39 | extract | Ticker Extractor Prompt: 
+Role:
+You are a Financial Entity Extraction specialist. Your task is to identify the primary US stock market ticker symbol from a user's natural language intent.
+
+User Intent:
+{'user_intent': 'What is the value of TSLA Stock today?'}
+
+Instructions:
+- Analyze the headline and content carefully.
+- Determine the primary ticker symbol.
+- Respond with ONLY ONE WORD.
+- Do not include punctuation.
+- Do not include explanations.
+- Do not include quotes.
+
+2026-02-19 12:56:02,103 | INFO    | system:global | ollama_chatmodel:193 | _generate | Building the payload ... {'model': 'qwen2:0.5b', 'stream': False, 'messages': [{'role': 'user', 'content': "\nRole:\nYou are a Financial Entity Extraction specialist. Your task is to identify the primary US stock market ticker symbol from a user's natural language intent.\n\nUser Intent:\n{'user_intent': 'What is the value of TSLA Stock today?'}\n\nInstructions:\n- Analyze the headline and content carefully.\n- Determine the primary ticker symbol.\n- Respond with ONLY ONE WORD.\n- Do not include punctuation.\n- Do not include explanations.\n- Do not include quotes.\n"}], 'options': {'temperature': 0.2, 'num_predict': 2048}}
+2026-02-20 20:44:19,187 | INFO    | system:global | macro_market:88 | fetch_macro_market_data | Starting macro market data fetch
+2026-02-20 20:44:19,806 | INFO    | system:global | macro_market:102 | fetch_macro_market_data | Macro market data fetched successfully
+2026-02-20 20:44:19,806 | INFO    | system:global | market_service:42 | fetch_alpaca_market | Macro Payload: {'market_data': {'price': 689.29, 'volume': 5541.0}, 'timestamp': '2026-02-21T04:44:19.806047+00:00', 'risk_mode': 'NORMAL'}
+2026-02-20 20:44:19,806 | INFO    | system:global | market_service:44 | fetch_alpaca_market | SystemContext initialization complete
+2026-02-20 20:44:19,806 | INFO    | system:global | market_tool:14 | fetch_alpaca_market | [fetch_alpaca_market] Result from mcp tool: {'market_data': {'price': 689.29, 'volume': 5541.0}, 'timestamp': '2026-02-21T04:44:19.806047+00:00', 'risk_mode': 'NORMAL'}
+2026-02-20 20:44:26,032 | INFO    | system:global | market_tool:29 | extract_ticker | [extract_ticker] Entering mcp tool: What is the value of TSLA Stock today?
+2026-02-20 20:44:26,032 | INFO    | system:global | model_manager:89 | __init__ | LLM Path: /Users/raymondordona/Workspace/ai/projects/agentic_system/llm
+2026-02-20 20:44:26,032 | INFO    | system:global | model_manager:98 | __init__ | Loading Embedding Factory
+2026-02-20 20:44:26,032 | INFO    | system:global | embedding_factory:115 | get | Provider and Model: 'ollama' and 'nomic-embed-text:latest'
+2026-02-20 20:44:26,032 | INFO    | system:global | embedding_factory:116 | get | Embedding Config chosen: {'module': 'llm.embeddings.adapters.ollama_embedding_client', 'class': 'OllamaEmbeddingClient', 'endpoint': 'http://localhost:11434/api/embed', 'models': ['nomic-embed-text:latest']}
+2026-02-20 20:44:26,032 | INFO    | system:global | ollama_embedding_client:62 | __init__ | OllamaEmbeddingClient initialized with model 'nomic-embed-text:latest' at http://localhost:11434/api/embed
+2026-02-20 20:44:26,033 | INFO    | system:global | model_manager:105 | __init__ | Loading Store Factory
+2026-02-20 20:44:26,033 | INFO    | system:global | store_factory:176 | get | Available parameters: {'dims': 1536}
+2026-02-20 20:44:26,033 | INFO    | system:global | inmemory_store:255 | __init__ | InMemoryStore initialized
+2026-02-20 20:44:26,033 | INFO    | system:global | model_manager:109 | __init__ | Loading reflection prompt
+2026-02-20 20:44:26,033 | INFO    | system:global | model_manager:115 | __init__ | Initializing Memory Manager
+2026-02-20 20:44:26,033 | INFO    | system:global | memory_manager:95 | __init__ | Memory Manager initialized
+2026-02-20 20:44:26,033 | INFO    | system:global | model_manager:125 | __init__ | Loading Chat Model Factory
+2026-02-20 20:44:26,033 | INFO    | system:global | chatmodel_factory:88 | get | Provider and Model: 'ollama' and 'qwen2:0.5b'
+2026-02-20 20:44:26,033 | INFO    | system:global | chatmodel_factory:89 | get | ChatModel Config chosen: {'module': 'llm.chatmodels.adapters.ollama_chatmodel', 'class': 'OllamaChatModel', 'endpoint': 'http://localhost:11434/api/chat', 'models': ['qwen2:0.5b', 'llama3.2', 'qwen2:1.5b-instruct', 'tinyllama', 'granite3-moe:1b'], 'temperature': 0.2, 'max_tokens': 2048, 'request_timeout': 120.0, 'apis': {'chat': {'uri': '/api/chat', 'payload_template': {'messages': [{'role': 'system', 'content': ''}, {'role': 'user', 'content': ''}], 'stream': False, 'options': {'num_predict': 4096}}, 'response_template': {'model': '', 'created_at': '', 'message': {'role': 'assistant', 'content': ''}, 'done': True, 'done_reason': 'stop', 'total_duration': 0, 'load_duration': 0, 'prompt_eval_count': 0, 'prompt_eval_duration': 0, 'eval_count': 0, 'eval_duration': 0}}, 'generate': {'uri': '/api/generate', 'payload_template': {'prompt': '', 'stream': False, 'options': {'num_predict': 4096}}, 'response_template': {'model': '', 'created_at': '', 'response': '', 'done': True, 'done_reason': 'stop', 'context': [], 'total_duration': 0, 'load_duration': 0, 'prompt_eval_count': 0, 'prompt_eval_duration': 0, 'eval_count': 0, 'eval_duration': 0}}, 'models': {'uri': '/api/tags', 'response_template': {'models': [{'name': '', 'model': '', 'size': ''}]}}}}
+2026-02-20 20:44:26,033 | INFO    | system:global | ollama_chatmodel:163 | model_post_init | OllamaChatModel initialized | model=qwen2:0.5b endpoint=http://localhost:11434/api/chat temperature=0.2 max_tokens=2048
+2026-02-20 20:44:26,033 | INFO    | system:global | market_service:97 | extract_ticker | Now Executing Extract Ticker: {'user_intent': 'What is the value of TSLA Stock today?'}
+2026-02-20 20:44:26,033 | INFO    | system:global | ticker_extractor:21 | extract | Reached this extract: {'user_intent': 'What is the value of TSLA Stock today?'}
+2026-02-20 20:44:26,033 | INFO    | system:global | ticker_extractor:39 | extract | Ticker Extractor Prompt: 
+Role:
+You are a Financial Entity Extraction specialist. Your task is to identify the primary US stock market ticker symbol from a user's natural language intent.
+
+User Intent:
+{'user_intent': 'What is the value of TSLA Stock today?'}
+
+Instructions:
+- Analyze the headline and content carefully.
+- Determine the primary ticker symbol.
+- Respond with ONLY ONE WORD.
+- Do not include punctuation.
+- Do not include explanations.
+- Do not include quotes.
+
+2026-02-20 20:44:26,034 | INFO    | system:global | ollama_chatmodel:193 | _generate | Building the payload ... {'model': 'qwen2:0.5b', 'stream': False, 'messages': [{'role': 'user', 'content': "\nRole:\nYou are a Financial Entity Extraction specialist. Your task is to identify the primary US stock market ticker symbol from a user's natural language intent.\n\nUser Intent:\n{'user_intent': 'What is the value of TSLA Stock today?'}\n\nInstructions:\n- Analyze the headline and content carefully.\n- Determine the primary ticker symbol.\n- Respond with ONLY ONE WORD.\n- Do not include punctuation.\n- Do not include explanations.\n- Do not include quotes.\n"}], 'options': {'temperature': 0.2, 'num_predict': 2048}}
+2026-02-20 20:47:45,489 | INFO    | system:global | macro_market:88 | fetch_macro_market_data | Starting macro market data fetch
+2026-02-20 20:47:45,756 | INFO    | system:global | macro_market:102 | fetch_macro_market_data | Macro market data fetched successfully
+2026-02-20 20:47:45,756 | INFO    | system:global | market_service:42 | fetch_alpaca_market | Macro Payload: {'market_data': {'price': 689.29, 'volume': 5541.0}, 'timestamp': '2026-02-21T04:47:45.756330+00:00', 'risk_mode': 'NORMAL'}
+2026-02-20 20:47:45,756 | INFO    | system:global | market_service:44 | fetch_alpaca_market | SystemContext initialization complete
+2026-02-20 20:47:45,756 | INFO    | system:global | market_tool:14 | fetch_alpaca_market | [fetch_alpaca_market] Result from mcp tool: {'market_data': {'price': 689.29, 'volume': 5541.0}, 'timestamp': '2026-02-21T04:47:45.756330+00:00', 'risk_mode': 'NORMAL'}
+2026-02-20 20:47:52,032 | INFO    | system:global | market_tool:29 | extract_ticker | [extract_ticker] Entering mcp tool: What is the value of TSLA Stock today?
+2026-02-20 20:47:52,032 | INFO    | system:global | model_manager:89 | __init__ | LLM Path: /Users/raymondordona/Workspace/ai/projects/agentic_system/llm
+2026-02-20 20:47:52,032 | INFO    | system:global | model_manager:98 | __init__ | Loading Embedding Factory
+2026-02-20 20:47:52,032 | INFO    | system:global | embedding_factory:115 | get | Provider and Model: 'ollama' and 'nomic-embed-text:latest'
+2026-02-20 20:47:52,032 | INFO    | system:global | embedding_factory:116 | get | Embedding Config chosen: {'module': 'llm.embeddings.adapters.ollama_embedding_client', 'class': 'OllamaEmbeddingClient', 'endpoint': 'http://localhost:11434/api/embed', 'models': ['nomic-embed-text:latest']}
+2026-02-20 20:47:52,032 | INFO    | system:global | ollama_embedding_client:62 | __init__ | OllamaEmbeddingClient initialized with model 'nomic-embed-text:latest' at http://localhost:11434/api/embed
+2026-02-20 20:47:52,032 | INFO    | system:global | model_manager:105 | __init__ | Loading Store Factory
+2026-02-20 20:47:52,033 | INFO    | system:global | store_factory:176 | get | Available parameters: {'dims': 1536}
+2026-02-20 20:47:52,033 | INFO    | system:global | inmemory_store:255 | __init__ | InMemoryStore initialized
+2026-02-20 20:47:52,033 | INFO    | system:global | model_manager:109 | __init__ | Loading reflection prompt
+2026-02-20 20:47:52,033 | INFO    | system:global | model_manager:115 | __init__ | Initializing Memory Manager
+2026-02-20 20:47:52,033 | INFO    | system:global | memory_manager:95 | __init__ | Memory Manager initialized
+2026-02-20 20:47:52,033 | INFO    | system:global | model_manager:125 | __init__ | Loading Chat Model Factory
+2026-02-20 20:47:52,033 | INFO    | system:global | chatmodel_factory:88 | get | Provider and Model: 'ollama' and 'qwen2:0.5b'
+2026-02-20 20:47:52,033 | INFO    | system:global | chatmodel_factory:89 | get | ChatModel Config chosen: {'module': 'llm.chatmodels.adapters.ollama_chatmodel', 'class': 'OllamaChatModel', 'endpoint': 'http://localhost:11434/api/chat', 'models': ['qwen2:0.5b', 'llama3.2', 'qwen2:1.5b-instruct', 'tinyllama', 'granite3-moe:1b'], 'temperature': 0.2, 'max_tokens': 2048, 'request_timeout': 120.0, 'apis': {'chat': {'uri': '/api/chat', 'payload_template': {'messages': [{'role': 'system', 'content': ''}, {'role': 'user', 'content': ''}], 'stream': False, 'options': {'num_predict': 4096}}, 'response_template': {'model': '', 'created_at': '', 'message': {'role': 'assistant', 'content': ''}, 'done': True, 'done_reason': 'stop', 'total_duration': 0, 'load_duration': 0, 'prompt_eval_count': 0, 'prompt_eval_duration': 0, 'eval_count': 0, 'eval_duration': 0}}, 'generate': {'uri': '/api/generate', 'payload_template': {'prompt': '', 'stream': False, 'options': {'num_predict': 4096}}, 'response_template': {'model': '', 'created_at': '', 'response': '', 'done': True, 'done_reason': 'stop', 'context': [], 'total_duration': 0, 'load_duration': 0, 'prompt_eval_count': 0, 'prompt_eval_duration': 0, 'eval_count': 0, 'eval_duration': 0}}, 'models': {'uri': '/api/tags', 'response_template': {'models': [{'name': '', 'model': '', 'size': ''}]}}}}
+2026-02-20 20:47:52,033 | INFO    | system:global | ollama_chatmodel:163 | model_post_init | OllamaChatModel initialized | model=qwen2:0.5b endpoint=http://localhost:11434/api/chat temperature=0.2 max_tokens=2048
+2026-02-20 20:47:52,033 | INFO    | system:global | market_service:97 | extract_ticker | Now Executing Extract Ticker: {'user_intent': 'What is the value of TSLA Stock today?'}
+2026-02-20 20:47:52,033 | INFO    | system:global | ticker_extractor:21 | extract | Reached this extract: {'user_intent': 'What is the value of TSLA Stock today?'}
+2026-02-20 20:47:52,033 | INFO    | system:global | ticker_extractor:39 | extract | Ticker Extractor Prompt: 
+Role:
+You are a Financial Entity Extraction specialist. Your task is to identify the primary US stock market ticker symbol from a user's natural language intent.
+
+User Intent:
+{'user_intent': 'What is the value of TSLA Stock today?'}
+
+Instructions:
+- Analyze the headline and content carefully.
+- Determine the primary ticker symbol.
+- Respond with ONLY ONE WORD.
+- Do not include punctuation.
+- Do not include explanations.
+- Do not include quotes.
+
+2026-02-20 20:47:52,034 | INFO    | system:global | ollama_chatmodel:193 | _generate | Building the payload ... {'model': 'qwen2:0.5b', 'stream': False, 'messages': [{'role': 'user', 'content': "\nRole:\nYou are a Financial Entity Extraction specialist. Your task is to identify the primary US stock market ticker symbol from a user's natural language intent.\n\nUser Intent:\n{'user_intent': 'What is the value of TSLA Stock today?'}\n\nInstructions:\n- Analyze the headline and content carefully.\n- Determine the primary ticker symbol.\n- Respond with ONLY ONE WORD.\n- Do not include punctuation.\n- Do not include explanations.\n- Do not include quotes.\n"}], 'options': {'temperature': 0.2, 'num_predict': 2048}}
+2026-02-20 20:49:51,128 | INFO    | system:global | config_api_manager:15 | __init__ | Path: /Users/raymondordona/Workspace/ai/projects/agentic_system/mcp_server/app/config_api_manager.py
+2026-02-20 20:49:55,507 | INFO    | system:global | macro_market:88 | fetch_macro_market_data | Starting macro market data fetch
+2026-02-20 20:49:55,843 | INFO    | system:global | macro_market:102 | fetch_macro_market_data | Macro market data fetched successfully
+2026-02-20 20:49:55,843 | INFO    | system:global | market_service:42 | fetch_alpaca_market | Macro Payload: {'market_data': {'price': 689.29, 'volume': 5541.0}, 'timestamp': '2026-02-21T04:49:55.843821+00:00', 'risk_mode': 'NORMAL'}
+2026-02-20 20:49:55,844 | INFO    | system:global | market_service:44 | fetch_alpaca_market | SystemContext initialization complete
+2026-02-20 20:49:55,844 | INFO    | system:global | market_tool:14 | fetch_alpaca_market | [fetch_alpaca_market] Result from mcp tool: {'market_data': {'price': 689.29, 'volume': 5541.0}, 'timestamp': '2026-02-21T04:49:55.843821+00:00', 'risk_mode': 'NORMAL'}
+2026-02-20 20:50:02,091 | INFO    | system:global | market_tool:29 | extract_ticker | [extract_ticker] Entering mcp tool: What is the value of TSLA Stock today?
+2026-02-20 20:50:02,091 | INFO    | system:global | model_manager:89 | __init__ | LLM Path: /Users/raymondordona/Workspace/ai/projects/agentic_system/llm
+2026-02-20 20:50:02,091 | INFO    | system:global | model_manager:98 | __init__ | Loading Embedding Factory
+2026-02-20 20:50:02,091 | INFO    | system:global | embedding_factory:72 | load_config | EmbeddingFactory config loaded
+2026-02-20 20:50:02,091 | INFO    | system:global | embedding_factory:115 | get | Provider and Model: 'ollama' and 'nomic-embed-text:latest'
+2026-02-20 20:50:02,091 | INFO    | system:global | embedding_factory:116 | get | Embedding Config chosen: {'module': 'llm.embeddings.adapters.ollama_embedding_client', 'class': 'OllamaEmbeddingClient', 'endpoint': 'http://localhost:11434/api/embed', 'models': ['nomic-embed-text:latest']}
+2026-02-20 20:50:02,092 | INFO    | system:global | ollama_embedding_client:62 | __init__ | OllamaEmbeddingClient initialized with model 'nomic-embed-text:latest' at http://localhost:11434/api/embed
+2026-02-20 20:50:02,092 | INFO    | system:global | model_manager:105 | __init__ | Loading Store Factory
+2026-02-20 20:50:02,092 | INFO    | system:global | store_factory:127 | load_config | StoreFactory config loaded
+2026-02-20 20:50:02,092 | INFO    | system:global | store_factory:176 | get | Available parameters: {'dims': 1536}
+2026-02-20 20:50:02,092 | INFO    | system:global | inmemory_store:255 | __init__ | InMemoryStore initialized
+2026-02-20 20:50:02,092 | INFO    | system:global | model_manager:109 | __init__ | Loading reflection prompt
+2026-02-20 20:50:02,093 | INFO    | system:global | store_factory:104 | load_reflection_prompt | Reflection prompt loaded from /Users/raymondordona/Workspace/ai/projects/agentic_system/prompts/reflection.md
+2026-02-20 20:50:02,093 | INFO    | system:global | model_manager:115 | __init__ | Initializing Memory Manager
+2026-02-20 20:50:02,093 | INFO    | system:global | memory_manager:95 | __init__ | Memory Manager initialized
+2026-02-20 20:50:02,093 | INFO    | system:global | model_manager:125 | __init__ | Loading Chat Model Factory
+2026-02-20 20:50:02,093 | INFO    | system:global | chatmodel_factory:55 | load_config | ChatModelFactory config loaded
+2026-02-20 20:50:02,093 | INFO    | system:global | chatmodel_factory:88 | get | Provider and Model: 'ollama' and 'qwen2:0.5b'
+2026-02-20 20:50:02,093 | INFO    | system:global | chatmodel_factory:89 | get | ChatModel Config chosen: {'module': 'llm.chatmodels.adapters.ollama_chatmodel', 'class': 'OllamaChatModel', 'endpoint': 'http://localhost:11434/api/chat', 'models': ['qwen2:0.5b', 'llama3.2', 'qwen2:1.5b-instruct', 'tinyllama', 'granite3-moe:1b'], 'temperature': 0.2, 'max_tokens': 2048, 'request_timeout': 120.0, 'apis': {'chat': {'uri': '/api/chat', 'payload_template': {'messages': [{'role': 'system', 'content': ''}, {'role': 'user', 'content': ''}], 'stream': False, 'options': {'num_predict': 4096}}, 'response_template': {'model': '', 'created_at': '', 'message': {'role': 'assistant', 'content': ''}, 'done': True, 'done_reason': 'stop', 'total_duration': 0, 'load_duration': 0, 'prompt_eval_count': 0, 'prompt_eval_duration': 0, 'eval_count': 0, 'eval_duration': 0}}, 'generate': {'uri': '/api/generate', 'payload_template': {'prompt': '', 'stream': False, 'options': {'num_predict': 4096}}, 'response_template': {'model': '', 'created_at': '', 'response': '', 'done': True, 'done_reason': 'stop', 'context': [], 'total_duration': 0, 'load_duration': 0, 'prompt_eval_count': 0, 'prompt_eval_duration': 0, 'eval_count': 0, 'eval_duration': 0}}, 'models': {'uri': '/api/tags', 'response_template': {'models': [{'name': '', 'model': '', 'size': ''}]}}}}
+2026-02-20 20:50:02,097 | INFO    | system:global | ollama_chatmodel:163 | model_post_init | OllamaChatModel initialized | model=qwen2:0.5b endpoint=http://localhost:11434/api/chat temperature=0.2 max_tokens=2048
+2026-02-20 20:50:02,098 | INFO    | system:global | market_service:97 | extract_ticker | Now Executing Extract Ticker: {'user_intent': 'What is the value of TSLA Stock today?'}
+2026-02-20 20:50:02,098 | INFO    | system:global | ticker_extractor:21 | extract | Reached this extract: {'user_intent': 'What is the value of TSLA Stock today?'}
+2026-02-20 20:50:02,098 | INFO    | system:global | ticker_extractor:39 | extract | Ticker Extractor Prompt: 
+Role:
+You are a Financial Entity Extraction specialist. Your task is to identify the primary US stock market ticker symbol from a user's natural language intent.
+
+User Intent:
+{'user_intent': 'What is the value of TSLA Stock today?'}
+
+Instructions:
+- Analyze the headline and content carefully.
+- Determine the primary ticker symbol.
+- Respond with ONLY ONE WORD.
+- Do not include punctuation.
+- Do not include explanations.
+- Do not include quotes.
+
+2026-02-20 20:50:02,226 | INFO    | system:global | ollama_chatmodel:193 | _generate | Building the payload ... {'model': 'qwen2:0.5b', 'stream': False, 'messages': [{'role': 'user', 'content': "\nRole:\nYou are a Financial Entity Extraction specialist. Your task is to identify the primary US stock market ticker symbol from a user's natural language intent.\n\nUser Intent:\n{'user_intent': 'What is the value of TSLA Stock today?'}\n\nInstructions:\n- Analyze the headline and content carefully.\n- Determine the primary ticker symbol.\n- Respond with ONLY ONE WORD.\n- Do not include punctuation.\n- Do not include explanations.\n- Do not include quotes.\n"}], 'options': {'temperature': 0.2, 'num_predict': 2048}}
+2026-02-20 20:52:22,744 | INFO    | system:global | config_api_manager:15 | __init__ | Path: /Users/raymondordona/Workspace/ai/projects/agentic_system/mcp_server/app/config_api_manager.py
+2026-02-20 20:52:30,835 | INFO    | system:global | macro_market:88 | fetch_macro_market_data | Starting macro market data fetch
+2026-02-20 20:52:31,259 | INFO    | system:global | macro_market:102 | fetch_macro_market_data | Macro market data fetched successfully
+2026-02-20 20:52:31,259 | INFO    | system:global | market_service:42 | fetch_alpaca_market | Macro Payload: {'market_data': {'price': 689.29, 'volume': 5541.0}, 'timestamp': '2026-02-21T04:52:31.259143+00:00', 'risk_mode': 'NORMAL'}
+2026-02-20 20:52:31,259 | INFO    | system:global | market_service:44 | fetch_alpaca_market | SystemContext initialization complete
+2026-02-20 20:52:31,259 | INFO    | system:global | market_tool:14 | fetch_alpaca_market | [fetch_alpaca_market] Result from mcp tool: {'market_data': {'price': 689.29, 'volume': 5541.0}, 'timestamp': '2026-02-21T04:52:31.259143+00:00', 'risk_mode': 'NORMAL'}
+2026-02-20 20:52:37,514 | INFO    | system:global | market_tool:29 | extract_ticker | [extract_ticker] Entering mcp tool: What is the value of TSLA Stock today?
+2026-02-20 20:52:37,514 | INFO    | system:global | model_manager:89 | __init__ | LLM Path: /Users/raymondordona/Workspace/ai/projects/agentic_system/llm
+2026-02-20 20:52:37,514 | INFO    | system:global | model_manager:98 | __init__ | Loading Embedding Factory
+2026-02-20 20:52:37,514 | INFO    | system:global | embedding_factory:72 | load_config | EmbeddingFactory config loaded
+2026-02-20 20:52:37,514 | INFO    | system:global | embedding_factory:115 | get | Provider and Model: 'ollama' and 'nomic-embed-text:latest'
+2026-02-20 20:52:37,514 | INFO    | system:global | embedding_factory:116 | get | Embedding Config chosen: {'module': 'llm.embeddings.adapters.ollama_embedding_client', 'class': 'OllamaEmbeddingClient', 'endpoint': 'http://localhost:11434/api/embed', 'models': ['nomic-embed-text:latest']}
+2026-02-20 20:52:37,515 | INFO    | system:global | ollama_embedding_client:62 | __init__ | OllamaEmbeddingClient initialized with model 'nomic-embed-text:latest' at http://localhost:11434/api/embed
+2026-02-20 20:52:37,515 | INFO    | system:global | model_manager:105 | __init__ | Loading Store Factory
+2026-02-20 20:52:37,515 | INFO    | system:global | store_factory:127 | load_config | StoreFactory config loaded
+2026-02-20 20:52:37,515 | INFO    | system:global | store_factory:176 | get | Available parameters: {'dims': 1536}
+2026-02-20 20:52:37,515 | INFO    | system:global | inmemory_store:255 | __init__ | InMemoryStore initialized
+2026-02-20 20:52:37,515 | INFO    | system:global | model_manager:109 | __init__ | Loading reflection prompt
+2026-02-20 20:52:37,516 | INFO    | system:global | store_factory:104 | load_reflection_prompt | Reflection prompt loaded from /Users/raymondordona/Workspace/ai/projects/agentic_system/prompts/reflection.md
+2026-02-20 20:52:37,516 | INFO    | system:global | model_manager:115 | __init__ | Initializing Memory Manager
+2026-02-20 20:52:37,516 | INFO    | system:global | memory_manager:95 | __init__ | Memory Manager initialized
+2026-02-20 20:52:37,516 | INFO    | system:global | model_manager:125 | __init__ | Loading Chat Model Factory
+2026-02-20 20:52:37,516 | INFO    | system:global | chatmodel_factory:55 | load_config | ChatModelFactory config loaded
+2026-02-20 20:52:37,516 | INFO    | system:global | chatmodel_factory:88 | get | Provider and Model: 'ollama' and 'qwen2:0.5b'
+2026-02-20 20:52:37,516 | INFO    | system:global | chatmodel_factory:89 | get | ChatModel Config chosen: {'module': 'llm.chatmodels.adapters.ollama_chatmodel', 'class': 'OllamaChatModel', 'endpoint': 'http://localhost:11434/api/chat', 'models': ['qwen2:0.5b', 'llama3.2', 'qwen2:1.5b-instruct', 'tinyllama', 'granite3-moe:1b'], 'temperature': 0.2, 'max_tokens': 2048, 'request_timeout': 120.0, 'apis': {'chat': {'uri': '/api/chat', 'payload_template': {'messages': [{'role': 'system', 'content': ''}, {'role': 'user', 'content': ''}], 'stream': False, 'options': {'num_predict': 4096}}, 'response_template': {'model': '', 'created_at': '', 'message': {'role': 'assistant', 'content': ''}, 'done': True, 'done_reason': 'stop', 'total_duration': 0, 'load_duration': 0, 'prompt_eval_count': 0, 'prompt_eval_duration': 0, 'eval_count': 0, 'eval_duration': 0}}, 'generate': {'uri': '/api/generate', 'payload_template': {'prompt': '', 'stream': False, 'options': {'num_predict': 4096}}, 'response_template': {'model': '', 'created_at': '', 'response': '', 'done': True, 'done_reason': 'stop', 'context': [], 'total_duration': 0, 'load_duration': 0, 'prompt_eval_count': 0, 'prompt_eval_duration': 0, 'eval_count': 0, 'eval_duration': 0}}, 'models': {'uri': '/api/tags', 'response_template': {'models': [{'name': '', 'model': '', 'size': ''}]}}}}
+2026-02-20 20:52:37,521 | INFO    | system:global | ollama_chatmodel:163 | model_post_init | OllamaChatModel initialized | model=qwen2:0.5b endpoint=http://localhost:11434/api/chat temperature=0.2 max_tokens=2048
+2026-02-20 20:52:37,521 | INFO    | system:global | market_service:97 | extract_ticker | Now Executing Extract Ticker: {'user_intent': 'What is the value of TSLA Stock today?'}
+2026-02-20 20:52:37,521 | INFO    | system:global | ticker_extractor:21 | extract | Reached this extract: {'user_intent': 'What is the value of TSLA Stock today?'}
+2026-02-20 20:52:37,521 | INFO    | system:global | ticker_extractor:39 | extract | Ticker Extractor Prompt: 
+Role:
+You are a Financial Entity Extraction specialist. Your task is to identify the primary US stock market ticker symbol from a user's natural language intent.
+
+User Intent:
+{'user_intent': 'What is the value of TSLA Stock today?'}
+
+Instructions:
+- Analyze the headline and content carefully.
+- Determine the primary ticker symbol.
+- Respond with ONLY ONE WORD.
+- Do not include punctuation.
+- Do not include explanations.
+- Do not include quotes.
+
+2026-02-20 20:52:37,522 | INFO    | system:global | ollama_chatmodel:193 | _generate | Building the payload ... {'model': 'qwen2:0.5b', 'stream': False, 'messages': [{'role': 'user', 'content': "\nRole:\nYou are a Financial Entity Extraction specialist. Your task is to identify the primary US stock market ticker symbol from a user's natural language intent.\n\nUser Intent:\n{'user_intent': 'What is the value of TSLA Stock today?'}\n\nInstructions:\n- Analyze the headline and content carefully.\n- Determine the primary ticker symbol.\n- Respond with ONLY ONE WORD.\n- Do not include punctuation.\n- Do not include explanations.\n- Do not include quotes.\n"}], 'options': {'temperature': 0.2, 'num_predict': 2048}}
+2026-02-20 20:52:38,466 | INFO    | system:global | ollama_chatmodel:200 | _generate | LLM Response status: <Response [200]>
+2026-02-20 20:52:38,466 | INFO    | system:global | ollama_chatmodel:205 | _generate | Raw Data: {'model': 'qwen2:0.5b', 'created_at': '2026-02-21T04:52:38.476369374Z', 'message': {'role': 'assistant', 'content': 'TSLA\n\nValue of TSLA Stock today.'}, 'done': True, 'done_reason': 'stop', 'total_duration': 939644931, 'load_duration': 93364045, 'prompt_eval_count': 101, 'prompt_eval_duration': 378833217, 'eval_count': 13, 'eval_duration': 439168483}
+2026-02-20 20:52:38,467 | INFO    | system:global | ticker_extractor:41 | extract | LLM response: content='TSLA\n\nValue of TSLA Stock today.' additional_kwargs={} response_metadata={} id='lc_run--019c7e8a-e411-7351-a714-722ce20e62f6-0'
+2026-02-20 20:52:38,467 | INFO    | system:global | market_tool:31 | extract_ticker | [extract_ticker] Result from mcp tool: {'ticker': 'TSLA\n\nValue of TSLA Stock today.'}
+2026-02-20 20:52:38,837 | INFO    | system:global | alpaca_news_provider:37 | get_ticker_news | Raw response type: <class 'alpaca.data.models.news.NewsSet'>
+2026-02-20 20:52:38,837 | INFO    | system:global | alpaca_news_provider:38 | get_ticker_news | Has news attr: False
+2026-02-20 20:52:38,837 | INFO    | system:global | alpaca_news_provider:39 | get_ticker_news | Response contents: 0 headlines
+2026-02-20 20:52:38,837 | INFO    | system:global | market_service:57 | search_ticker_news | Completed News Search: {'agent': 'AlpacaNewsProvider', 'type': 'TickerNews', 'version': '1.0', 'created_at': '2026-02-21T04:52:38.837794', 'payload': {'ticker': 'TSLA\n\nValue of TSLA Stock today.', 'articles': []}, 'metadata': {'count': 0, 'status': 'success'}}
+2026-02-20 20:52:38,838 | INFO    | system:global | model_manager:89 | __init__ | LLM Path: /Users/raymondordona/Workspace/ai/projects/agentic_system/llm
+2026-02-20 20:52:38,838 | INFO    | system:global | model_manager:98 | __init__ | Loading Embedding Factory
+2026-02-20 20:52:38,838 | INFO    | system:global | embedding_factory:115 | get | Provider and Model: 'ollama' and 'nomic-embed-text:latest'
+2026-02-20 20:52:38,838 | INFO    | system:global | embedding_factory:116 | get | Embedding Config chosen: {'module': 'llm.embeddings.adapters.ollama_embedding_client', 'class': 'OllamaEmbeddingClient', 'endpoint': 'http://localhost:11434/api/embed', 'models': ['nomic-embed-text:latest']}
+2026-02-20 20:52:38,838 | INFO    | system:global | ollama_embedding_client:62 | __init__ | OllamaEmbeddingClient initialized with model 'nomic-embed-text:latest' at http://localhost:11434/api/embed
+2026-02-20 20:52:38,838 | INFO    | system:global | model_manager:105 | __init__ | Loading Store Factory
+2026-02-20 20:52:38,839 | INFO    | system:global | store_factory:176 | get | Available parameters: {'dims': 1536}
+2026-02-20 20:52:38,839 | INFO    | system:global | inmemory_store:255 | __init__ | InMemoryStore initialized
+2026-02-20 20:52:38,839 | INFO    | system:global | model_manager:109 | __init__ | Loading reflection prompt
+2026-02-20 20:52:38,839 | INFO    | system:global | model_manager:115 | __init__ | Initializing Memory Manager
+2026-02-20 20:52:38,839 | INFO    | system:global | memory_manager:95 | __init__ | Memory Manager initialized
+2026-02-20 20:52:38,839 | INFO    | system:global | model_manager:125 | __init__ | Loading Chat Model Factory
+2026-02-20 20:52:38,839 | INFO    | system:global | chatmodel_factory:88 | get | Provider and Model: 'ollama' and 'qwen2:0.5b'
+2026-02-20 20:52:38,839 | INFO    | system:global | chatmodel_factory:89 | get | ChatModel Config chosen: {'module': 'llm.chatmodels.adapters.ollama_chatmodel', 'class': 'OllamaChatModel', 'endpoint': 'http://localhost:11434/api/chat', 'models': ['qwen2:0.5b', 'llama3.2', 'qwen2:1.5b-instruct', 'tinyllama', 'granite3-moe:1b'], 'temperature': 0.2, 'max_tokens': 2048, 'request_timeout': 120.0, 'apis': {'chat': {'uri': '/api/chat', 'payload_template': {'messages': [{'role': 'system', 'content': ''}, {'role': 'user', 'content': ''}], 'stream': False, 'options': {'num_predict': 4096}}, 'response_template': {'model': '', 'created_at': '', 'message': {'role': 'assistant', 'content': ''}, 'done': True, 'done_reason': 'stop', 'total_duration': 0, 'load_duration': 0, 'prompt_eval_count': 0, 'prompt_eval_duration': 0, 'eval_count': 0, 'eval_duration': 0}}, 'generate': {'uri': '/api/generate', 'payload_template': {'prompt': '', 'stream': False, 'options': {'num_predict': 4096}}, 'response_template': {'model': '', 'created_at': '', 'response': '', 'done': True, 'done_reason': 'stop', 'context': [], 'total_duration': 0, 'load_duration': 0, 'prompt_eval_count': 0, 'prompt_eval_duration': 0, 'eval_count': 0, 'eval_duration': 0}}, 'models': {'uri': '/api/tags', 'response_template': {'models': [{'name': '', 'model': '', 'size': ''}]}}}}
+2026-02-20 20:52:38,839 | INFO    | system:global | ollama_chatmodel:163 | model_post_init | OllamaChatModel initialized | model=qwen2:0.5b endpoint=http://localhost:11434/api/chat temperature=0.2 max_tokens=2048
+2026-02-23 18:46:54,201 | INFO    | system:global | macro_market:88 | fetch_macro_market_data | Starting macro market data fetch
+2026-02-23 18:46:54,219 | ERROR   | system:global | macro_market:106 | fetch_macro_market_data | Macro data fetch failed — switching to CONSERVATIVE mode
+Traceback (most recent call last):
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/mcp_server/app/services/market/macro_market.py", line 91, in fetch_macro_market_data
+    quote = await self.provider.get_latest_quote(self.benchmark_symbol)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/mcp_server/app/services/market/macro_market.py", line 53, in get_latest_quote
+    data = self._request(endpoint)
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/mcp_server/app/services/market/macro_market.py", line 41, in _request
+    response = requests.get(
+        url,
+        headers=headers,
+        timeout=self.timeout,
+    )
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/requests/api.py", line 73, in get
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/requests/api.py", line 59, in request
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/requests/sessions.py", line 589, in request
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/requests/sessions.py", line 703, in send
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/requests/adapters.py", line 616, in send
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/requests/adapters.py", line 303, in cert_verify
+OSError: Could not find a suitable TLS CA certificate bundle, invalid path: /Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/certifi/cacert.pem
+2026-02-23 18:46:54,232 | INFO    | system:global | market_service:42 | fetch_alpaca_market | Macro Payload: {'market_data': {'price': 0.0, 'volume': 0.0}, 'timestamp': '2026-02-24T02:46:54.231906+00:00', 'risk_mode': 'CONSERVATIVE'}
+2026-02-23 18:46:54,232 | INFO    | system:global | market_service:44 | fetch_alpaca_market | SystemContext initialization complete
+2026-02-23 18:46:54,232 | INFO    | system:global | market_tool:14 | fetch_alpaca_market | [fetch_alpaca_market] Result from mcp tool: {'market_data': {'price': 0.0, 'volume': 0.0}, 'timestamp': '2026-02-24T02:46:54.231906+00:00', 'risk_mode': 'CONSERVATIVE'}
+2026-02-23 18:47:00,460 | INFO    | system:global | market_tool:29 | extract_ticker | [extract_ticker] Entering mcp tool: dsfsdfasdf
+2026-02-23 18:47:00,460 | INFO    | system:global | model_manager:89 | __init__ | LLM Path: /Users/raymondordona/Workspace/ai/projects/agentic_system/llm
+2026-02-23 18:47:00,460 | INFO    | system:global | model_manager:98 | __init__ | Loading Embedding Factory
+2026-02-23 18:47:00,460 | INFO    | system:global | embedding_factory:115 | get | Provider and Model: 'ollama' and 'nomic-embed-text:latest'
+2026-02-23 18:47:00,460 | INFO    | system:global | embedding_factory:116 | get | Embedding Config chosen: {'module': 'llm.embeddings.adapters.ollama_embedding_client', 'class': 'OllamaEmbeddingClient', 'endpoint': 'http://localhost:11434/api/embed', 'models': ['nomic-embed-text:latest']}
+2026-02-23 18:47:00,461 | INFO    | system:global | ollama_embedding_client:62 | __init__ | OllamaEmbeddingClient initialized with model 'nomic-embed-text:latest' at http://localhost:11434/api/embed
+2026-02-23 18:47:00,461 | INFO    | system:global | model_manager:105 | __init__ | Loading Store Factory
+2026-02-23 18:47:00,461 | INFO    | system:global | store_factory:176 | get | Available parameters: {'dims': 1536}
+2026-02-23 18:47:00,461 | INFO    | system:global | inmemory_store:255 | __init__ | InMemoryStore initialized
+2026-02-23 18:47:00,461 | INFO    | system:global | model_manager:109 | __init__ | Loading reflection prompt
+2026-02-23 18:47:00,461 | INFO    | system:global | model_manager:115 | __init__ | Initializing Memory Manager
+2026-02-23 18:47:00,461 | INFO    | system:global | memory_manager:95 | __init__ | Memory Manager initialized
+2026-02-23 18:47:00,461 | INFO    | system:global | model_manager:125 | __init__ | Loading Chat Model Factory
+2026-02-23 18:47:00,462 | INFO    | system:global | chatmodel_factory:88 | get | Provider and Model: 'ollama' and 'qwen2:0.5b'
+2026-02-23 18:47:00,462 | INFO    | system:global | chatmodel_factory:89 | get | ChatModel Config chosen: {'module': 'llm.chatmodels.adapters.ollama_chatmodel', 'class': 'OllamaChatModel', 'endpoint': 'http://localhost:11434/api/chat', 'models': ['qwen2:0.5b', 'llama3.2', 'qwen2:1.5b-instruct', 'tinyllama', 'granite3-moe:1b'], 'temperature': 0.2, 'max_tokens': 2048, 'request_timeout': 120.0, 'apis': {'chat': {'uri': '/api/chat', 'payload_template': {'messages': [{'role': 'system', 'content': ''}, {'role': 'user', 'content': ''}], 'stream': False, 'options': {'num_predict': 4096}}, 'response_template': {'model': '', 'created_at': '', 'message': {'role': 'assistant', 'content': ''}, 'done': True, 'done_reason': 'stop', 'total_duration': 0, 'load_duration': 0, 'prompt_eval_count': 0, 'prompt_eval_duration': 0, 'eval_count': 0, 'eval_duration': 0}}, 'generate': {'uri': '/api/generate', 'payload_template': {'prompt': '', 'stream': False, 'options': {'num_predict': 4096}}, 'response_template': {'model': '', 'created_at': '', 'response': '', 'done': True, 'done_reason': 'stop', 'context': [], 'total_duration': 0, 'load_duration': 0, 'prompt_eval_count': 0, 'prompt_eval_duration': 0, 'eval_count': 0, 'eval_duration': 0}}, 'models': {'uri': '/api/tags', 'response_template': {'models': [{'name': '', 'model': '', 'size': ''}]}}}}
+2026-02-23 18:47:00,462 | INFO    | system:global | ollama_chatmodel:163 | model_post_init | OllamaChatModel initialized | model=qwen2:0.5b endpoint=http://localhost:11434/api/chat temperature=0.2 max_tokens=2048
+2026-02-23 18:47:00,462 | INFO    | system:global | market_service:97 | extract_ticker | Now Executing Extract Ticker: {'user_intent': 'dsfsdfasdf'}
+2026-02-23 18:47:00,462 | INFO    | system:global | ticker_extractor:21 | extract | Reached this extract: {'user_intent': 'dsfsdfasdf'}
+2026-02-23 18:47:00,462 | INFO    | system:global | ticker_extractor:39 | extract | Ticker Extractor Prompt: 
+Role:
+You are a Financial Entity Extraction specialist. Your task is to identify the primary US stock market ticker symbol from a user's natural language intent.
+
+User Intent:
+{'user_intent': 'dsfsdfasdf'}
+
+Instructions:
+- Analyze the headline and content carefully.
+- Determine the primary ticker symbol.
+- Respond with ONLY ONE WORD.
+- Do not include punctuation.
+- Do not include explanations.
+- Do not include quotes.
+
+2026-02-23 18:47:00,466 | INFO    | system:global | ollama_chatmodel:193 | _generate | Building the payload ... {'model': 'qwen2:0.5b', 'stream': False, 'messages': [{'role': 'user', 'content': "\nRole:\nYou are a Financial Entity Extraction specialist. Your task is to identify the primary US stock market ticker symbol from a user's natural language intent.\n\nUser Intent:\n{'user_intent': 'dsfsdfasdf'}\n\nInstructions:\n- Analyze the headline and content carefully.\n- Determine the primary ticker symbol.\n- Respond with ONLY ONE WORD.\n- Do not include punctuation.\n- Do not include explanations.\n- Do not include quotes.\n"}], 'options': {'temperature': 0.2, 'num_predict': 2048}}
+2026-02-23 18:47:02,429 | INFO    | system:global | ollama_chatmodel:200 | _generate | LLM Response status: <Response [200]>
+2026-02-23 18:47:02,429 | INFO    | system:global | ollama_chatmodel:205 | _generate | Raw Data: {'model': 'qwen2:0.5b', 'created_at': '2026-02-24T02:47:02.978453092Z', 'message': {'role': 'assistant', 'content': 'US Stock Market Ticker Symbol: TSLA'}, 'done': True, 'done_reason': 'stop', 'total_duration': 1957550427, 'load_duration': 1314236281, 'prompt_eval_count': 94, 'prompt_eval_duration': 342436379, 'eval_count': 11, 'eval_duration': 266825254}
+2026-02-23 18:47:02,431 | INFO    | system:global | ticker_extractor:41 | extract | LLM response: content='US Stock Market Ticker Symbol: TSLA' additional_kwargs={} response_metadata={} id='lc_run--019c8d8a-f670-79c2-adb7-b9a0592105a1-0'
+2026-02-23 18:47:02,431 | INFO    | system:global | market_tool:31 | extract_ticker | [extract_ticker] Result from mcp tool: {'ticker': 'US Stock Market Ticker Symbol: TSLA'}
+2026-02-23 18:47:02,467 | INFO    | system:global | market_service:57 | search_ticker_news | Completed News Search: {'agent': 'AlpacaNewsProvider', 'type': 'TickerNews', 'version': '1.0', 'created_at': '2026-02-24T02:47:02.467445', 'payload': None, 'metadata': {'error_details': 'Could not find a suitable TLS CA certificate bundle, invalid path: /Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/certifi/cacert.pem', 'status': 'failed'}}
+2026-02-23 20:06:48,923 | INFO    | system:global | macro_market:88 | fetch_macro_market_data | Starting macro market data fetch
+2026-02-23 20:06:48,925 | ERROR   | system:global | macro_market:106 | fetch_macro_market_data | Macro data fetch failed — switching to CONSERVATIVE mode
+Traceback (most recent call last):
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/mcp_server/app/services/market/macro_market.py", line 91, in fetch_macro_market_data
+    quote = await self.provider.get_latest_quote(self.benchmark_symbol)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/mcp_server/app/services/market/macro_market.py", line 53, in get_latest_quote
+    data = self._request(endpoint)
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/mcp_server/app/services/market/macro_market.py", line 41, in _request
+    response = requests.get(
+        url,
+        headers=headers,
+        timeout=self.timeout,
+    )
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/requests/api.py", line 73, in get
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/requests/api.py", line 59, in request
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/requests/sessions.py", line 589, in request
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/requests/sessions.py", line 703, in send
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/requests/adapters.py", line 616, in send
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/requests/adapters.py", line 303, in cert_verify
+OSError: Could not find a suitable TLS CA certificate bundle, invalid path: /Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/certifi/cacert.pem
+2026-02-23 20:06:48,926 | INFO    | system:global | market_service:42 | fetch_alpaca_market | Macro Payload: {'market_data': {'price': 0.0, 'volume': 0.0}, 'timestamp': '2026-02-24T04:06:48.926707+00:00', 'risk_mode': 'CONSERVATIVE'}
+2026-02-23 20:06:48,926 | INFO    | system:global | market_service:44 | fetch_alpaca_market | SystemContext initialization complete
+2026-02-23 20:06:48,926 | INFO    | system:global | market_tool:14 | fetch_alpaca_market | [fetch_alpaca_market] Result from mcp tool: {'market_data': {'price': 0.0, 'volume': 0.0}, 'timestamp': '2026-02-24T04:06:48.926707+00:00', 'risk_mode': 'CONSERVATIVE'}
+2026-02-23 20:06:55,156 | INFO    | system:global | market_tool:29 | extract_ticker | [extract_ticker] Entering mcp tool: What is the value of TSLA Stock today?
+2026-02-23 20:06:55,156 | INFO    | system:global | model_manager:89 | __init__ | LLM Path: /Users/raymondordona/Workspace/ai/projects/agentic_system/llm
+2026-02-23 20:06:55,156 | INFO    | system:global | model_manager:98 | __init__ | Loading Embedding Factory
+2026-02-23 20:06:55,156 | INFO    | system:global | embedding_factory:115 | get | Provider and Model: 'ollama' and 'nomic-embed-text:latest'
+2026-02-23 20:06:55,156 | INFO    | system:global | embedding_factory:116 | get | Embedding Config chosen: {'module': 'llm.embeddings.adapters.ollama_embedding_client', 'class': 'OllamaEmbeddingClient', 'endpoint': 'http://localhost:11434/api/embed', 'models': ['nomic-embed-text:latest']}
+2026-02-23 20:06:55,156 | INFO    | system:global | ollama_embedding_client:62 | __init__ | OllamaEmbeddingClient initialized with model 'nomic-embed-text:latest' at http://localhost:11434/api/embed
+2026-02-23 20:06:55,156 | INFO    | system:global | model_manager:105 | __init__ | Loading Store Factory
+2026-02-23 20:06:55,157 | INFO    | system:global | store_factory:176 | get | Available parameters: {'dims': 1536}
+2026-02-23 20:06:55,157 | INFO    | system:global | inmemory_store:255 | __init__ | InMemoryStore initialized
+2026-02-23 20:06:55,157 | INFO    | system:global | model_manager:109 | __init__ | Loading reflection prompt
+2026-02-23 20:06:55,157 | INFO    | system:global | model_manager:115 | __init__ | Initializing Memory Manager
+2026-02-23 20:06:55,157 | INFO    | system:global | memory_manager:95 | __init__ | Memory Manager initialized
+2026-02-23 20:06:55,157 | INFO    | system:global | model_manager:125 | __init__ | Loading Chat Model Factory
+2026-02-23 20:06:55,157 | INFO    | system:global | chatmodel_factory:88 | get | Provider and Model: 'ollama' and 'qwen2:0.5b'
+2026-02-23 20:06:55,157 | INFO    | system:global | chatmodel_factory:89 | get | ChatModel Config chosen: {'module': 'llm.chatmodels.adapters.ollama_chatmodel', 'class': 'OllamaChatModel', 'endpoint': 'http://localhost:11434/api/chat', 'models': ['qwen2:0.5b', 'llama3.2', 'qwen2:1.5b-instruct', 'tinyllama', 'granite3-moe:1b'], 'temperature': 0.2, 'max_tokens': 2048, 'request_timeout': 120.0, 'apis': {'chat': {'uri': '/api/chat', 'payload_template': {'messages': [{'role': 'system', 'content': ''}, {'role': 'user', 'content': ''}], 'stream': False, 'options': {'num_predict': 4096}}, 'response_template': {'model': '', 'created_at': '', 'message': {'role': 'assistant', 'content': ''}, 'done': True, 'done_reason': 'stop', 'total_duration': 0, 'load_duration': 0, 'prompt_eval_count': 0, 'prompt_eval_duration': 0, 'eval_count': 0, 'eval_duration': 0}}, 'generate': {'uri': '/api/generate', 'payload_template': {'prompt': '', 'stream': False, 'options': {'num_predict': 4096}}, 'response_template': {'model': '', 'created_at': '', 'response': '', 'done': True, 'done_reason': 'stop', 'context': [], 'total_duration': 0, 'load_duration': 0, 'prompt_eval_count': 0, 'prompt_eval_duration': 0, 'eval_count': 0, 'eval_duration': 0}}, 'models': {'uri': '/api/tags', 'response_template': {'models': [{'name': '', 'model': '', 'size': ''}]}}}}
+2026-02-23 20:06:55,157 | INFO    | system:global | ollama_chatmodel:163 | model_post_init | OllamaChatModel initialized | model=qwen2:0.5b endpoint=http://localhost:11434/api/chat temperature=0.2 max_tokens=2048
+2026-02-23 20:06:55,157 | INFO    | system:global | market_service:97 | extract_ticker | Now Executing Extract Ticker: {'user_intent': 'What is the value of TSLA Stock today?'}
+2026-02-23 20:06:55,157 | INFO    | system:global | ticker_extractor:21 | extract | Reached this extract: {'user_intent': 'What is the value of TSLA Stock today?'}
+2026-02-23 20:06:55,157 | INFO    | system:global | ticker_extractor:39 | extract | Ticker Extractor Prompt: 
+Role:
+You are a Financial Entity Extraction specialist. Your task is to identify the primary US stock market ticker symbol from a user's natural language intent.
+
+User Intent:
+{'user_intent': 'What is the value of TSLA Stock today?'}
+
+Instructions:
+- Analyze the headline and content carefully.
+- Determine the primary ticker symbol.
+- Respond with ONLY ONE WORD.
+- Do not include punctuation.
+- Do not include explanations.
+- Do not include quotes.
+
+2026-02-23 20:06:55,158 | INFO    | system:global | ollama_chatmodel:193 | _generate | Building the payload ... {'model': 'qwen2:0.5b', 'stream': False, 'messages': [{'role': 'user', 'content': "\nRole:\nYou are a Financial Entity Extraction specialist. Your task is to identify the primary US stock market ticker symbol from a user's natural language intent.\n\nUser Intent:\n{'user_intent': 'What is the value of TSLA Stock today?'}\n\nInstructions:\n- Analyze the headline and content carefully.\n- Determine the primary ticker symbol.\n- Respond with ONLY ONE WORD.\n- Do not include punctuation.\n- Do not include explanations.\n- Do not include quotes.\n"}], 'options': {'temperature': 0.2, 'num_predict': 2048}}
+2026-02-23 20:06:58,005 | INFO    | system:global | ollama_chatmodel:200 | _generate | LLM Response status: <Response [200]>
+2026-02-23 20:06:58,005 | INFO    | system:global | ollama_chatmodel:205 | _generate | Raw Data: {'model': 'qwen2:0.5b', 'created_at': '2026-02-24T03:27:56.812208341Z', 'message': {'role': 'assistant', 'content': "TSLA\n\nThe user's intent is to know the value of TSLA Stock today. The primary US stock market ticker symbol for TSLA is TSLA."}, 'done': True, 'done_reason': 'stop', 'total_duration': 2842284442, 'load_duration': 1309424748, 'prompt_eval_count': 101, 'prompt_eval_duration': 387428915, 'eval_count': 37, 'eval_duration': 1052822901}
+2026-02-23 20:06:58,006 | INFO    | system:global | ticker_extractor:41 | extract | LLM response: content="TSLA\n\nThe user's intent is to know the value of TSLA Stock today. The primary US stock market ticker symbol for TSLA is TSLA." additional_kwargs={} response_metadata={} id='lc_run--019c8dd4-1fb6-7df1-a48a-0d2bdb113626-0'
+2026-02-23 20:06:58,006 | INFO    | system:global | market_tool:31 | extract_ticker | [extract_ticker] Result from mcp tool: {'ticker': "TSLA\n\nThe user's intent is to know the value of TSLA Stock today. The primary US stock market ticker symbol for TSLA is TSLA."}
+2026-02-23 20:06:58,039 | INFO    | system:global | market_service:57 | search_ticker_news | Completed News Search: {'agent': 'AlpacaNewsProvider', 'type': 'TickerNews', 'version': '1.0', 'created_at': '2026-02-24T04:06:58.039339', 'payload': None, 'metadata': {'error_details': 'Could not find a suitable TLS CA certificate bundle, invalid path: /Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/certifi/cacert.pem', 'status': 'failed'}}
+2026-02-24 12:08:12,164 | INFO    | system:global | macro_market:88 | fetch_macro_market_data | Starting macro market data fetch
+2026-02-24 12:08:12,205 | ERROR   | system:global | macro_market:106 | fetch_macro_market_data | Macro data fetch failed — switching to CONSERVATIVE mode
+Traceback (most recent call last):
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/mcp_server/app/services/market/macro_market.py", line 91, in fetch_macro_market_data
+    quote = await self.provider.get_latest_quote(self.benchmark_symbol)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/mcp_server/app/services/market/macro_market.py", line 53, in get_latest_quote
+    data = self._request(endpoint)
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/mcp_server/app/services/market/macro_market.py", line 41, in _request
+    response = requests.get(
+        url,
+        headers=headers,
+        timeout=self.timeout,
+    )
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/requests/api.py", line 73, in get
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/requests/api.py", line 59, in request
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/requests/sessions.py", line 589, in request
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/requests/sessions.py", line 703, in send
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/requests/adapters.py", line 616, in send
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/requests/adapters.py", line 303, in cert_verify
+OSError: Could not find a suitable TLS CA certificate bundle, invalid path: /Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/certifi/cacert.pem
+2026-02-24 12:08:12,206 | INFO    | system:global | market_service:42 | fetch_alpaca_market | Macro Payload: {'market_data': {'price': 0.0, 'volume': 0.0}, 'timestamp': '2026-02-24T20:08:12.206494+00:00', 'risk_mode': 'CONSERVATIVE'}
+2026-02-24 12:08:12,206 | INFO    | system:global | market_service:44 | fetch_alpaca_market | SystemContext initialization complete
+2026-02-24 12:08:12,206 | INFO    | system:global | market_tool:14 | fetch_alpaca_market | [fetch_alpaca_market] Result from mcp tool: {'market_data': {'price': 0.0, 'volume': 0.0}, 'timestamp': '2026-02-24T20:08:12.206494+00:00', 'risk_mode': 'CONSERVATIVE'}
+2026-02-24 12:08:18,455 | INFO    | system:global | market_tool:29 | extract_ticker | [extract_ticker] Entering mcp tool: asdfasdfasdf
+2026-02-24 12:08:18,455 | INFO    | system:global | model_manager:89 | __init__ | LLM Path: /Users/raymondordona/Workspace/ai/projects/agentic_system/llm
+2026-02-24 12:08:18,455 | INFO    | system:global | model_manager:98 | __init__ | Loading Embedding Factory
+2026-02-24 12:08:18,455 | INFO    | system:global | embedding_factory:115 | get | Provider and Model: 'ollama' and 'nomic-embed-text:latest'
+2026-02-24 12:08:18,455 | INFO    | system:global | embedding_factory:116 | get | Embedding Config chosen: {'module': 'llm.embeddings.adapters.ollama_embedding_client', 'class': 'OllamaEmbeddingClient', 'endpoint': 'http://localhost:11434/api/embed', 'models': ['nomic-embed-text:latest']}
+2026-02-24 12:08:18,455 | INFO    | system:global | ollama_embedding_client:62 | __init__ | OllamaEmbeddingClient initialized with model 'nomic-embed-text:latest' at http://localhost:11434/api/embed
+2026-02-24 12:08:18,455 | INFO    | system:global | model_manager:105 | __init__ | Loading Store Factory
+2026-02-24 12:08:18,456 | INFO    | system:global | store_factory:176 | get | Available parameters: {'dims': 1536}
+2026-02-24 12:08:18,456 | INFO    | system:global | inmemory_store:255 | __init__ | InMemoryStore initialized
+2026-02-24 12:08:18,456 | INFO    | system:global | model_manager:109 | __init__ | Loading reflection prompt
+2026-02-24 12:08:18,456 | INFO    | system:global | model_manager:115 | __init__ | Initializing Memory Manager
+2026-02-24 12:08:18,456 | INFO    | system:global | memory_manager:95 | __init__ | Memory Manager initialized
+2026-02-24 12:08:18,456 | INFO    | system:global | model_manager:125 | __init__ | Loading Chat Model Factory
+2026-02-24 12:08:18,456 | INFO    | system:global | chatmodel_factory:88 | get | Provider and Model: 'ollama' and 'qwen2:0.5b'
+2026-02-24 12:08:18,456 | INFO    | system:global | chatmodel_factory:89 | get | ChatModel Config chosen: {'module': 'llm.chatmodels.adapters.ollama_chatmodel', 'class': 'OllamaChatModel', 'endpoint': 'http://localhost:11434/api/chat', 'models': ['qwen2:0.5b', 'llama3.2', 'qwen2:1.5b-instruct', 'tinyllama', 'granite3-moe:1b'], 'temperature': 0.2, 'max_tokens': 2048, 'request_timeout': 120.0, 'apis': {'chat': {'uri': '/api/chat', 'payload_template': {'messages': [{'role': 'system', 'content': ''}, {'role': 'user', 'content': ''}], 'stream': False, 'options': {'num_predict': 4096}}, 'response_template': {'model': '', 'created_at': '', 'message': {'role': 'assistant', 'content': ''}, 'done': True, 'done_reason': 'stop', 'total_duration': 0, 'load_duration': 0, 'prompt_eval_count': 0, 'prompt_eval_duration': 0, 'eval_count': 0, 'eval_duration': 0}}, 'generate': {'uri': '/api/generate', 'payload_template': {'prompt': '', 'stream': False, 'options': {'num_predict': 4096}}, 'response_template': {'model': '', 'created_at': '', 'response': '', 'done': True, 'done_reason': 'stop', 'context': [], 'total_duration': 0, 'load_duration': 0, 'prompt_eval_count': 0, 'prompt_eval_duration': 0, 'eval_count': 0, 'eval_duration': 0}}, 'models': {'uri': '/api/tags', 'response_template': {'models': [{'name': '', 'model': '', 'size': ''}]}}}}
+2026-02-24 12:08:18,456 | INFO    | system:global | ollama_chatmodel:163 | model_post_init | OllamaChatModel initialized | model=qwen2:0.5b endpoint=http://localhost:11434/api/chat temperature=0.2 max_tokens=2048
+2026-02-24 12:08:18,456 | INFO    | system:global | market_service:97 | extract_ticker | Now Executing Extract Ticker: {'user_intent': 'asdfasdfasdf'}
+2026-02-24 12:08:18,456 | INFO    | system:global | ticker_extractor:21 | extract | Reached this extract: {'user_intent': 'asdfasdfasdf'}
+2026-02-24 12:08:18,456 | INFO    | system:global | ticker_extractor:39 | extract | Ticker Extractor Prompt: 
+Role:
+You are a Financial Entity Extraction specialist. Your task is to identify the primary US stock market ticker symbol from a user's natural language intent.
+
+User Intent:
+{'user_intent': 'asdfasdfasdf'}
+
+Instructions:
+- Analyze the headline and content carefully.
+- Determine the primary ticker symbol.
+- Respond with ONLY ONE WORD.
+- Do not include punctuation.
+- Do not include explanations.
+- Do not include quotes.
+
+2026-02-24 12:08:18,457 | INFO    | system:global | ollama_chatmodel:193 | _generate | Building the payload ... {'model': 'qwen2:0.5b', 'stream': False, 'messages': [{'role': 'user', 'content': "\nRole:\nYou are a Financial Entity Extraction specialist. Your task is to identify the primary US stock market ticker symbol from a user's natural language intent.\n\nUser Intent:\n{'user_intent': 'asdfasdfasdf'}\n\nInstructions:\n- Analyze the headline and content carefully.\n- Determine the primary ticker symbol.\n- Respond with ONLY ONE WORD.\n- Do not include punctuation.\n- Do not include explanations.\n- Do not include quotes.\n"}], 'options': {'temperature': 0.2, 'num_predict': 2048}}
+2026-02-24 12:08:20,849 | INFO    | system:global | ollama_chatmodel:200 | _generate | LLM Response status: <Response [200]>
+2026-02-24 12:08:20,850 | INFO    | system:global | ollama_chatmodel:205 | _generate | Raw Data: {'model': 'qwen2:0.5b', 'created_at': '2026-02-24T20:08:22.068469172Z', 'message': {'role': 'assistant', 'content': 'ASDFASDFAEHSFJHJKLKMLNQOOPRTUWVWXYZ'}, 'done': True, 'done_reason': 'stop', 'total_duration': 2388166495, 'load_duration': 1309858443, 'prompt_eval_count': 93, 'prompt_eval_duration': 383494977, 'eval_count': 24, 'eval_duration': 633524021}
+2026-02-24 12:08:20,850 | INFO    | system:global | ticker_extractor:41 | extract | LLM response: content='ASDFASDFAEHSFJHJKLKMLNQOOPRTUWVWXYZ' additional_kwargs={} response_metadata={} id='lc_run--019c9144-4d19-7330-a76d-1b5d965832b8-0'
+2026-02-24 12:08:20,850 | INFO    | system:global | market_tool:31 | extract_ticker | [extract_ticker] Result from mcp tool: {'ticker': 'ASDFASDFAEHSFJHJKLKMLNQOOPRTUWVWXYZ'}
+2026-02-24 12:08:20,885 | INFO    | system:global | market_service:57 | search_ticker_news | Completed News Search: {'agent': 'AlpacaNewsProvider', 'type': 'TickerNews', 'version': '1.0', 'created_at': '2026-02-24T20:08:20.885261', 'payload': None, 'metadata': {'error_details': 'Could not find a suitable TLS CA certificate bundle, invalid path: /Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/certifi/cacert.pem', 'status': 'failed'}}
+2026-02-24 12:11:47,673 | INFO    | system:global | macro_market:88 | fetch_macro_market_data | Starting macro market data fetch
+2026-02-24 12:11:47,674 | ERROR   | system:global | macro_market:106 | fetch_macro_market_data | Macro data fetch failed — switching to CONSERVATIVE mode
+Traceback (most recent call last):
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/mcp_server/app/services/market/macro_market.py", line 91, in fetch_macro_market_data
+    quote = await self.provider.get_latest_quote(self.benchmark_symbol)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/mcp_server/app/services/market/macro_market.py", line 53, in get_latest_quote
+    data = self._request(endpoint)
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/mcp_server/app/services/market/macro_market.py", line 41, in _request
+    response = requests.get(
+        url,
+        headers=headers,
+        timeout=self.timeout,
+    )
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/requests/api.py", line 73, in get
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/requests/api.py", line 59, in request
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/requests/sessions.py", line 589, in request
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/requests/sessions.py", line 703, in send
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/requests/adapters.py", line 616, in send
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/requests/adapters.py", line 303, in cert_verify
+OSError: Could not find a suitable TLS CA certificate bundle, invalid path: /Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/certifi/cacert.pem
+2026-02-24 12:11:47,675 | INFO    | system:global | market_service:42 | fetch_alpaca_market | Macro Payload: {'market_data': {'price': 0.0, 'volume': 0.0}, 'timestamp': '2026-02-24T20:11:47.675244+00:00', 'risk_mode': 'CONSERVATIVE'}
+2026-02-24 12:11:47,675 | INFO    | system:global | market_service:44 | fetch_alpaca_market | SystemContext initialization complete
+2026-02-24 12:11:47,675 | INFO    | system:global | market_tool:14 | fetch_alpaca_market | [fetch_alpaca_market] Result from mcp tool: {'market_data': {'price': 0.0, 'volume': 0.0}, 'timestamp': '2026-02-24T20:11:47.675244+00:00', 'risk_mode': 'CONSERVATIVE'}
+2026-02-24 12:11:54,015 | INFO    | system:global | market_tool:29 | extract_ticker | [extract_ticker] Entering mcp tool: asdfasdfsd
+2026-02-24 12:11:54,015 | INFO    | system:global | model_manager:89 | __init__ | LLM Path: /Users/raymondordona/Workspace/ai/projects/agentic_system/llm
+2026-02-24 12:11:54,015 | INFO    | system:global | model_manager:98 | __init__ | Loading Embedding Factory
+2026-02-24 12:11:54,015 | INFO    | system:global | embedding_factory:115 | get | Provider and Model: 'ollama' and 'nomic-embed-text:latest'
+2026-02-24 12:11:54,015 | INFO    | system:global | embedding_factory:116 | get | Embedding Config chosen: {'module': 'llm.embeddings.adapters.ollama_embedding_client', 'class': 'OllamaEmbeddingClient', 'endpoint': 'http://localhost:11434/api/embed', 'models': ['nomic-embed-text:latest']}
+2026-02-24 12:11:54,015 | INFO    | system:global | ollama_embedding_client:62 | __init__ | OllamaEmbeddingClient initialized with model 'nomic-embed-text:latest' at http://localhost:11434/api/embed
+2026-02-24 12:11:54,015 | INFO    | system:global | model_manager:105 | __init__ | Loading Store Factory
+2026-02-24 12:11:54,015 | INFO    | system:global | store_factory:176 | get | Available parameters: {'dims': 1536}
+2026-02-24 12:11:54,015 | INFO    | system:global | inmemory_store:255 | __init__ | InMemoryStore initialized
+2026-02-24 12:11:54,015 | INFO    | system:global | model_manager:109 | __init__ | Loading reflection prompt
+2026-02-24 12:11:54,015 | INFO    | system:global | model_manager:115 | __init__ | Initializing Memory Manager
+2026-02-24 12:11:54,015 | INFO    | system:global | memory_manager:95 | __init__ | Memory Manager initialized
+2026-02-24 12:11:54,015 | INFO    | system:global | model_manager:125 | __init__ | Loading Chat Model Factory
+2026-02-24 12:11:54,015 | INFO    | system:global | chatmodel_factory:88 | get | Provider and Model: 'ollama' and 'qwen2:0.5b'
+2026-02-24 12:11:54,015 | INFO    | system:global | chatmodel_factory:89 | get | ChatModel Config chosen: {'module': 'llm.chatmodels.adapters.ollama_chatmodel', 'class': 'OllamaChatModel', 'endpoint': 'http://localhost:11434/api/chat', 'models': ['qwen2:0.5b', 'llama3.2', 'qwen2:1.5b-instruct', 'tinyllama', 'granite3-moe:1b'], 'temperature': 0.2, 'max_tokens': 2048, 'request_timeout': 120.0, 'apis': {'chat': {'uri': '/api/chat', 'payload_template': {'messages': [{'role': 'system', 'content': ''}, {'role': 'user', 'content': ''}], 'stream': False, 'options': {'num_predict': 4096}}, 'response_template': {'model': '', 'created_at': '', 'message': {'role': 'assistant', 'content': ''}, 'done': True, 'done_reason': 'stop', 'total_duration': 0, 'load_duration': 0, 'prompt_eval_count': 0, 'prompt_eval_duration': 0, 'eval_count': 0, 'eval_duration': 0}}, 'generate': {'uri': '/api/generate', 'payload_template': {'prompt': '', 'stream': False, 'options': {'num_predict': 4096}}, 'response_template': {'model': '', 'created_at': '', 'response': '', 'done': True, 'done_reason': 'stop', 'context': [], 'total_duration': 0, 'load_duration': 0, 'prompt_eval_count': 0, 'prompt_eval_duration': 0, 'eval_count': 0, 'eval_duration': 0}}, 'models': {'uri': '/api/tags', 'response_template': {'models': [{'name': '', 'model': '', 'size': ''}]}}}}
+2026-02-24 12:11:54,016 | INFO    | system:global | ollama_chatmodel:163 | model_post_init | OllamaChatModel initialized | model=qwen2:0.5b endpoint=http://localhost:11434/api/chat temperature=0.2 max_tokens=2048
+2026-02-24 12:11:54,016 | INFO    | system:global | market_service:97 | extract_ticker | Now Executing Extract Ticker: {'user_intent': 'asdfasdfsd'}
+2026-02-24 12:11:54,016 | INFO    | system:global | ticker_extractor:21 | extract | Reached this extract: {'user_intent': 'asdfasdfsd'}
+2026-02-24 12:11:54,016 | INFO    | system:global | ticker_extractor:39 | extract | Ticker Extractor Prompt: 
+Role:
+You are a Financial Entity Extraction specialist. Your task is to identify the primary US stock market ticker symbol from a user's natural language intent.
+
+User Intent:
+{'user_intent': 'asdfasdfsd'}
+
+Instructions:
+- Analyze the headline and content carefully.
+- Determine the primary ticker symbol.
+- Respond with ONLY ONE WORD.
+- Do not include punctuation.
+- Do not include explanations.
+- Do not include quotes.
+
+2026-02-24 12:11:54,016 | INFO    | system:global | ollama_chatmodel:193 | _generate | Building the payload ... {'model': 'qwen2:0.5b', 'stream': False, 'messages': [{'role': 'user', 'content': "\nRole:\nYou are a Financial Entity Extraction specialist. Your task is to identify the primary US stock market ticker symbol from a user's natural language intent.\n\nUser Intent:\n{'user_intent': 'asdfasdfsd'}\n\nInstructions:\n- Analyze the headline and content carefully.\n- Determine the primary ticker symbol.\n- Respond with ONLY ONE WORD.\n- Do not include punctuation.\n- Do not include explanations.\n- Do not include quotes.\n"}], 'options': {'temperature': 0.2, 'num_predict': 2048}}
+2026-02-24 12:13:13,832 | INFO    | system:global | macro_market:88 | fetch_macro_market_data | Starting macro market data fetch
+2026-02-24 12:13:13,833 | ERROR   | system:global | macro_market:106 | fetch_macro_market_data | Macro data fetch failed — switching to CONSERVATIVE mode
+Traceback (most recent call last):
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/mcp_server/app/services/market/macro_market.py", line 91, in fetch_macro_market_data
+    quote = await self.provider.get_latest_quote(self.benchmark_symbol)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/mcp_server/app/services/market/macro_market.py", line 53, in get_latest_quote
+    data = self._request(endpoint)
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/mcp_server/app/services/market/macro_market.py", line 41, in _request
+    response = requests.get(
+        url,
+        headers=headers,
+        timeout=self.timeout,
+    )
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/requests/api.py", line 73, in get
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/requests/api.py", line 59, in request
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/requests/sessions.py", line 589, in request
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/requests/sessions.py", line 703, in send
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/requests/adapters.py", line 616, in send
+  File "/Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/requests/adapters.py", line 303, in cert_verify
+OSError: Could not find a suitable TLS CA certificate bundle, invalid path: /Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/certifi/cacert.pem
+2026-02-24 12:13:13,834 | INFO    | system:global | market_service:42 | fetch_alpaca_market | Macro Payload: {'market_data': {'price': 0.0, 'volume': 0.0}, 'timestamp': '2026-02-24T20:13:13.834865+00:00', 'risk_mode': 'CONSERVATIVE'}
+2026-02-24 12:13:13,835 | INFO    | system:global | market_service:44 | fetch_alpaca_market | SystemContext initialization complete
+2026-02-24 12:13:13,835 | INFO    | system:global | market_tool:14 | fetch_alpaca_market | [fetch_alpaca_market] Result from mcp tool: {'market_data': {'price': 0.0, 'volume': 0.0}, 'timestamp': '2026-02-24T20:13:13.834865+00:00', 'risk_mode': 'CONSERVATIVE'}
+2026-02-24 12:13:14,082 | INFO    | system:global | ollama_chatmodel:200 | _generate | LLM Response status: <Response [200]>
+2026-02-24 12:13:14,082 | INFO    | system:global | ollama_chatmodel:205 | _generate | Raw Data: {'model': 'qwen2:0.5b', 'created_at': '2026-02-24T20:13:15.298627551Z', 'message': {'role': 'assistant', 'content': 'ASDFSDTQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQF'}, 'done': True, 'done_reason': 'length', 'total_duration': 80061107298, 'load_duration': 114464483, 'prompt_eval_count': 93, 'prompt_eval_duration': 213750564, 'eval_count': 2048, 'eval_duration': 76273576710}
+2026-02-24 12:13:14,083 | INFO    | system:global | ticker_extractor:41 | extract | LLM response: content='ASDFSDTQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQF' additional_kwargs={} response_metadata={} id='lc_run--019c9147-9720-7e40-82c5-8b2314e6b349-0'
+2026-02-24 12:13:14,083 | INFO    | system:global | market_tool:31 | extract_ticker | [extract_ticker] Result from mcp tool: {'ticker': 'ASDFSDTQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQFQF'}
+2026-02-24 12:13:20,114 | INFO    | system:global | market_tool:29 | extract_ticker | [extract_ticker] Entering mcp tool: asdfadf
+2026-02-24 12:13:20,114 | INFO    | system:global | model_manager:89 | __init__ | LLM Path: /Users/raymondordona/Workspace/ai/projects/agentic_system/llm
+2026-02-24 12:13:20,114 | INFO    | system:global | model_manager:98 | __init__ | Loading Embedding Factory
+2026-02-24 12:13:20,114 | INFO    | system:global | embedding_factory:115 | get | Provider and Model: 'ollama' and 'nomic-embed-text:latest'
+2026-02-24 12:13:20,114 | INFO    | system:global | embedding_factory:116 | get | Embedding Config chosen: {'module': 'llm.embeddings.adapters.ollama_embedding_client', 'class': 'OllamaEmbeddingClient', 'endpoint': 'http://localhost:11434/api/embed', 'models': ['nomic-embed-text:latest']}
+2026-02-24 12:13:20,115 | INFO    | system:global | ollama_embedding_client:62 | __init__ | OllamaEmbeddingClient initialized with model 'nomic-embed-text:latest' at http://localhost:11434/api/embed
+2026-02-24 12:13:20,115 | INFO    | system:global | model_manager:105 | __init__ | Loading Store Factory
+2026-02-24 12:13:20,115 | INFO    | system:global | store_factory:176 | get | Available parameters: {'dims': 1536}
+2026-02-24 12:13:20,115 | INFO    | system:global | inmemory_store:255 | __init__ | InMemoryStore initialized
+2026-02-24 12:13:20,115 | INFO    | system:global | model_manager:109 | __init__ | Loading reflection prompt
+2026-02-24 12:13:20,115 | INFO    | system:global | model_manager:115 | __init__ | Initializing Memory Manager
+2026-02-24 12:13:20,115 | INFO    | system:global | memory_manager:95 | __init__ | Memory Manager initialized
+2026-02-24 12:13:20,115 | INFO    | system:global | model_manager:125 | __init__ | Loading Chat Model Factory
+2026-02-24 12:13:20,115 | INFO    | system:global | chatmodel_factory:88 | get | Provider and Model: 'ollama' and 'qwen2:0.5b'
+2026-02-24 12:13:20,115 | INFO    | system:global | chatmodel_factory:89 | get | ChatModel Config chosen: {'module': 'llm.chatmodels.adapters.ollama_chatmodel', 'class': 'OllamaChatModel', 'endpoint': 'http://localhost:11434/api/chat', 'models': ['qwen2:0.5b', 'llama3.2', 'qwen2:1.5b-instruct', 'tinyllama', 'granite3-moe:1b'], 'temperature': 0.2, 'max_tokens': 2048, 'request_timeout': 120.0, 'apis': {'chat': {'uri': '/api/chat', 'payload_template': {'messages': [{'role': 'system', 'content': ''}, {'role': 'user', 'content': ''}], 'stream': False, 'options': {'num_predict': 4096}}, 'response_template': {'model': '', 'created_at': '', 'message': {'role': 'assistant', 'content': ''}, 'done': True, 'done_reason': 'stop', 'total_duration': 0, 'load_duration': 0, 'prompt_eval_count': 0, 'prompt_eval_duration': 0, 'eval_count': 0, 'eval_duration': 0}}, 'generate': {'uri': '/api/generate', 'payload_template': {'prompt': '', 'stream': False, 'options': {'num_predict': 4096}}, 'response_template': {'model': '', 'created_at': '', 'response': '', 'done': True, 'done_reason': 'stop', 'context': [], 'total_duration': 0, 'load_duration': 0, 'prompt_eval_count': 0, 'prompt_eval_duration': 0, 'eval_count': 0, 'eval_duration': 0}}, 'models': {'uri': '/api/tags', 'response_template': {'models': [{'name': '', 'model': '', 'size': ''}]}}}}
+2026-02-24 12:13:20,115 | INFO    | system:global | ollama_chatmodel:163 | model_post_init | OllamaChatModel initialized | model=qwen2:0.5b endpoint=http://localhost:11434/api/chat temperature=0.2 max_tokens=2048
+2026-02-24 12:13:20,115 | INFO    | system:global | market_service:97 | extract_ticker | Now Executing Extract Ticker: {'user_intent': 'asdfadf'}
+2026-02-24 12:13:20,115 | INFO    | system:global | ticker_extractor:21 | extract | Reached this extract: {'user_intent': 'asdfadf'}
+2026-02-24 12:13:20,115 | INFO    | system:global | ticker_extractor:39 | extract | Ticker Extractor Prompt: 
+Role:
+You are a Financial Entity Extraction specialist. Your task is to identify the primary US stock market ticker symbol from a user's natural language intent.
+
+User Intent:
+{'user_intent': 'asdfadf'}
+
+Instructions:
+- Analyze the headline and content carefully.
+- Determine the primary ticker symbol.
+- Respond with ONLY ONE WORD.
+- Do not include punctuation.
+- Do not include explanations.
+- Do not include quotes.
+
+2026-02-24 12:13:20,117 | INFO    | system:global | ollama_chatmodel:193 | _generate | Building the payload ... {'model': 'qwen2:0.5b', 'stream': False, 'messages': [{'role': 'user', 'content': "\nRole:\nYou are a Financial Entity Extraction specialist. Your task is to identify the primary US stock market ticker symbol from a user's natural language intent.\n\nUser Intent:\n{'user_intent': 'asdfadf'}\n\nInstructions:\n- Analyze the headline and content carefully.\n- Determine the primary ticker symbol.\n- Respond with ONLY ONE WORD.\n- Do not include punctuation.\n- Do not include explanations.\n- Do not include quotes.\n"}], 'options': {'temperature': 0.2, 'num_predict': 2048}}
+2026-02-24 12:13:20,531 | INFO    | system:global | ollama_chatmodel:200 | _generate | LLM Response status: <Response [200]>
+2026-02-24 12:13:20,531 | INFO    | system:global | ollama_chatmodel:205 | _generate | Raw Data: {'model': 'qwen2:0.5b', 'created_at': '2026-02-24T20:13:21.748472469Z', 'message': {'role': 'assistant', 'content': 'ASDFADF'}, 'done': True, 'done_reason': 'stop', 'total_duration': 409887098, 'load_duration': 102146109, 'prompt_eval_count': 92, 'prompt_eval_duration': 192356286, 'eval_count': 4, 'eval_duration': 98214305}
+2026-02-24 12:13:20,532 | INFO    | system:global | ticker_extractor:41 | extract | LLM response: content='ASDFADF' additional_kwargs={} response_metadata={} id='lc_run--019c9148-e774-7fb1-b77b-9eddb88b516d-0'
+2026-02-24 12:13:20,532 | INFO    | system:global | market_tool:31 | extract_ticker | [extract_ticker] Result from mcp tool: {'ticker': 'ASDFADF'}
+2026-02-24 12:13:20,566 | INFO    | system:global | market_service:57 | search_ticker_news | Completed News Search: {'agent': 'AlpacaNewsProvider', 'type': 'TickerNews', 'version': '1.0', 'created_at': '2026-02-24T20:13:20.566290', 'payload': None, 'metadata': {'error_details': 'Could not find a suitable TLS CA certificate bundle, invalid path: /Users/raymondordona/Workspace/ai/projects/agentic_system/venv/lib/python3.14/site-packages/certifi/cacert.pem', 'status': 'failed'}}
+2026-02-24 22:32:53,284 | INFO    | system:global | config_api_manager:15 | __init__ | Path: /Users/raymondordona/Workspace/ai/projects/agentic_system/mcp_server/app/config_api_manager.py
+2026-02-24 22:34:02,702 | INFO    | system:global | macro_market:89 | fetch_macro_market_data | Starting macro market data fetch
+2026-02-24 22:34:04,838 | INFO    | system:global | macro_market:103 | fetch_macro_market_data | Macro market data fetched successfully
+2026-02-24 22:34:04,838 | INFO    | system:global | market_service:43 | fetch_alpaca_market | Macro Payload: {'market_data': {'price': 687.03, 'volume': 140.0}, 'timestamp': '2026-02-25T06:34:04.838478+00:00', 'risk_mode': 'NORMAL'}
+2026-02-24 22:34:04,838 | INFO    | system:global | market_service:45 | fetch_alpaca_market | SystemContext initialization complete
+2026-02-24 22:34:04,838 | INFO    | system:global | market_tool:14 | fetch_alpaca_market | [fetch_alpaca_market] Result from mcp tool: {'market_data': {'price': 687.03, 'volume': 140.0}, 'timestamp': '2026-02-25T06:34:04.838478+00:00', 'risk_mode': 'NORMAL'}
+2026-02-24 22:34:11,070 | INFO    | system:global | market_tool:29 | extract_ticker | [extract_ticker] Entering mcp tool: asdfasdfasdf
+2026-02-24 22:34:11,070 | INFO    | system:global | model_manager:87 | __init__ | LLM Path: /Users/raymondordona/Workspace/ai/projects/agentic_system/llm
+2026-02-24 22:34:11,071 | INFO    | system:global | model_manager:96 | __init__ | Loading Embedding Factory
+2026-02-24 22:34:11,071 | INFO    | system:global | embedding_factory:72 | load_config | EmbeddingFactory config loaded
+2026-02-24 22:34:11,071 | INFO    | system:global | embedding_factory:115 | get | Provider and Model: 'ollama' and 'nomic-embed-text:latest'
+2026-02-24 22:34:11,071 | INFO    | system:global | embedding_factory:116 | get | Embedding Config chosen: {'module': 'llm.embeddings.adapters.ollama_embedding_client', 'class': 'OllamaEmbeddingClient', 'endpoint': 'http://localhost:11434/api/embed', 'models': ['nomic-embed-text:latest']}
+2026-02-24 22:34:11,071 | INFO    | system:global | ollama_embedding_client:62 | __init__ | OllamaEmbeddingClient initialized with model 'nomic-embed-text:latest' at http://localhost:11434/api/embed
+2026-02-24 22:34:11,071 | INFO    | system:global | model_manager:103 | __init__ | Loading Store Factory
+2026-02-24 22:34:11,071 | INFO    | system:global | store_factory:127 | load_config | StoreFactory config loaded
+2026-02-24 22:34:11,072 | INFO    | system:global | store_factory:176 | get | Available parameters: {'dims': 1536}
+2026-02-24 22:34:11,072 | INFO    | system:global | inmemory_store:255 | __init__ | InMemoryStore initialized
+2026-02-24 22:34:11,072 | INFO    | system:global | model_manager:107 | __init__ | Loading reflection prompt
+2026-02-24 22:34:11,072 | INFO    | system:global | store_factory:104 | load_reflection_prompt | Reflection prompt loaded from /Users/raymondordona/Workspace/ai/projects/agentic_system/prompts/reflection.md
+2026-02-24 22:34:11,072 | INFO    | system:global | model_manager:113 | __init__ | Initializing Memory Manager
+2026-02-24 22:34:11,072 | INFO    | system:global | memory_manager:95 | __init__ | Memory Manager initialized
+2026-02-24 22:34:11,072 | INFO    | system:global | model_manager:123 | __init__ | Loading Chat Model Factory
+2026-02-24 22:34:11,073 | INFO    | system:global | chatmodel_factory:55 | load_config | ChatModelFactory config loaded
+2026-02-24 22:34:11,073 | INFO    | system:global | chatmodel_factory:88 | get | Provider and Model: 'ollama' and 'qwen2:0.5b'
+2026-02-24 22:34:11,073 | INFO    | system:global | chatmodel_factory:89 | get | ChatModel Config chosen: {'module': 'llm.chatmodels.adapters.ollama_chatmodel', 'class': 'OllamaChatModel', 'endpoint': 'http://localhost:11434/api/chat', 'models': ['qwen2:0.5b', 'llama3.2', 'qwen2:1.5b-instruct', 'tinyllama', 'granite3-moe:1b'], 'temperature': 0.2, 'max_tokens': 2048, 'request_timeout': 120.0, 'apis': {'chat': {'uri': '/api/chat', 'payload_template': {'messages': [{'role': 'system', 'content': ''}, {'role': 'user', 'content': ''}], 'stream': False, 'options': {'num_predict': 4096}}, 'response_template': {'model': '', 'created_at': '', 'message': {'role': 'assistant', 'content': ''}, 'done': True, 'done_reason': 'stop', 'total_duration': 0, 'load_duration': 0, 'prompt_eval_count': 0, 'prompt_eval_duration': 0, 'eval_count': 0, 'eval_duration': 0}}, 'generate': {'uri': '/api/generate', 'payload_template': {'prompt': '', 'stream': False, 'options': {'num_predict': 4096}}, 'response_template': {'model': '', 'created_at': '', 'response': '', 'done': True, 'done_reason': 'stop', 'context': [], 'total_duration': 0, 'load_duration': 0, 'prompt_eval_count': 0, 'prompt_eval_duration': 0, 'eval_count': 0, 'eval_duration': 0}}, 'models': {'uri': '/api/tags', 'response_template': {'models': [{'name': '', 'model': '', 'size': ''}]}}}}
+2026-02-24 22:34:11,077 | INFO    | system:global | ollama_chatmodel:163 | model_post_init | OllamaChatModel initialized | model=qwen2:0.5b endpoint=http://localhost:11434/api/chat temperature=0.2 max_tokens=2048
+2026-02-24 22:34:11,077 | INFO    | system:global | market_service:98 | extract_ticker | Now Executing Extract Ticker: {'user_intent': 'asdfasdfasdf'}
+2026-02-24 22:34:11,078 | INFO    | system:global | ticker_extractor:21 | extract | Reached this extract: {'user_intent': 'asdfasdfasdf'}
+2026-02-24 22:34:11,078 | INFO    | system:global | ticker_extractor:39 | extract | Ticker Extractor Prompt: 
+Role:
+You are a Financial Entity Extraction specialist. Your task is to identify the primary US stock market ticker symbol from a user's natural language intent.
+
+User Intent:
+{'user_intent': 'asdfasdfasdf'}
+
+Instructions:
+- Analyze the headline and content carefully.
+- Determine the primary ticker symbol.
+- Respond with ONLY ONE WORD.
+- Do not include punctuation.
+- Do not include explanations.
+- Do not include quotes.
+
+2026-02-24 22:34:11,087 | INFO    | system:global | ollama_chatmodel:193 | _generate | Building the payload ... {'model': 'qwen2:0.5b', 'stream': False, 'messages': [{'role': 'user', 'content': "\nRole:\nYou are a Financial Entity Extraction specialist. Your task is to identify the primary US stock market ticker symbol from a user's natural language intent.\n\nUser Intent:\n{'user_intent': 'asdfasdfasdf'}\n\nInstructions:\n- Analyze the headline and content carefully.\n- Determine the primary ticker symbol.\n- Respond with ONLY ONE WORD.\n- Do not include punctuation.\n- Do not include explanations.\n- Do not include quotes.\n"}], 'options': {'temperature': 0.2, 'num_predict': 2048}}
+2026-02-24 22:35:28,881 | INFO    | system:global | ollama_chatmodel:200 | _generate | LLM Response status: <Response [200]>
+2026-02-24 22:35:28,881 | INFO    | system:global | ollama_chatmodel:205 | _generate | Raw Data: {'model': 'qwen2:0.5b', 'created_at': '2026-02-25T06:35:28.884684652Z', 'message': {'role': 'assistant', 'content': 'ASDFASDFAEHSFASDFHSAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFA'}, 'done': True, 'done_reason': 'length', 'total_duration': 77788700719, 'load_duration': 1293632127, 'prompt_eval_count': 93, 'prompt_eval_duration': 360065703, 'eval_count': 2048, 'eval_duration': 72865737989}
+2026-02-24 22:35:28,882 | INFO    | system:global | ticker_extractor:41 | extract | LLM response: content='ASDFASDFAEHSFASDFHSAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFA' additional_kwargs={} response_metadata={} id='lc_run--019c9381-4f06-7610-aa8a-263682f32fe5-0' tool_calls=[] invalid_tool_calls=[]
+2026-02-24 22:35:28,882 | INFO    | system:global | market_tool:31 | extract_ticker | [extract_ticker] Result from mcp tool: {'ticker': 'ASDFASDFAEHSFASDFHSAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFA'}
+2026-02-24 22:35:29,242 | INFO    | system:global | alpaca_news_provider:37 | get_ticker_news | Raw response type: <class 'alpaca.data.models.news.NewsSet'>
+2026-02-24 22:35:29,242 | INFO    | system:global | alpaca_news_provider:38 | get_ticker_news | Has news attr: False
+2026-02-24 22:35:29,242 | INFO    | system:global | alpaca_news_provider:39 | get_ticker_news | Response contents: 0 headlines
+2026-02-24 22:35:29,242 | INFO    | system:global | market_service:58 | search_ticker_news | Completed News Search: {'agent': 'AlpacaNewsProvider', 'type': 'TickerNews', 'version': '1.0', 'created_at': '2026-02-25T06:35:29.242282', 'payload': {'ticker': 'ASDFASDFAEHSFASDFHSAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFAHFA', 'articles': []}, 'metadata': {'count': 0, 'status': 'success'}}
+2026-02-24 22:35:29,243 | INFO    | system:global | model_manager:87 | __init__ | LLM Path: /Users/raymondordona/Workspace/ai/projects/agentic_system/llm
+2026-02-24 22:35:29,243 | INFO    | system:global | model_manager:96 | __init__ | Loading Embedding Factory
+2026-02-24 22:35:29,243 | INFO    | system:global | embedding_factory:115 | get | Provider and Model: 'ollama' and 'nomic-embed-text:latest'
+2026-02-24 22:35:29,243 | INFO    | system:global | embedding_factory:116 | get | Embedding Config chosen: {'module': 'llm.embeddings.adapters.ollama_embedding_client', 'class': 'OllamaEmbeddingClient', 'endpoint': 'http://localhost:11434/api/embed', 'models': ['nomic-embed-text:latest']}
+2026-02-24 22:35:29,243 | INFO    | system:global | ollama_embedding_client:62 | __init__ | OllamaEmbeddingClient initialized with model 'nomic-embed-text:latest' at http://localhost:11434/api/embed
+2026-02-24 22:35:29,243 | INFO    | system:global | model_manager:103 | __init__ | Loading Store Factory
+2026-02-24 22:35:29,243 | INFO    | system:global | store_factory:176 | get | Available parameters: {'dims': 1536}
+2026-02-24 22:35:29,243 | INFO    | system:global | inmemory_store:255 | __init__ | InMemoryStore initialized
+2026-02-24 22:35:29,243 | INFO    | system:global | model_manager:107 | __init__ | Loading reflection prompt
+2026-02-24 22:35:29,243 | INFO    | system:global | model_manager:113 | __init__ | Initializing Memory Manager
+2026-02-24 22:35:29,243 | INFO    | system:global | memory_manager:95 | __init__ | Memory Manager initialized
+2026-02-24 22:35:29,243 | INFO    | system:global | model_manager:123 | __init__ | Loading Chat Model Factory
+2026-02-24 22:35:29,243 | INFO    | system:global | chatmodel_factory:88 | get | Provider and Model: 'ollama' and 'qwen2:0.5b'
+2026-02-24 22:35:29,243 | INFO    | system:global | chatmodel_factory:89 | get | ChatModel Config chosen: {'module': 'llm.chatmodels.adapters.ollama_chatmodel', 'class': 'OllamaChatModel', 'endpoint': 'http://localhost:11434/api/chat', 'models': ['qwen2:0.5b', 'llama3.2', 'qwen2:1.5b-instruct', 'tinyllama', 'granite3-moe:1b'], 'temperature': 0.2, 'max_tokens': 2048, 'request_timeout': 120.0, 'apis': {'chat': {'uri': '/api/chat', 'payload_template': {'messages': [{'role': 'system', 'content': ''}, {'role': 'user', 'content': ''}], 'stream': False, 'options': {'num_predict': 4096}}, 'response_template': {'model': '', 'created_at': '', 'message': {'role': 'assistant', 'content': ''}, 'done': True, 'done_reason': 'stop', 'total_duration': 0, 'load_duration': 0, 'prompt_eval_count': 0, 'prompt_eval_duration': 0, 'eval_count': 0, 'eval_duration': 0}}, 'generate': {'uri': '/api/generate', 'payload_template': {'prompt': '', 'stream': False, 'options': {'num_predict': 4096}}, 'response_template': {'model': '', 'created_at': '', 'response': '', 'done': True, 'done_reason': 'stop', 'context': [], 'total_duration': 0, 'load_duration': 0, 'prompt_eval_count': 0, 'prompt_eval_duration': 0, 'eval_count': 0, 'eval_duration': 0}}, 'models': {'uri': '/api/tags', 'response_template': {'models': [{'name': '', 'model': '', 'size': ''}]}}}}
+2026-02-24 22:35:29,244 | INFO    | system:global | ollama_chatmodel:163 | model_post_init | OllamaChatModel initialized | model=qwen2:0.5b endpoint=http://localhost:11434/api/chat temperature=0.2 max_tokens=2048

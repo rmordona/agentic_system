@@ -7,6 +7,8 @@ the StageGraph during execution.
 StageManager does NOT execute agents or manage state.
 """
 from __future__ import annotations
+from core.paths import WORKSPACES_ROOT
+
 import json
 from pathlib import Path
 from typing import Dict, List, Optional, Any, Callable
@@ -145,16 +147,11 @@ class StageManager:
 
     pipeline_adapter: PipelineAdapter = None
 
-    def __init__(self, 
-                workspace_path: Path, 
-                stage_file: Optional[Path] = None):
+    def __init__(self, workspace_name: str):
 
-        self.workspace_path = workspace_path
-        self.workspace_name = workspace_path.name
+        self.workspace_path = WORKSPACES_ROOT / workspace_name
+        self.workspace_name = workspace_name
         self.entry_stage = ""
-
-        if stage_file is not None:
-            self.stage_file = stage_file
 
         self._stages: Dict[str, StageSchema] = {}
         self._allowed_agents: List[str] = []

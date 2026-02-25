@@ -1,0 +1,88 @@
+/* Buttons */
+.ui-button {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  background-color: #2563eb; /* bg-blue-600 */
+  color: white;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.ui-button:hover {
+  background-color: #1d4ed8; /* bg-blue-700 */
+}
+
+.ui-button-outline {
+  background-color: transparent;
+  border: 2px solid #2563eb;
+  color: #2563eb;
+}
+
+.ui-button-outline:hover {
+  background-color: #2563eb;
+  color: white;
+}
+
+/* Cards */
+.ui-card {
+  background-color: #1f2937; /* bg-gray-800 */
+  color: white;
+  border-radius: 1rem; /* rounded-2xl */
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  padding: 1rem;
+}
+
+.ui-card-content {
+  padding: 1rem;
+}
+
+/* Inputs and Textareas */
+.ui-input,
+.ui-textarea {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  border: 1px solid #4b5563; /* border-gray-600 */
+  background-color: #374151; /* bg-gray-700 */
+  color: white;
+}
+
+.ui-input::placeholder,
+.ui-textarea::placeholder {
+  color: #9ca3af; /* placeholder-gray-400 */
+}
+
+.ui-textarea {
+  resize: vertical;
+  min-height: 3rem;
+}
+
+/* Tabs */
+.ui-tabs {
+  display: flex;
+  flex-direction: column;
+}
+
+.ui-tabs-list {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.ui-tabs-trigger {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  background-color: #1f2937; /* bg-gray-800 */
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s;
+}
+
+.ui-tabs-trigger:hover,
+.ui-tabs-trigger-active {
+  background-color: #2563eb;
+  color: white;
+}

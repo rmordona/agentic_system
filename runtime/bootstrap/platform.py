@@ -70,14 +70,14 @@
 #
 # -----------------------------------------------------------------------------
 from __future__ import annotations
+
 import json
 from pathlib import Path
 from typing import Optional
 
 from runtime.logger import AgentLogger
-
 from runtime.bootstrap.config_loader import ConfigLoader
-from runtime.workspace_hub import WorkspaceHub
+from runtime.bootstrap.workspace_hub import WorkspaceHub
 from runtime.session_manager import SessionManager
 
 from events.event_bus import EventBus
@@ -88,34 +88,20 @@ class Platform:
     Process-wide singleton runtime for the agentic platform.
     Provides access to memory, embedding store, tool client, and logging.
     """
-
+    session_manager: SessionManager | None = None
+    workspace_hub: WorkspaceHub | None = None
+    event_bus: EventBus | None = None
     _initialized = False
 
-    session_manager: SessionManager = None
-    workspace_hub: WorkspaceHub = None
-    event_bus: EventBus = None
-
-
-
-
     @classmethod
-    def initialize(
-        self,
-        *,
-        workspaces_root: Path,
-    ):
-        if self._initialized:
+    def initialize(cls):
+        if cls._initialized:
             return
 
         # --------------------------------------------------
         # Config
         # --------------------------------------------------
-        parent_path = Path(__file__).parent
-        config_path = parent_path / "config.json"  # runtime/bootstrap/config.json
-
-        config_loader = ConfigLoader(global_config_path=config_path, workspaces_root=workspaces_root)
-        self.config = config_loader.load()
-
+        cls.config = ConfigLoader().load()
 
         # --------------------------------------------------
         # Initialize Logger
@@ -127,51 +113,23 @@ class Platform:
         logger.info("Bootstrapping this Agentic Platform")
 
         # --------------------------------------------------
-        # Tools Config
-        # --------------------------------------------------
-        #tool_config_path = parent_path.parent / "tools" / "config.json" # runtime/tools/config.json
-        #tools_policy_path = workspaces_root / "tools_policy.json" # workspaces/tools_config.json
-
-        # --------------------------------------------------
-        # Tool Bootstrapping
-        # --------------------------------------------------
-    
-        '''
-        self.tool_registry = ToolRegistry(tool_config_path)
-        self.tool_registry.load()
-
-        self.tool_policy = ToolPolicy(
-            json.loads(tools_policy_path.read_text())
-        )
-
-        self.tool_client = ToolClient(
-            registry=self.tool_registry,
-            policy=self.tool_policy,
-            agent_role="critic"
-        )
-        logger.info("ToolClient initialized")
-        '''
-
-        # --------------------------------------------------
         # Event Bus
         # --------------------------------------------------
-        self.event_bus = EventBus()
+        cls.event_bus = EventBus()
 
         # --------------------------------------------------
         # Session Bootstrapping
         # --------------------------------------------------
-        self.session_manager = SessionManager()
+        cls.session_manager = SessionManager()
 
         # --------------------------------------------------
         # Workspace Hub
         # --------------------------------------------------
-        self.workspace_hub = WorkspaceHub(
-            workspaces_root=workspaces_root,
-            #model_manager=self.model_manager,
-            session_manager=self.session_manager,
-            #tool_client=self.tool_client,
-            event_bus=self.event_bus
+        cls.workspace_hub = WorkspaceHub(
+            session_manager=cls.session_manager,
+            event_bus=cls.event_bus
         )
 
-        self._initialized = True
+
+        cls._initialized = True
         logger.info("PlatformRuntime initialized successfully")

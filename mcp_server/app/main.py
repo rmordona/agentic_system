@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import importlib
 import pkgutil
 import inspect
 import importlib.util
-from app.mcp import mcp
+from app.mcp_instance import mcp
 import app.tools  # tools package
 
 # ------------------------

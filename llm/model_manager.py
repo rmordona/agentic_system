@@ -46,7 +46,7 @@
 # -----------------------------------------------------------------------------
 
 from pathlib import Path
-from typing import Optional, Dict, Tuple, Any
+from typing import Optional, Dict, Tuple, Any, List, Union
 from datetime import datetime
 
 from langchain_core.prompts import PromptTemplate
@@ -57,9 +57,7 @@ from llm.stores.store_factory import StoreFactory
 from llm.memory_manager import MemoryManager
 from langgraph.store.memory import InMemoryStore
 
-#from llm.stores.adapters.base_store import BaseStore
-#from llm.embeddings.adapters.base_client import BaseEmbeddingClient
-#from langchain.chat_models.base import BaseChatModel
+from langchain_core.messages import BaseMessage, AIMessage
 
 
 from runtime.logger import AgentLogger

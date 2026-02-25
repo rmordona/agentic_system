@@ -1,0 +1,39 @@
+/* src/components/chat/MessageInput.css */
+
+.message-input-container {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.message-input-field {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  background-color: #374151; /* bg-gray-700 */
+  color: white;
+  border: 1px solid #4b5563; /* border-gray-600 */
+}
+
+.message-input-field::placeholder {
+  color: #9ca3af; /* placeholder-gray-400 */
+}
+
+.message-input-button {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  background-color: #2563eb; /* bg-blue-600 */
+  color: white;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.message-input-button:hover {
+  background-color: #1d4ed8; /* bg-blue-700 */
+}
+
+.message-input-button:disabled {
+  background-color: #6b7280; /* bg-gray-500 */
+  cursor: not-allowed;
+}

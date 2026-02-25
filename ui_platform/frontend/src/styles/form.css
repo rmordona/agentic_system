@@ -1,0 +1,96 @@
+/* src/styles/form.css */
+
+/* General form container */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Labels */
+form label {
+  font-size: 0.875rem; /* 14px */
+  font-weight: 500;
+  color: #d1d5db; /* gray-300 */
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+/* Inputs */
+input,
+textarea {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid #4b5563; /* gray-600 */
+  background-color: #1f2937; /* bg-gray-700 */
+  color: #f9fafb; /* text-white */
+  font-size: 0.875rem;
+  outline: none;
+  transition: all 0.2s;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #9ca3af; /* placeholder-gray-400 */
+}
+
+/* Input focus state */
+input:focus,
+textarea:focus {
+  border-color: #3b82f6; /* blue-500 */
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+  background-color: #1f2937;
+}
+
+/* Buttons */
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+/* Primary button */
+button.bg-blue-600 {
+  background-color: #2563eb; /* blue-600 */
+  color: #ffffff;
+}
+
+button.bg-blue-600:hover {
+  background-color: #1d4ed8; /* blue-700 */
+}
+
+/* Secondary / outline buttons */
+button.bg-transparent {
+  background-color: transparent;
+  color: #3b82f6; /* blue-500 */
+}
+
+button.bg-transparent:hover {
+  color: #2563eb; /* blue-600 */
+}
+
+/* Error messages */
+form .error {
+  color: #f87171; /* red-400 */
+  font-size: 0.75rem; /* 12px */
+  text-align: center;
+}
+
+/* Form card spacing */
+.card-content form > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* Small text for links */
+form .small-text {
+  font-size: 0.75rem;
+  color: #9ca3af; /* gray-400 */
+  text-align: center;
+}

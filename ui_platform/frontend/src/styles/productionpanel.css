@@ -1,0 +1,30 @@
+/* src/components/sidebar/ProductionPanel.css */
+
+.production-panel {
+  background-color: #1f2937; /* bg-gray-800 */
+  color: white;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+.production-panel h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.production-panel .scroll-area {
+  height: 70vh;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.production-panel .message-user {
+  color: #d1d5db; /* gray-300 */
+  margin-bottom: 0.5rem;
+}
+
+.production-panel .message-assistant {
+  color: #60a5fa; /* blue-400 */
+  margin-bottom: 0.5rem;
+}

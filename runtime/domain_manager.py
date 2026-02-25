@@ -66,6 +66,7 @@
 #          └────────────────────────────┘
 ############################################################
 from __future__ import annotations
+from core.paths import WORKSPACES_ROOT
 
 import re
 import os
@@ -1279,12 +1280,11 @@ class ToolManager:
 ##################################################################
 # SYSTEM CONTEXT
 ##################################################################
-
 class SystemContext:
-    def __init__(self, template_repo: str, workspace_path: str, agent_manager: AgentManager):
+    def __init__(self, template_repo: str, workspace_name: str, agent_manager: AgentManager):
         # Only setup synchronous variables here
         self.template_repo = Path(template_repo)
-        self.workspace_path = Path(workspace_path)
+        self.workspace_path = WORKSPACES_ROOT / workspace_name
         self.agent_manager = agent_manager
         self.data_manager = DataManager(agent_manager)
         self.tool_manager = ToolManager(agent_manager)
@@ -1292,15 +1292,15 @@ class SystemContext:
         self.manifests: Dict[str, Any] = {}
 
     @classmethod
-    async def create(cls, template_repo: str, workspace_path: str, agent_manager: AgentManager):
+    async def create(cls, template_repo: str, workspace_name: str, agent_manager: AgentManager):
         """
         The proper way to instantiate SystemContext asynchronously.
         """
         logger.info("Initializing SystemContext via Async Factory")
-        instance = cls(template_repo, workspace_path, agent_manager)
+        instance = cls(template_repo, workspace_name, agent_manager)
 
         # 1. Load Manifest
-        await cls.load_manifest(instance, workspace_path)
+        await cls.load_manifest(instance)
                 
         # 2. Async registration For Tool
         await instance.tool_manager.scan_and_register_tools()
@@ -1314,8 +1314,9 @@ class SystemContext:
 
         return instance
 
-    async def load_manifest(self, workspace_path: Path) -> None:
-        self.manifest_dir = workspace_path / "tools" / "spec"
+    async def load_manifest(self) -> None:
+
+        self.manifest_dir = self.workspace_path / "tools" / "spec"
 
         logger.info(f"Scanning Manifest {self.manifest_dir}")
 
@@ -1336,7 +1337,7 @@ class SystemContext:
                     raise Exception(manifest_result.get("error"))
 
             except Exception as e:
-                logger.error(f"Failed to laod manifest for tool ({tool_name}) from {manifest_file.name}: {e}", exc_info=True)
+                logger.error(f"Failed to load manifest for tool ({tool_name}) from {manifest_file.name}: {e}", exc_info=True)
 
         logger.info(f"Tool Manifest scan complete. Total loaded manifests: {len(self.manifests)}")
 
