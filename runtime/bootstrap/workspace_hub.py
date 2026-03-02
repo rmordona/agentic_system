@@ -5,7 +5,7 @@ import asyncio
 from pathlib import Path
 from typing import Dict
 from runtime.bootstrap.runtime_manager import RuntimeManager
-from runtime.session_manager import SessionManager
+from runtime.bootstrap.session_manager import SessionManager
 from events.event_bus import EventBus
 
 from runtime.logger import AgentLogger

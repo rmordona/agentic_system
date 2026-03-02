@@ -14,10 +14,10 @@ from typing import TypedDict, List, Dict, Any
 from typing_extensions import Annotated, Literal, Optional
 from langgraph.channels import Topic, LastValue, BinaryOperatorAggregate
 from langgraph.graph.message import add_messages  # optional
-
+from langgraph.checkpoint.memory import MemorySaver
 
 from langchain_core.messages import SystemMessage, HumanMessage
-
+from langgraph.types import interrupt
 from langgraph.errors import GraphInterrupt
 
 from runtime.artifact_factory import Task, ArtifactSchema, ArtifactFactory, HITLState
@@ -144,6 +144,7 @@ class StateSchema(BaseModel):
     task: Task = None
     agent: str = ""
     stage: str = ""
+    final_content: str = ""
     done: bool = False
 
     # ------------------------------------------------------------------
@@ -160,6 +161,11 @@ class StateSchema(BaseModel):
 
     class Config:
         arbitrary_types_allowed = True  # allows ArtifactSchema inside
+
+    # ------------------------------------------------------------------
+    # HITL - Human Response
+    # ------------------------------------------------------------------   
+    human_response: Optional[str] = None
 
 
 # -----------------------------------------------------------------------------
@@ -1391,32 +1397,59 @@ class AgentPlanner:
 #   - timeout    → configurable fail / approve behavior
 #
 ####################################################################################################
-
-
 class AgentHITL:
     """
     Production-grade HITL enforcement node.
+    Handles human-in-the-loop approval for tasks.
     """
-    def __init__( self,context: SystemContext, auto_approve: bool = False,timeout_seconds: int | None = None,fail_on_timeout: bool = True):
-        self.context = context 
+    def __init__(
+        self,
+        context: SystemContext,
+        auto_approve: bool = False,
+        timeout_seconds: int | None = None,
+        fail_on_timeout: bool = True,
+    ):
+        self.context = context
         self.auto_approve = auto_approve
         self.timeout_seconds = timeout_seconds
         self.fail_on_timeout = fail_on_timeout
 
+        self.llm = ModelManager.spin_model()
+
     # ------------------------------------------------------------------
     # LangGraph Node Entry Point
     # ------------------------------------------------------------------
-    async def __call__(self, state: StateSchema) -> Dict[str, Any]:
+    async def __call__(self, state: Union[StateSchema, Dict[str, Any]]) -> Dict[str, Any]:
+        # Ensure we are working with a Pydantic object, even after resume
+        # This is a classic "de-serialization" hurdle in LangGraph. When you use a custom Pydantic class like StateSchema 
+        # as your state, LangGraph’s checkpointer (Postgres or Memory) has to save that data as JSON. When the graph resumes, 
+        # it tries to rebuild your state from that JSON.
+        if isinstance(state, dict):
+            state = StateSchema(**state)
 
         logger.info("*********************************************************************************************************")
         logger.info("****                                  AgentHITL is being called                                    ******")
         logger.info("*********************************************************************************************************")
+        logger.info(f"State Type: {type(state)}")
+        # logger.info(f"State: {state}")
+        # --------------------------------------------------
+        # RESUME AFTER INTERRUPT
+        # --------------------------------------------------
+        logger.info(f"State human_response at entry: {state.human_response}")
+        if state.human_response is not None:
+            logger.info(f"HITL resumed with: {state.human_response}")
+            return {
+                "hitl_completed": True,
+                "approved": state.human_response,
+            }
 
+        # --------------------------------------------------
+        # NORMAL EXECUTION PATH
+        # --------------------------------------------------
         user_intent = state.user_intent
-
-        stage      = state.stage        # Received from AgentPlanner
-        agent_name = state.agent        # Received from AgentPlanner
-        task       = state.task         # Received from AgentPlanner
+        stage      = state.stage
+        agent_name = state.agent
+        task       = state.task
 
         logger.info(f"Current Stage: {stage}")
         logger.info(f"User Intent: {user_intent}")
@@ -1427,7 +1460,33 @@ class AgentHITL:
         agent_ctx = state.agentContext[agent_name]
         artifact = agent_ctx.control_raw
 
-        await self._request_hitl(state)
+        # --------------------------------------------------
+        # Generate HITL prompt for the user
+        # --------------------------------------------------
+        response = await self._request_llm_for_hitl(state)
+        logger.info(f"Model response received ...")
+
+        # --------------------------------------------------
+        # INTERRUPT GRAPH & WAIT FOR HUMAN RESPONSE
+        # --------------------------------------------------
+        # Important: Do NOT assign interrupt() to a variable.
+        # LangGraph will pause execution here and save the checkpoint.
+        logger.info(f"Now interrupting for HITL ... Awaiting user response ...")
+        interrupt({
+            "type": "hitl_required",
+            "prompt": response.content,
+            "agent": state.agent,
+            "task_id": state.task.id,
+        })
+
+        logger.error("THIS SHOULD NEVER PRINT")
+        '''
+        # The interrupt will stop the node and resumes by re-entering the done 
+        # upon human response.
+
+
+        ######### ------------------------------- below may not be required
+
         # --------------------------------------------------------------
         # Guard: HITL only applies after successful validation
         # --------------------------------------------------------------
@@ -1473,22 +1532,12 @@ class AgentHITL:
                 self._approve(artifact, reason="HITL timeout auto-approve")
 
             return {"agentContext": state.agentContext}
-
-        # --------------------------------------------------------------
-        # Interrupt graph execution for human input
-        # --------------------------------------------------------------
-        self._request_hitl(artifact)
-
-        raise GraphInterrupt(
-            reason="HITL approval required",
-            payload=self._build_payload(state, artifact),
-        )
+        '''
 
     # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
-
-    async def _request_hitl(self, state):
+    async def _request_llm_for_hitl(self, state: StateSchema):
 
         user_intent = state.user_intent
         agent_name  = state.agent
@@ -1518,8 +1567,6 @@ class AgentHITL:
 
         #failed = format_list_readable(artifact.validation_errors)
         
-        llm = ModelManager.spin_model()
-
         prompt = ModelManager.read_prompt_template(ModelManager.RUNTIME_TEMPLATE, 'HITL_TEMPLATE.md')
         prompt = ModelManager.hydrate(prompt, {
             "USER_INTENT" : user_intent,
@@ -1530,13 +1577,9 @@ class AgentHITL:
          })
 
         logger.info(f"Prompt: {prompt}")
-        response = await llm.ainvoke(prompt)
+        response = await self.llm.ainvoke(prompt)
 
-        # ArtifactFactory.show_tasks(artifact.open_tasks)
-        logger.console(f"\n**Assistant**: {response.content}")
-
-        artifact.status = "awaiting_human"
-        user_response = input("\n>>> Provide guidance: ")
+        return response
 
     def _approve(self, artifact, reason: str):
         hitl = artifact.hitl
@@ -1615,6 +1658,10 @@ class CoreEngine:
         self.user_intent = None
         self.compiled_graph = None
         
+
+    # ------------------------------------------------------------------
+    # Initialized from runtime_manager.py at bootstrap
+    # ------------------------------------------------------------------
     async def initialize(self):
 
         # --------------------------------------------------
@@ -1711,8 +1758,12 @@ class CoreEngine:
             }
         )
 
-        self.compiled_graph = workflow.compile()
-        # Use a 'breakpoint' on the planner node if a human tool was called
+        # required such that after HITL, we can resume from where we are interrupted. see core_engine.py (AgentHITL)
+        # Rse a 'breakpoint' on the planner node if a human tool was called
+        checkpointer = MemorySaver()
+        self.compiled_graph = workflow.compile(checkpointer=checkpointer)
+
+
         return self.compiled_graph
         #return workflow.compile(interrupt_before=["agent"] if self._check_hitl_needed else [])
 

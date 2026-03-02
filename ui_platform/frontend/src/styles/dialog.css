@@ -1,0 +1,26 @@
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.dialog-box {
+  background: white;
+  padding: 24px;
+  border-radius: 8px;
+  width: 400px;
+  max-width: 90%;
+}
+
+.dialog-box h3 {
+  margin-top: 0;
+}
+
+.dialog-box button {
+  margin-top: 16px;
+  padding: 8px 12px;
+}

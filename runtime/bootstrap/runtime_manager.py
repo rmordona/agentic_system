@@ -6,13 +6,13 @@ import uuid
 from pathlib import Path
 from typing import Dict, Optional, Any
 
-
 from runtime.bootstrap.workspace_loader import WorkspaceLoader
+from runtime.bootstrap.session_manager import SessionManager, SessionContext
 from runtime.core_engine import CoreEngine
 from runtime.runtime_context import RuntimeContext
 from runtime.reload_manager import ReloadManager
 from runtime.orchestrator import Orchestrator
-from runtime.session_manager import SessionManager, SessionContext
+
 from runtime.lifecycle import register_lifecycle_handlers
 
 from events.event_bus import EventBus
@@ -88,9 +88,13 @@ class RuntimeManager:
             workspace_meta=self.workspace_meta
         )
 
+    # ------------------------------------------------------------------
+    # Initialized from workspace_hub.py at bootstrap
+    # ------------------------------------------------------------------
     async def initialize(self):
         logger.info("Initializing Core Engine ...")
         await self.core_engine.initialize()
+
         self.compiled_graph = self.core_engine.compile()
 
     def get_orchestrator(self, session_ctx: SessionContext) -> Orchestrator:
@@ -112,40 +116,84 @@ class RuntimeManager:
             self._orchestrators[session_ctx.session_id] = orchestrator
         return orchestrator
 
-    async def run_user_message(
+    # ------------------------------------------------------------------
+    # Run the stream
+    # ------------------------------------------------------------------
+    async def run_stream(
         self,
         user_id: str,
         user_intent: str,
         session_id: Optional[str] = None
-    ) -> Dict[str, Any]:
+    ):
         """
-        Main entry for CLI or API:
-        - Injects user message into session state
-        - Runs orchestrator
+        Stream LangGraph events for the user message.
+        Yields dictionaries to send over WebSocket.
         """
-
-        print("Entering run user message ...")
-        logger.info("Entering Session Space")
-
         # 1. Create or fetch session
         if session_id and self.session_manager.exists(user_id, session_id):
-            logger.info(f"Session Exists: {session_id}")
             session_ctx = self.session_manager.get(session_id)
         else:
-            logger.info("Session does not exist. Creating one.")
             session_ctx = self.session_manager.create_session(user_id)
+        session_id = session_ctx.session_id
 
-        logger.info("Now acquiring an Orchestrator")
+        # Persist Session Id right away
+        yield {
+            "type": "session_update",
+            "session_id": session_id
+        }
+
         orchestrator = self.get_orchestrator(session_ctx)
 
-        logger.info(f"Context Session id {session_ctx.session_id} with user message: {user_intent}")
+        logger.info(f"Run: Session ID: {session_id}")
 
-        # 6. Run orchestrator
-        logger.info("Start the Orchestrator")
-        logger.info(f"Workspace Meta: {self.workspace_meta}")
-        result = await orchestrator.run(user_intent, session_ctx.session_id, self.workspace_meta)
-        logger.info("Orchestrator running")
-        return result, session_ctx.session_id
+        # 2. Run LangGraph stream
+        iter = 0
+        async for event in orchestrator.run_stream(user_intent, session_id):
+            iter += 1
+            # Each event can be a token, tool update, or status update
+            yield {
+                "type": "event",
+                "iteration": iter,
+                "event": event
+            }
+
+        # After completion, yield final content
+        final_content = getattr(orchestrator.initial_state, "final_content", "No response")
+        yield {
+            "type": "completion",
+            "content": final_content
+        }
+
+
+    # ------------------------------------------------------------------
+    # Resuming the stream
+    # ------------------------------------------------------------------
+    async def resume_stream(
+        self,
+        human_input: str,
+        session_id: str,
+    ):
+        """
+        Resume an interrupted LangGraph stream (HITL).
+        Yields websocket-ready events.
+        """
+
+        logger.info(f"Resume: Session ID: {session_id}")
+
+        # Retrieve session context
+        session_ctx = self.session_manager.get(session_id)
+        orchestrator = self.get_orchestrator(session_ctx)
+
+        iter_count = 0
+
+        async for event in orchestrator.resume_stream(human_input, session_id):
+            iter_count += 1
+
+            yield {
+                "type": "event",
+                "iteration": iter_count,
+                "event": event,
+            }
 
     # ------------------------------------------------------------------
     # Session Utilities

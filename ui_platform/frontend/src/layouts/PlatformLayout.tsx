@@ -8,6 +8,7 @@ import EngineeringPanel from "@/components/sidebar/EngineeringPanel";
 import ProductionPanel from "@/components/sidebar/ProductionPanel";
 import ChatWindow from "@/components/chat/ChatWindow";
 import MessageInput from "@/components/chat/MessageInput";
+import ErrorDialog from "@/components/common/ErrorDialog";
 
 import { useAuth } from "@/contexts/AuthContext";
 import { useChat } from "@/hooks/useChat";
@@ -69,74 +70,79 @@ const PlatformLayout = () => {
   }, [threadId]); // ✅ only run when threadId changes
 
   return (
-    <div className="platform">
+    <>
+      <div className="platform">
+        {/* TOPBAR */}
+        <div className="platform-topbar">
+          <Topbar
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            mode={mode}
+            setMode={setMode}
+            onSignoutClick={handleSignout}
+          />
+        </div>
 
-      {/* TOPBAR */}
-      <div className="platform-topbar">
-        <Topbar
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          mode={mode}
-          setMode={setMode}
-          onSignoutClick={handleSignout}
-        />
-      </div>
+        {/* MAIN CONTENT */}
+        <div className="platform-content">
+          {/* LEFT THREAD SIDEBAR */}
+          <div className="platform-thread-sidebar bg-gray-800 text-white p-2">
+            <h3 className="font-semibold mb-2">Threads</h3>
+            {threadsError && <div className="text-red-500 mb-2">{threadsError}</div>}
+            <div className="flex flex-col gap-1">
+              {threads.map((thread) => (
+                <button
+                  key={thread.id}
+                  className={`text-left px-2 py-1 rounded ${
+                    thread.id === threadId ? "bg-gray-700" : "hover:bg-gray-700"
+                  }`}
+                  onClick={() => setThreadId(thread.id)}
+                >
+                  {thread.name}
+                </button>
+              ))}
+              {threads.length === 0 && !threadsError && (
+                <div className="text-gray-400">No threads found</div>
+              )}
+            </div>
+          </div>
 
-      {/* MAIN CONTENT */}
-      <div className="platform-content">
+          {/* SIDEBAR */}
+          <div className="platform-sidebar">
+            {mode === "engineering" ? (
+              <EngineeringPanel />
+            ) : (
+              <ProductionPanel messages={messages} />
+            )}
+          </div>
 
-        {/* LEFT THREAD SIDEBAR */}
-        <div className="platform-thread-sidebar bg-gray-800 text-white p-2">
-          <h3 className="font-semibold mb-2">Threads</h3>
-          {threadsError && <div className="text-red-500 mb-2">{threadsError}</div>}
-          <div className="flex flex-col gap-1">
-            {threads.map((thread) => (
-              <button
-                key={thread.id}
-                className={`text-left px-2 py-1 rounded ${
-                  thread.id === threadId ? "bg-gray-700" : "hover:bg-gray-700"
-                }`}
-                onClick={() => setThreadId(thread.id)}
-              >
-                {thread.name}
-              </button>
-            ))}
-            {threads.length === 0 && !threadsError && <div className="text-gray-400">No threads found</div>}
+          {/* MAIN CHAT */}
+          <div className="platform-main">
+            <div className="platform-chat-window">
+              <ChatWindow messages={messages} loading={loading} />
+            </div>
+            <div className="platform-message-input">
+              <MessageInput onSend={sendMessage} disabled={loading || !threadId} />
+            </div>
+          </div>
+
+          {/* RIGHT BAR */}
+          <div className="platform-rightbar">
+            <RightPanel />
           </div>
         </div>
 
-        {/* SIDEBAR */}
-        <div className="platform-sidebar">
-          {mode === "engineering" ? (
-            <EngineeringPanel />
-          ) : (
-            <ProductionPanel messages={messages} />
-          )}
+        {/* FOOTER */}
+        <div className="platform-footer text-left text-sm">
+          © 2026 Raymond M.O Ordona. All rights reserved.
         </div>
-
-        {/* MAIN CHAT */}
-        <div className="platform-main">
-          <div className="platform-chat-window">
-            <ChatWindow messages={messages} loading={loading} error={chatError} />
-          </div>
-          <div className="platform-message-input">
-            <MessageInput onSend={sendMessage} disabled={loading || !threadId} />
-          </div>
-        </div>
-
-        {/* RIGHT BAR */}
-        <div className="platform-rightbar">
-          <RightPanel />
-        </div>
-
       </div>
 
-      {/* FOOTER */}
-      <div className="platform-footer text-left text-sm">
-        © 2026 Raymond M.O Ordona. All rights reserved.
-      </div>
-
-    </div>
+      <ErrorDialog
+        message={chatError}
+        onClose={() => window.location.reload()}
+      />
+    </>
   );
 };
 

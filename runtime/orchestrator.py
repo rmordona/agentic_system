@@ -24,16 +24,25 @@ from core.paths import WORKSPACES_ROOT
 
 import sys
 import time
+import json
 import itertools
 import asyncio
+
+from uuid import UUID
+from enum import Enum
+
+from datetime import datetime
 from typing import Any, Dict, Optional
 from events.event_bus import EventBus
+
+from langgraph.types import Command
 
 from runtime.artifact_factory import Task
 from runtime.core_engine import CoreEngine
 
 from runtime.logger import AgentLogger
 logger = AgentLogger.get_logger( component="system" )
+
 
 class Orchestrator:
     """
@@ -70,7 +79,138 @@ class Orchestrator:
         self._graph = self.core_engine.compiled_graph
 
 
-    async def run(self, user_intent: str, session_id: str, workspace_meta: dict) -> Dict[str, Any]:
+    async def run_stream(self, user_intent: str, session_id: str):
+        """
+        Async generator for WebSocket streaming.
+        """
+        self.initial_state = await self.core_engine.acquire_new_state(user_intent, session_id)
+        self.initial_state.model_rebuild()
+
+        config = {
+            "configurable": {"thread_id": session_id},  # Use session_id as LangGraph thread
+            "recursion_limit": 8
+        }
+
+        print("GRAPH ID RUN:", id(self._graph))
+        print("CHECKPOINTER ID RUN:", id(self._graph.checkpointer))
+
+        async for event in self._graph.astream(self.initial_state, config, stream_mode="updates"):
+            print("EVENT RUN:", event)
+            print(f"this will be streamed: {Orchestrator.to_jsonable(event)}")
+            yield Orchestrator.to_jsonable(event)   
+
+        # Finalize state
+        self.initial_state.final_content = getattr(self.initial_state, "last_output", "")
+        yield {"type": "done", "content": self.initial_state.final_content}
+
+
+    async def resume_stream(self, human_input: str, session_id: str):
+        """
+        Resume LangGraph execution after HITL interrupt.
+        """
+
+        config = {
+            "configurable": {"thread_id": session_id},
+            "recursion_limit": 8,
+        }
+
+        print("GRAPH ID RESUME:", id(self._graph))
+        print("CHECKPOINTER ID RESUME:", id(self._graph.checkpointer))
+        print(f"Human Input: {human_input}")
+
+        # -------------------------------
+        # 🔹 DEBUG: check interrupted nodes before resume
+        # -------------------------------
+        interrupted = getattr(self._graph.checkpointer, "interrupted_nodes", None)
+        print("Interrupted nodes BEFORE resume:", interrupted)
+
+        resume_payload = {"human_response": human_input}
+        print("Resume payload:", resume_payload)
+
+
+        final_output = ""
+        async for event in self._graph.astream(
+            Command(resume={"human_response": human_input}),
+            config,
+            stream_mode="updates",
+        ):
+            print("EVENT RESUME:", event)
+            json_event = Orchestrator.to_jsonable(event)
+            print(f"RESUME STREAM: {json_event}")
+
+            if "last_output" in json_event:
+                final_output = json_event["last_output"]
+
+            print("FINAL OUTPUT: ", final_output)
+
+            yield json_event
+
+        yield {"type": "done", "content": final_output}
+
+
+    @staticmethod
+    def to_jsonable(obj):
+        """
+        Recursively convert complex objects to JSON-safe structures.
+        """
+
+        # Primitive types
+        if obj is None or isinstance(obj, (str, int, float, bool)):
+            return obj
+
+        # datetime → ISO string
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+
+        # UUID → string
+        if isinstance(obj, UUID):
+            return str(obj)
+
+        # Enum → value
+        if isinstance(obj, Enum):
+            return obj.value
+
+        # Handle LangGraph Interrupt
+        #
+        #if isinstance(obj, Interrupt):
+        #    return obj.value  # <-- THIS IS THE IMPORTANT PART
+
+        # Handle LangGraph Interrupt safely
+        if obj.__class__.__name__ == "Interrupt":
+            return Orchestrator.to_jsonable(getattr(obj, "value", None))
+
+        # list / tuple / set
+        if isinstance(obj, (list, tuple, set)):
+            return [Orchestrator.to_jsonable(item) for item in obj]
+
+        # dict
+        if isinstance(obj, dict):
+            return {str(k): Orchestrator.to_jsonable(v) for k, v in obj.items()}
+
+        # Pydantic v2
+        if hasattr(obj, "model_dump"):
+            return Orchestrator.to_jsonable(obj.model_dump())
+
+        # Pydantic v1
+        if hasattr(obj, "dict"):
+            return Orchestrator.to_jsonable(obj.dict())
+
+
+        # Dataclass (safe way)
+        if hasattr(obj, "__dataclass_fields__"):
+            return {
+                k: Orchestrator.to_jsonable(getattr(obj, k))
+                for k in obj.__dataclass_fields__
+            }
+
+        # Generic object → fallback to __dict__
+        if hasattr(obj, "__dict__"):
+            return Orchestrator.to_jsonable(vars(obj))
+
+        # Last resort
+        return str(obj)
+
+    async def run1(self, user_intent: str, session_id: str, workspace_meta: dict) -> Dict[str, Any]:
         """
         Run the session through the LangGraph.
         Returns final session state.
@@ -82,7 +222,7 @@ class Orchestrator:
         logger.info(f"Start with an initial state: {self.initial_state}")
 
         self.initial_state.model_rebuild()
-        
+
         await self.event_bus.emit(
                 "orchestrator_start",
                 {
@@ -112,7 +252,7 @@ class Orchestrator:
             # self.hitl_loop(event)
 
 
-            self.spinner_task()
+            # self.spinner_task()
 
             await self.event_bus.emit("graph_event", event)
             logger.info("Now running next iteration and waiting for graph_event response")

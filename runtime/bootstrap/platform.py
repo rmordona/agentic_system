@@ -78,7 +78,7 @@ from typing import Optional
 from runtime.logger import AgentLogger
 from runtime.bootstrap.config_loader import ConfigLoader
 from runtime.bootstrap.workspace_hub import WorkspaceHub
-from runtime.session_manager import SessionManager
+from runtime.bootstrap.session_manager import SessionManager
 
 from events.event_bus import EventBus
 

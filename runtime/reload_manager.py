@@ -17,7 +17,6 @@ class ReloadManager:
     def __init__(
         self,
         workspace_loaders: Dict[str, WorkspaceLoader],
-        #stage_manager: StageManager,
         interval_seconds: int = 30,
     ):
         """

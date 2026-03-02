@@ -1,6 +1,8 @@
 // src/hooks/useChat.ts
-import { useState, useCallback, useEffect } from "react";
+
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useApi } from "@/hooks/useApi";
+import { ChatSocket } from "@/services/chatSocket";
 
 export interface ChatMessage {
   id?: string;
@@ -9,20 +11,144 @@ export interface ChatMessage {
   createdAt?: string;
 }
 
-interface SendThreadMessageRequest {
-  content: string;
+interface HitlContext {
+  agent: string;
+  taskId: string;
+  prompt: string;
 }
 
 export const useChat = (threadId?: string) => {
   const api = useApi();
+  const socketRef = useRef<ChatSocket | null>(null);
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  /**
-   * Fetch messages for the current thread
-   */
+  const [hitlContext, setHitlContext] = useState<HitlContext | null>(null);
+  const [awaitingResume, setAwaitingResume] = useState(false);
+
+  const token = localStorage.getItem("access_token");
+
+  // =====================================================
+  // 🔌 WebSocket Lifecycle
+  // =====================================================
+const currentThreadRef = useRef<string | null>(null);
+
+useEffect(() => {
+  if (!threadId || !token) return;
+
+  // If already connected for this thread, do nothing
+  if (currentThreadRef.current === threadId && socketRef.current) {
+    return;
+  }
+
+  // If switching threads, close old socket
+  if (socketRef.current) {
+    socketRef.current.close();
+    socketRef.current = null;
+  }
+
+  const socket = new ChatSocket(threadId, token);
+
+  socket.connect((data) => {
+    // HITL
+    if (data.type === "hitl_required") {
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: data.prompt },
+      ]);
+
+      setHitlContext({
+        agent: data.agent,
+        taskId: data.task_id,
+        prompt: data.prompt,
+      });
+
+      setAwaitingResume(true);
+      setLoading(false);
+      return;
+    }
+
+    // Token streaming
+    if (data.type === "token") {
+      const partial = data.content;
+      if (!partial) return;
+
+      setMessages((prev) => {
+        const last = prev[prev.length - 1];
+
+        if (last?.role === "assistant") {
+          const updated = [...prev];
+          updated[updated.length - 1] = {
+            ...last,
+            content: last.content + partial,
+          };
+          return updated;
+        }
+
+        return [...prev, { role: "assistant", content: partial }];
+      });
+
+      return;
+    }
+
+    // Completion
+    if (data.type === "completion") {
+      setLoading(false);
+      setAwaitingResume(false);
+      setHitlContext(null);
+      return;
+    }
+
+    // Error
+    if (data.type === "error") {
+      setError(data.message || "Unknown error");
+      setLoading(false);
+      setAwaitingResume(false);
+      return;
+    }
+
+    // ---------------------------------------
+    // Internal Error
+    // ---------------------------------------
+    if (data.type === "internal_error") {
+      setError(
+        "An internal error occurred. Our team has been notified and is investigating."
+      );
+      setLoading(false);
+      setAwaitingResume(false);
+      return;
+    }
+
+    // ---------------------------------------
+    // Connection Lost
+    // ---------------------------------------
+    if (data.type === "connection_lost") {
+      setError(
+        "Connection to the server was lost. Please refresh and try again."
+      );
+      setLoading(false);
+      return;
+    }
+
+
+  });
+
+  socketRef.current = socket;
+  currentThreadRef.current = threadId;
+
+  return () => {
+    // Only close if component truly unmounts
+    socket.close();
+    socketRef.current = null;
+    currentThreadRef.current = null;
+  };
+}, [threadId, token]);
+
+  // =====================================================
+  // Fetch History
+  // =====================================================
   const fetchMessages = useCallback(async () => {
     if (!threadId) return;
 
@@ -30,70 +156,93 @@ export const useChat = (threadId?: string) => {
     setError(null);
 
     try {
-      // Match /routers/threads.py to avoid 307 redirect
-      // If backend route is without trailing slash, then do not add trailing slash
-      const endpoint = `/threads/${threadId}/messages`;
-      const data = await api(endpoint);
+      const data = await api(`/threads/${threadId}/messages`);
       setMessages(data);
     } catch (err: any) {
-      console.error("fetchMessages error:", err);
       setError(err.message || "Failed to fetch messages");
     } finally {
       setLoading(false);
     }
   }, [threadId, api]);
 
-  /**
-   * Send message to the thread
-   */
+  // =====================================================
+  // Send Message
+  // =====================================================
   const sendMessage = useCallback(
-    async (content: string) => {
-      if (!threadId || !content.trim()) return;
+    (content: string) => {
+      if (!threadId || !content.trim() || !socketRef.current) return;
 
-      // Optimistic UI update
-      const userMessage: ChatMessage = { role: "user", content };
-      setMessages((prev) => [...prev, userMessage]);
-      setLoading(true);
+      // Prevent duplicate resume clicks
+      if (awaitingResume === false && loading) return;
+
       setError(null);
 
-      try {
-        const body: SendThreadMessageRequest = { content };
-        // Match /routers/threads.py to avoid 307 redirect
-        // If backend route is without trailing slash, then do not add trailing slash
-        console.log("see: ", content)
-        const data = await api(`/chat/${threadId}`, {
-          method: "POST",
-          body: JSON.stringify({
-            message: content,
-            mode: "chat",
-            artifacts: null,
-            workspace: "stockticker_assistant"
-          }),
+      // ==========================================
+      // HITL Resume Mode
+      // ==========================================
+      if (hitlContext && awaitingResume) {
+        socketRef.current.send({
+          type: "hitl_response",
+          content,
+          workspace: "stockticker_assistant"
         });
-
-        // Add the response from backend as assistant message if returned
-        if (data?.content) {
-          const assistantMessage: ChatMessage = {
-            role: "assistant",
-            content: data.content,
-          };
-          setMessages((prev) => [...prev, assistantMessage]);
-        }
-      } catch (err: any) {
-        console.error("sendMessage error:", err);
-        setError(err.message || "Failed to send message");
 
         setMessages((prev) => [
           ...prev,
-          { role: "assistant", content: "⚠️ Failed to get response from backend." },
+          { role: "user", content },
         ]);
-      } finally {
-        setLoading(false);
+
+        setAwaitingResume(false);
+        setLoading(true);
+
+        return;
       }
+
+      // ==========================================
+      // Normal User Message
+      // ==========================================
+      const userMessage: ChatMessage = { role: "user", content };
+      setMessages((prev) => [...prev, userMessage]);
+
+      setLoading(true);
+
+      socketRef.current.send({
+        type: "user_message",
+        message: content,
+        workspace: "stockticker_assistant",
+      });
     },
-    [threadId, api]
+    [threadId, hitlContext, awaitingResume, loading]
   );
 
+  // =====================================================
+  // Approval Helpers (Optional UI Helpers)
+  // =====================================================
+  const approve = () => {
+    if (!hitlContext) return;
+    sendMessage("approve");
+  };
 
-  return { messages, loading, error, fetchMessages, sendMessage };
+  const reject = () => {
+    if (!hitlContext) return;
+    sendMessage("reject");
+  };
+
+  return {
+    messages,
+    loading,
+    error,
+
+    hitlContext,
+    awaitingResume,
+
+    isWaitingForHuman: !!hitlContext && awaitingResume,
+    isStreaming: loading && !awaitingResume,
+
+    fetchMessages,
+    sendMessage,
+    approve,
+    reject,
+  };
+
 };
