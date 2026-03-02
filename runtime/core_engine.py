@@ -1419,7 +1419,57 @@ class AgentHITL:
     # ------------------------------------------------------------------
     # LangGraph Node Entry Point
     # ------------------------------------------------------------------
-    async def __call__(self, state: Union[StateSchema, Dict[str, Any]]) -> Dict[str, Any]:
+    async def __call__(self, state: StateSchema) -> Dict[str, Any]:
+
+        logger.info("AgentHITL called")
+
+        # --------------------------------------------------
+        # NORMAL EXECUTION (idempotent)
+        # Everything above interrupt() may run twice.
+        # --------------------------------------------------
+
+        user_intent = state.user_intent
+        stage = state.stage
+        agent_name = state.agent
+        task = state.task
+
+        logger.info(f"Stage: {stage}")
+        logger.info(f"Task: {task.id}")
+
+        # Generate HITL prompt
+        response = await self._request_llm_for_hitl(state)
+
+        # --------------------------------------------------
+        # INTERRUPT (pause here)
+        # --------------------------------------------------
+
+        resume_payload = interrupt({
+            "type": "hitl_required",
+            "prompt": response.content,
+            "agent": state.agent,
+            "task_id": state.task.id,
+        })
+
+        # --------------------------------------------------
+        # RESUME CONTINUES HERE
+        # --------------------------------------------------
+
+        # When resumed, interrupt() RETURNS the resume dict
+        human_response = resume_payload.get("human_response")
+
+        logger.info(f"HITL resumed with: {human_response}")
+
+        # Optionally persist in state for downstream nodes
+        state.human_response = human_response
+
+        return {
+            "hitl_completed": True,
+            "approved": human_response,
+            "human_response": human_response,
+        }
+
+
+    async def __call1__(self, state: Union[StateSchema, Dict[str, Any]]) -> Dict[str, Any]:
         # Ensure we are working with a Pydantic object, even after resume
         # This is a classic "de-serialization" hurdle in LangGraph. When you use a custom Pydantic class like StateSchema 
         # as your state, LangGraph’s checkpointer (Postgres or Memory) has to save that data as JSON. When the graph resumes, 

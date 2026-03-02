@@ -93,6 +93,7 @@ class Orchestrator:
 
         print("GRAPH ID RUN:", id(self._graph))
         print("CHECKPOINTER ID RUN:", id(self._graph.checkpointer))
+        print("SESSION ID:", session_id)
 
         async for event in self._graph.astream(self.initial_state, config, stream_mode="updates"):
             print("EVENT RUN:", event)
@@ -116,6 +117,7 @@ class Orchestrator:
 
         print("GRAPH ID RESUME:", id(self._graph))
         print("CHECKPOINTER ID RESUME:", id(self._graph.checkpointer))
+        print("SESSION ID:", session_id)
         print(f"Human Input: {human_input}")
 
         # -------------------------------
