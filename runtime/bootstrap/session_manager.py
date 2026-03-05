@@ -5,7 +5,6 @@ from dataclasses import dataclass
 from pydantic import BaseModel, Field
 from typing import List, Dict, Optional, Any
 from datetime import datetime, timedelta
-import uuid
 
 from runtime.logger import AgentLogger
 
@@ -14,8 +13,12 @@ logger = AgentLogger.get_logger(  component="system")
 DEFAULT_TTL_SECONDS = 60 * 60 * 24 * 7  # 7 days
 
 
+def _generate_session_id() -> str:
+    return str(uuid.uuid4())
+
 class SessionContext(BaseModel):
     # Identifiers
+    user_id: str = ""
     session_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     created_at: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
     
@@ -52,7 +55,7 @@ class SessionManager:
         now = time.time()
         logger.info(f"Creating new session for user: {user_id}")
         session = SessionContext(
-            session_id=str(uuid.uuid4()),
+            session_id=_generate_session_id(),
             user_id=user_id
         )
         logger.info(f"New  session for user '{user_id}': {session.session_id}")
@@ -63,7 +66,7 @@ class SessionManager:
         if session_id and session_id in self.sessions:
             session_ctx = self.sessions[session_id]
             if user_id == session_ctx.user_id:
-                return true
+                return True
             else:
                 logger.info(f"The user '{user_id}' is using a different session id '{session_ctx.session_id}")
                 raise AuthenticationError("Invalid Session detected ...")

@@ -248,10 +248,9 @@ class PredicateEngine:
             return False
 
 
-################################################################################
-# Predicate Decorator
-################################################################################
-
+#############################################################################################
+# Predicate Decorator - Required by Assistances ./workspaces/<assistants/tools/predicates.py
+#############################################################################################
 class Predicates:
     @staticmethod
     def policy(name: str | None = None):
@@ -262,10 +261,10 @@ class Predicates:
 
     @staticmethod
     def process(ctx: StageEvalContext) -> dict:
-        task_result = ctx.task.result
+        logger.info(f"ctx.task: {ctx.task}")
+        task_result = ctx.task.get("result")
         logger.info(f"Task Result: {task_result}")
         data = task_result.get("output")
-
         return data
 
 

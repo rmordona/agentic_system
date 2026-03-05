@@ -27,6 +27,7 @@ import time
 import json
 import itertools
 import asyncio
+import uuid
 
 from uuid import UUID
 from enum import Enum
@@ -37,12 +38,13 @@ from events.event_bus import EventBus
 
 from langgraph.types import Command
 
-from runtime.artifact_factory import Task
 from runtime.core_engine import CoreEngine
 
 from runtime.logger import AgentLogger
 logger = AgentLogger.get_logger( component="system" )
 
+def _generate_thread_id() -> str:
+    return str(uuid.uuid4())
 
 class Orchestrator:
     """
@@ -83,17 +85,26 @@ class Orchestrator:
         """
         Async generator for WebSocket streaming.
         """
-        self.initial_state = await self.core_engine.acquire_new_state(user_intent, session_id)
-        self.initial_state.model_rebuild()
+ 
+        # 1. Generate execution identity
+        thread_id = _generate_thread_id()
 
+        # 2. Persist in memory
+        self.thread_id = thread_id
+
+        # 3. Initialize state with BOTH IDs
+        self.initial_state = await self.core_engine.acquire_new_state(user_intent, session_id, thread_id)
+
+        # 4. Use thread_id for LangGraph execution
         config = {
-            "configurable": {"thread_id": session_id},  # Use session_id as LangGraph thread
+            "configurable": {"thread_id": thread_id},  # Use session_id as LangGraph thread
             "recursion_limit": 8
         }
 
         print("GRAPH ID RUN:", id(self._graph))
         print("CHECKPOINTER ID RUN:", id(self._graph.checkpointer))
         print("SESSION ID:", session_id)
+        print("THREAD ID:", thread_id)
 
         async for event in self._graph.astream(self.initial_state, config, stream_mode="updates"):
             print("EVENT RUN:", event)
@@ -102,7 +113,12 @@ class Orchestrator:
 
         # Finalize state
         self.initial_state.final_content = getattr(self.initial_state, "last_output", "")
-        yield {"type": "done", "content": self.initial_state.final_content}
+        yield {
+            "type": "done",
+            "content": self.initial_state.final_content,
+            "session_id": session_id,
+            "thread_id": thread_id
+        }
 
 
     async def resume_stream(self, human_input: str, session_id: str):
@@ -111,13 +127,14 @@ class Orchestrator:
         """
 
         config = {
-            "configurable": {"thread_id": session_id},
+            "configurable": {"thread_id": self.thread_id},
             "recursion_limit": 8,
         }
 
         print("GRAPH ID RESUME:", id(self._graph))
         print("CHECKPOINTER ID RESUME:", id(self._graph.checkpointer))
         print("SESSION ID:", session_id)
+        print("THREAD ID:", self.thread_id)
         print(f"Human Input: {human_input}")
 
         # -------------------------------
@@ -132,7 +149,7 @@ class Orchestrator:
 
         final_output = ""
         async for event in self._graph.astream(
-            Command(resume={"human_response": human_input}),
+            Command(resume=resume_payload),
             config,
             stream_mode="updates",
         ):
@@ -252,8 +269,6 @@ class Orchestrator:
             logger.info(f"Event yield: {first_key}")
 
             # self.hitl_loop(event)
-
-
             # self.spinner_task()
 
             await self.event_bus.emit("graph_event", event)

@@ -97,6 +97,8 @@ from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 from mcp.client.streamable_http import streamablehttp_client
 
+from runtime.engine.domain.envelopes import DataEnvelope, ToolEnvelope, DomainType
+
 from runtime.tools.mcp_client import MCPClient
 from runtime.tools.mcp_manager import MCPManager
 from runtime.artifact_factory import ArtifactSchema
@@ -126,7 +128,21 @@ def generate_uuid() -> str:
     return uid
 
 
-DomainType = TypeVar("DomainType", bound=BaseModel)
+# --------------------------------------------------------------------------------------------------
+# AgentContext: dynamic, per-turn ownership: control, data, stage, artifacts, and history.
+# --------------------------------------------------------------------------------------------------
+@dataclass
+class AgentContext:
+    agent_name: str
+    stage: str
+
+    control_raw: ArtifactSchema = field(default_factory=ArtifactSchema)
+    data_raw: DataEnvelope = None
+    tool_raw: List[ToolEnvelope] = field(default_factory=list)
+
+    timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
+    result_summary: Optional[str] = None
+
 
 ##################################################################
 # Schema Factory
@@ -379,33 +395,7 @@ class SchemaFactory:
         return defs[def_name]
 
 
-
-# --------------------------------------------------------------------------------------------------
-# AgentContext: dynamic, per-turn ownership: control, data, stage, artifacts, and history.
-# --------------------------------------------------------------------------------------------------
-
-@dataclass
-class AgentContext:
-        agent_name: str        # identity of the agent in this turn
-        stage: str             # current stage
-        # ------------------------------------------------------------------
-        # Control Plane (required, immutable intent)
-        # ------------------------------------------------------------------
-        control_raw: ArtifactSchema = None # artifact.md / plan / contract
-
-        # ------------------------------------------------------------------
-        # Data Plane (append-only, domain governed)
-        # ------------------------------------------------------------------
-        data_raw:  DataEnvelope[DomainType]  = None # Field(default_factory=DataEnvelope)
-
-        # ------------------------------------------------------------------
-        # Tool Plane (append-only execution records)
-        # ------------------------------------------------------------------
-        tool_raw: List[ToolEnvelope[DomainType]] = field(default_factory=list)
-        # ------------------------------------------------------------------
-        timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
-        result_summary: str | None = None          # optional result / status
-
+ 
 ########################################################################################
 # DATA ENVELOPE
 ########################################################################################
@@ -480,18 +470,6 @@ class AgentContext:
 # - ToolEnvelope: per-execution runtime state, references governance
 # - ToolAdapter: executes tool logic using envelope data
 ################################################################################
-
-class DataEnvelope(BaseModel, Generic[DomainType]):
-    tool: str
-    type: str
-    version: str
-    producer: str # The Agent
-    stage: str
-    created_at: datetime = field(default_factory=lambda: datetime.now(UTC).isoformat())
-    payload: DomainType
-    checksum: Optional[str]
-    references: List[str] = []
-
 class DataBridge:
     def __init__(self, agent_md_content: str):
         self.raw_schema = self._extract_json_from_md(agent_md_content)
@@ -749,9 +727,6 @@ class DataManager:
         - JSON string
         - List[TextContent]
         """
-
-
-
         if raw_output is None:
             raise ValueError("Tool returned None output")
 
@@ -833,22 +808,6 @@ class ToolCall(TypedDict):
     args: Dict[str, Any]
     result: Any
 
-class ToolEnvelope(BaseModel, Generic[DomainType]):
-    id: str
-    tool_name: str
-    tool_version: Optional[str] = None
-    agent_role: str
-    stage: str
-    intent: str 
-    input: Dict[str, Any] = Field(default_factory=dict)
-    #output: Optional[Dict[AgentOutput, Any]] = None
-    output: Optional[Any] = None
-    error: Optional[str] = None
-    started_at: datetime = field(default_factory=lambda: datetime.now(UTC).isoformat())
-    completed_at: Optional[str] = None
-    success: bool = False
-    governance_policy: Dict[str, Any] = Field(default_factory=dict)
-
 class ToolAdapter:
 
     def __init__(self, name: str, description: str, schema: dict, tool_file: Path):
@@ -914,6 +873,7 @@ class ToolAdapter:
             error = result.get("message")
             logger.exception(f"Tool execution failed: {error}")
 
+        logger.info(f"Output: {_output}")
         logger.info(f"Execution Completed ...")
 
         logger.info(f"Wrapping output into a ToolEnvelope")

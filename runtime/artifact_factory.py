@@ -180,89 +180,17 @@ import mistune
 import json
 import hashlib
 from typing import Dict, Any, List, Optional, Literal
-from datetime import datetime, UTC
-from dataclasses import dataclass, field
+#from datetime import datetime, UTC
+#from dataclasses import dataclass, field
 
 from pydantic import BaseModel, Field
 from uuid import uuid4, UUID
 
+from runtime.engine.domain.agent_context import ArtifactSchema
+from runtime.engine.domain.task import Task, HITLState
+
 from runtime.logger import AgentLogger
 logger = AgentLogger.get_logger(component="system")
-
-
-class Task(BaseModel):
-    id: str
-    description: str
-    stage: str
-    execution: Literal["tool", "llm"] = "tool"
-    tool_name: str = ""
-    depends_on: List[str] = []
-    status: Literal["pending", "done", "blocked", "completed"] = "pending"
-    result: dict | None = None
-    error: str | None = None
-    reason: str | None = None
-
-
-class HITLState(BaseModel):
-    required: bool = False
-    approved: Optional[bool] = None
-    comments: Optional[str] = None
-    requested_at: datetime = field(default_factory=lambda: datetime.now(UTC))
-
-
-class ArtifactSchema(BaseModel):
-    # ---- Versioning ----
-    schema_version: Literal["1.0"] = "1.0"
-
-    # ---- Identity ----
-
-    role: str
-    purpose: str
-
-    mission: str
-    session_id: str
-    status: Literal[
-        "initialized",
-        "running",
-        "blocked",
-        "completed",
-        "aborted"
-    ]
-
-    # ---- Used per tool to determine stage-exit policy
-    stage_exit_allowed: bool
-
-    # ---- Planning ----
-    current_stage: str
-    current_plan: List[Task] = Field(default_factory=list)
-    plan_history: List[Dict] = Field(default_factory=list)
-
-    # Open tasks are tasks that haven't been executed or completed yet
-    open_tasks: List[Task] = Field(default_factory=list)
-
-    # ---- Knowledge ----
-    spec: Optional[Dict] = None
-    constraints: Dict = Field(default_factory=dict)
-
-    # ---- Proposals ----
-    proposals: List[Dict] = Field(default_factory=list)
-    accepted_proposals: List[Dict] = Field(default_factory=list)
-    rejected_proposals: List[Dict] = Field(default_factory=list)
-
-    # ---- Clarifications ----
-    open_questions: List[Dict] = Field(default_factory=list)
-    resolved_questions: List[Dict] = Field(default_factory=list)
-
-    # ---- Validation ----
-    validation_errors: List[str] = Field(default_factory=list)
-    warnings: List[str] = Field(default_factory=list)
-
-    # ---- Human-in-the-loop ----
-    hitl: HITLState = Field(default_factory=HITLState)
-
-    # ---- Timestamps ----
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    last_updated: datetime = Field(default_factory=datetime.utcnow)
 
 
 # -------------------------------------------------------------------------
