@@ -37,6 +37,9 @@ class StateSchema(BaseModel):
     final_content: str = ""
     done: bool = False
 
+    # HITL
+    human_response: Optional[str] = None
+
     # -------------------------
     # Execution Metadata
     # -------------------------

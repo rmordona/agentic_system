@@ -192,8 +192,8 @@ class AgentPlanner:
 
         logger.info("Composing initial plan ...")
 
-        if not isinstance(state, StateSchema):
-            state = StateSchema(**state)
+        #if not isinstance(state, StateSchema):
+        #    state = StateSchema(**state)
 
         # 1. Acquire first stage
         logger.info("Acquiring the first stage")

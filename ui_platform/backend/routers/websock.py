@@ -131,7 +131,7 @@ async def handle_graph_stream(
                 event = event.get("event")
 
         # --------------------------------------------------
-        # 🛑 Handle Interrupt(s)
+        # Handle Interrupt(s)
         # --------------------------------------------------
         if isinstance(event, dict) and "__interrupt__" in event:
             interrupts = event.get("__interrupt__", [])
@@ -154,12 +154,12 @@ async def handle_graph_stream(
             break  # stop consuming stream immediately
 
         # --------------------------------------------------
-        # 🧩 Capture session updates
+        # Capture session updates
         # --------------------------------------------------
         if isinstance(event, dict) and event.get("type") == "session_update":
             updated_session_id = event["session_id"]
 
-            # 🔥 Persist immediately
+            # Persist immediately
             if updated_session_id != thread.session_id:
                 thread.session_id = updated_session_id
                 db.commit()
@@ -167,7 +167,7 @@ async def handle_graph_stream(
             continue
 
         # --------------------------------------------------
-        # 📡 Token streaming
+        # Token streaming
         # --------------------------------------------------
         if isinstance(event, str):
             full_response += event
@@ -178,7 +178,7 @@ async def handle_graph_stream(
             })
 
         # --------------------------------------------------
-        # 📦 Structured event streaming
+        # Structured event streaming
         # --------------------------------------------------
         else:
             await websocket.send_json({
@@ -187,7 +187,7 @@ async def handle_graph_stream(
             })
 
     # ==================================================
-    # 🏁 FINALIZATION (only if NOT interrupted)
+    # FINALIZATION (only if NOT interrupted)
     # ==================================================
     if not interrupted:
 

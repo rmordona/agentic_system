@@ -102,17 +102,23 @@ class AgentRunner:
         data_env = await self.context.data_manager.process_output(task.tool_name, tool_env.output, data_env)
         logger.info(f"Data Envelope Type: {type(data_env)}")
         logger.info(f"Data Envelope with Output Data: {data_env}")
+        logger.info(f"Previous artifact: {artifact}")
         if isinstance(data_env, DataEnvelope):
             agent_ctx.data_raw = data_env # Preserve the DataEnvelope
             agent_ctx.result_summary = f"Task {task.id} completed successfully"
             state.task["result"] = asdict(tool_env)
             state.task["status"] = "done"
-
+            task_id = int(state.task.get("id")) 
+            for index, task in enumerate(artifact.current_plan):
+                if task.get("id") == state.task.get("id"):
+                    artifact.current_plan[index] = state.task
+            agent_ctx.control_raw = artifact
 
         #logger.info(f"agent_ctx.tool_raw: {agent_ctx.tool_raw}")
         #logger.info(f"-------------------------- agentContext: {agent_ctx}")
         logger.info(f"Tool Envelope: {asdict(tool_env)}")
         logger.info(f"State Task: {state.task}")
+        logger.info(f"agent_ctx: {agent_ctx}")
 
         state.update_active_agent(agent_ctx)
 

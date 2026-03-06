@@ -101,7 +101,7 @@ class AgentHITL:
         user_intent = state.user_intent
         stage      = state.stage
         agent_name = state.active_agent
-        task       = state.task
+        task       = state.get_task() 
 
         logger.info(f"Current Stage: {stage}")
         logger.info(f"User Intent: {user_intent}")
@@ -109,7 +109,8 @@ class AgentHITL:
         logger.info(f"Task: {task.id}, description: {task.description}")
         logger.info(f"Tool type: {task.execution}, tool_name: {task.tool_name}")
 
-        agent_ctx = state.agents[agent_name]
+
+        agent_ctx = state.get_active_agent()
         artifact = agent_ctx.control_raw
 
         # --------------------------------------------------
@@ -125,13 +126,15 @@ class AgentHITL:
         # LangGraph will pause execution here and save the checkpoint.
 
         logger.info(f"Now interrupting for HITL ... Awaiting user response ...")
-        interrupt({
+        resume = interrupt({
             "type": "hitl_required",
             "prompt": response.content,
             "agent": state.active_agent,
-            "task_id": state.task.id,
+            "task_id": task.id,
         })
-        logger.error("THIS SHOULD NEVER PRINT")
+        logger.error(f"THIS SHOULD NEVER PRINT: {resume}")
+        if resume.get("human_response"):
+            return resume
         return {}
 
 
@@ -196,9 +199,9 @@ class AgentHITL:
 
         user_intent = state.user_intent
         agent_name  = state.active_agent
-        task        = state.task
+        task        = state.get_task()
 
-        agent_ctx = state.agents[agent_name]
+        agent_ctx = state.get_active_agent()
         artifact = agent_ctx.control_raw
 
         hitl = artifact.hitl
@@ -206,7 +209,7 @@ class AgentHITL:
         artifact.validation_errors
 
         data_env = agent_ctx.data_raw
-        payload = data_env.payload.model_dump()
+        payload = data_env.payload
         normalized_payload = format_dict_readable(payload)
         logger.info(f"Payload: {normalized_payload}")
 
