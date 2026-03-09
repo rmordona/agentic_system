@@ -78,10 +78,68 @@ class AgentHITL:
         logger.info("*********************************************************************************************************")
         logger.info(f"State Type: {type(state)}")
         logger.info(f"State: {state}")
+
+        # ------------------------------------
+        # RESUME PATH
+        # ------------------------------------
+        if state.human_response:
+
+            response = state.human_response
+            resume_node = state.hitl_resume_node
+
+            logger.info(f"Resuming to {resume_node} with human input: {response}")
+
+            return Command(
+                goto=resume_node,
+                update={
+                    "human_response": response,
+                    "hitl_required": False
+                }
+            )
+
+        # ------------------------------------
+        # INTERRUPT PATH
+        # ------------------------------------
+        prompt = state.hitl_prompt or "User input required."
+
+        logger.info(f"Now interrupting for HITL ... Awaiting user response ...")
+        logger.info(f"Note: websocket receiver is (frontend/src/hooks/useChat.ts)")
+        resume =  interrupt({
+            "type": state.hitl_type,
+            "prompt": prompt
+        })
+
+        return Command(
+            goto=state.hitl_resume_node,
+            update={
+                "human_response": resume.get("human_response"),
+                "hitl_required": False
+            }
+        )
+
+        '''
+        logger.info(f"Now interrupting for HITL ... Awaiting user response ...")
+        resume = interrupt({
+            "type": "hitl_required",
+            "prompt": response.content,
+            "agent": state.active_agent,
+            "task_id": task.id,
+        })
+        logger.error(f"THIS SHOULD NEVER PRINT: {resume}")
+        return Command(
+                goto="runner",
+                update={
+                    "human_response": resume.get("human_response"),
+                    "retry_count": state.retry_count + 1
+                }
+            )
+        '''
+
         # --------------------------------------------------
         # RESUME AFTER INTERRUPT
         # --------------------------------------------------
         logger.info(f"State human_response at entry: {state.human_response}")
+        '''
         # 1. Check if we just came back from an interrupt
         if state.human_response:
             logger.info(f"Resumed! User said: {state.human_response}")
@@ -93,7 +151,7 @@ class AgentHITL:
                 "hitl_completed": True,
                 "approved": True if "yes" in user_feedback.lower() else False
             }
-
+        '''
 
         # --------------------------------------------------
         # NORMAL EXECUTION PATH
@@ -133,9 +191,13 @@ class AgentHITL:
             "task_id": task.id,
         })
         logger.error(f"THIS SHOULD NEVER PRINT: {resume}")
-        if resume.get("human_response"):
-            return resume
-        return {}
+        return Command(
+                goto="runner",
+                update={
+                    "human_response": resume.get("human_response"),
+                    "retry_count": state.retry_count + 1
+                }
+            )
 
 
         '''

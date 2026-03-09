@@ -253,3 +253,15 @@ class StageManager:
         stage = self.get(stage_name)
         return stage.terminal if stage else False
 
+    def compile_predicate(self, exit_condition: dict):
+        compiled_condition = self.policy_registry.compile(exit_condition)
+        logger.info(f"[AgentPlanner] Exit condition '{exit_condition}' and compiled: '{compiled_condition}'")     
+        return compiled_condition
+
+    def evaluate_predicate(self, compiled_condition: dict, state_ctx: dict, artifact: dict):
+        exit_result = self.policy_registry.evaluate(
+            compiled_expr=compiled_condition,
+            artifact=artifact,
+            state_ctx=state_ctx,
+        )    
+        return exit_result

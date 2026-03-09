@@ -5,41 +5,33 @@ import re
 import json
 from datetime import datetime, UTC, timezone
 from langgraph.graph import StateGraph, END
-# from pathlib import Path
 
-#import operator
 from pydantic import BaseModel, Field
 from typing import TypedDict, List, Dict, Any, Union, Optional
-#from typing_extensions import Annotated, Literal, Optional
-#from dataclasses import dataclass, field
 
-
-#from langgraph.channels import Topic, LastValue, BinaryOperatorAggregate
-#from langgraph.graph.message import add_messages  # optional
-#from langchain_core.messages import SystemMessage, HumanMessage
 
 from langgraph.checkpoint.memory import MemorySaver
 
 from llm.model_manager import ModelManager
 from runtime.stage_manager import StageManager
 from runtime.agent_manager import AgentManager
-#from runtime.policy_registry import PolicyRegistry, PredicateEngine
 
 from runtime.domain_manager import SystemContext
 from runtime.engine.state.state_schema import StateSchema
 from runtime.engine.domain.agent_context import AgentContext, ArtifactSchema
 from runtime.engine.domain.task import Task, HITLState
 
-#from runtime.agent_profiler import AgentProfile
-
-#from runtime.domain_manager import DomainType, AgentContext, SystemContext, DataEnvelope, ToolEnvelope, DataAdapter, ToolAdapter
-
-##### 
+# LangGraph Nodes
 from runtime.engine.nodes.validator_node import AgentValidator
 from runtime.engine.nodes.runner_node import AgentRunner
 from runtime.engine.nodes.planner_node import AgentPlanner 
 from runtime.engine.nodes.hitl_node import AgentHITL
+from runtime.engine.nodes.refiner_node import AgentIntentRefiner
+from runtime.engine.nodes.classifier_node import AgentClassifier
+from runtime.engine.nodes.governance_node import AgentGovernance
+from runtime.engine.nodes.domain_node import AgentDomain
 
+#Logger
 from runtime.logger import AgentLogger
 
 logger = AgentLogger.get_logger(  component="system")
@@ -121,6 +113,22 @@ logger = AgentLogger.get_logger(  component="system")
 #   it defines how intelligence flows, but does not perform
 #   reasoning or execution itself.
 # -----------------------------------------------------------------------------
+# In terms of the Architecture. We will follow this route
+#
+#    User Intent
+#        ↓
+#    IntentRefiner → structured_intent / normalized_intent
+#        ↓
+#    AgentClassifier → decide agent profile / capability
+#        ↓
+#    AgentGovernance → pipeline stage, allowed agents, HITL flags
+#        ↓
+#    AgentPlanner → generate tasks per agent
+#        ↓
+#    AgentRunner → execute tasks
+#        ↓
+#    AgentGovernance → next stage (loop)
+# -----------------------------------------------------------------------------
 class CoreEngine:
     """
     The Orchestration Assembly for the Agnostic OS.
@@ -151,23 +159,23 @@ class CoreEngine:
         # --------------------------------------------------
         # 1. Stage Management
         # --------------------------------------------------
-        logger.info("Initializing Stage Manager")
-        self.stage_manager = StageManager(workspace_name=self.workspace_name)
-        self.stage_manager.register_stages()
-        logger.info("Stage Manager initialized")
+        # logger.info("Initializing Stage Manager")
+        # self.stage_manager = StageManager(workspace_name=self.workspace_name)
+        # self.stage_manager.register_stages()
+        # logger.info("Stage Manager initialized")
 
         # --------------------------------------------------
         # 2. Agent Management
         # --------------------------------------------------
-        logger.info("Initializing Agent Manager")
-        self.agent_manager = AgentManager(workspace_name=self.workspace_name)
-        self.agent_manager.scan_and_register_agents()
-        logger.info("Agent Manager initialized")
+        #logger.info("Initializing Agent Manager")
+        #self.agent_manager = AgentManager(workspace_name=self.workspace_name)
+        #self.agent_manager.scan_and_register_agents()
+        #logger.info("Agent Manager initialized")
 
         # --------------------------------------------------
         # 3. System Context
         # --------------------------------------------------
-        self.context = await SystemContext.create(template_repo = self.template_repo, workspace_name = self.workspace_name, agent_manager = self.agent_manager)
+        self.context = SystemContext()
 
         # --------------------------------------------------
         # 4. Initial Data Raw Setup 
@@ -182,6 +190,7 @@ class CoreEngine:
         self.agent_llm = ModelManager.spin_model()
         self.architect_llm = ModelManager.spin_model()
         self.core_llm = ModelManager.spin_model()
+        self.refiner_llm = ModelManager.spin_model()
 
         # --------------------------------------------------
         # 6. Engine Hemispheres
@@ -193,11 +202,14 @@ class CoreEngine:
         #    _should_continue → just checks the verdict
 
         logger.info("Initializing Agent Nodes")
-        self.validator = AgentValidator()
-        self.runner    = AgentRunner(self.context, self.stage_manager, self.agent_manager, self.agent_llm)
-        self.planner   = AgentPlanner(self.context, self.stage_manager, self.agent_manager, self.architect_llm)
-        self.hitl      = AgentHITL(self.context, True, 10, True )
-
+        self.refiner      = AgentIntentRefiner(self.refiner_llm)
+        self.classifier   = AgentClassifier(self.refiner_llm)
+        self.domainnode   = AgentDomain(self.context)
+        self.governance   = AgentGovernance(self.context)
+        self.planner      = AgentPlanner(self.context, self.architect_llm)
+        self.runner       = AgentRunner(self.context, self.agent_llm)
+        self.validator    = AgentValidator()
+        self.hitl         = AgentHITL(self.context, True, 10, True )
         logger.info("Core Engine initialized successfully")
 
     # --------------------------------------------------
@@ -217,28 +229,45 @@ class CoreEngine:
         workflow = StateGraph(StateSchema)
 
         # Register the Hemispheres
-        workflow.add_node("runner", self.runner)
+        workflow.add_node("refiner", self.refiner)
+        workflow.add_node("classifier", self.classifier)
+        workflow.add_node("domain", self.domainnode)
+        workflow.add_node("governance", self.governance)
         workflow.add_node("planner", self.planner)
+        workflow.add_node("runner", self.runner)
         workflow.add_node("validator", self.validator)
         workflow.add_node("hitl", self.hitl)
         
-        # Every action is followed by a plan reconciliation
-        workflow.add_edge("runner", "validator")
-        #workflow.add_edge("validator", "planner") # This is replaced by a conditional edge to support HITL
+        workflow.add_edge("classifier", "domain")
+        workflow.add_edge("domain", "governance")
+        workflow.add_edge("governance", "planner")
         workflow.add_edge("planner", "runner")
-        
+        workflow.add_edge("runner", "validator")
+
         # The Planner's output determines the next step
         workflow.add_conditional_edges("planner", self.planner._should_continue )
 
         # Define the entry point to the Logical Flow
-        workflow.set_entry_point("planner")
+        workflow.set_entry_point("refiner")
 
+        # Decide whether we require HITL or routes to the default planner
         workflow.add_conditional_edges(
             "validator",
             self.validator.route_after_validation,
             {
                 "Route_To_HITL": "hitl",
-                "Route_To_Planner": "planner"
+                "Route_To_Refiner": "refiner"
+            }
+        )
+
+        # Decide whether we require classification (During bootstrapping/context switching) 
+        # at start of conversation or new session / new thread.
+        workflow.add_conditional_edges("refiner", 
+            self.refiner.route_after_refining,
+            {
+                "Route_To_HITL" : "hitl",
+                "Route_To_Classifier": "classifier",
+                "Route_To_Governance": "governance",
             }
         )
 
@@ -246,7 +275,6 @@ class CoreEngine:
         # Rse a 'breakpoint' on the planner node if a human tool was called
         checkpointer = MemorySaver()
         self.compiled_graph = workflow.compile(checkpointer=checkpointer)
-
 
         return self.compiled_graph
         #return workflow.compile(interrupt_before=["agent"] if self._check_hitl_needed else [])
@@ -261,7 +289,7 @@ class CoreEngine:
             session_id=session_id,
             thread_id=thread_id,
             domain=self.domain,
-            user_intent=user_intent,
+            original_intent=user_intent,
             workflow_metadata={
                 "status": "running",
                 "initial_timestamp": datetime.now(UTC).isoformat(),

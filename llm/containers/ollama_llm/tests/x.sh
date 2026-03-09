@@ -1,9 +1,10 @@
-curl http://host.containers.internal:11434/api/embed --show-error --verbose \
-  -H "Content-Type: application/json" \
+curl http://localhost:11434/api/chat \
   -d '{
-  "model": "nomic-embed-text:latest",
-  "input" : "The sky is blue.",
-  "stream": "False",
-  "options": {"num_predict": 0}
+  "model": "qwen3:0.6b",
+  "prompt": "Hello!",
+  "stream": false,
+  "options": {
+    "num_predict": 512
+  }
 }'
 

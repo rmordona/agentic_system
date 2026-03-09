@@ -164,6 +164,8 @@ class Orchestrator:
 
             yield json_event
 
+        print("Exited from stream ...")
+
         yield {"type": "done", "content": final_output}
 
 

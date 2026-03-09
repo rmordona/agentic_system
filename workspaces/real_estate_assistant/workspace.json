@@ -1,5 +1,6 @@
 {
   "assistant_id": "realty_assistant",
+  "name" : "real_estate_assistant",
   "domain": "real_estate",
   "pipeline_template": "acquisition_pipeline.md",
   "default_artifact_path": "artifacts/property_deals/",

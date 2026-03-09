@@ -160,7 +160,7 @@ class ModelManager:
     @staticmethod
     def spin_model():
         return ModelManager(
-            chatmodel_provider="ollama:qwen2:0.5b",
+            chatmodel_provider="ollama:qwen3:0.6b",
             embedding_provider="ollama:nomic-embed-text:latest",
             store_provider="in-memory-ollama",  
         )

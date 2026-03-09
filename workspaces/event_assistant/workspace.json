@@ -1,5 +1,6 @@
 {
   "assistant_id": "event_assistant",
+  "name" : "event_assistant",
   "domain": "event_coordination",
   "pipeline_template": "event_orchestration_pipeline.md",
   "default_artifact_path": "artifacts/event_productions/",

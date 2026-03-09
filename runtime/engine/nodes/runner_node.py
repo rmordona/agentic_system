@@ -31,16 +31,12 @@ logger = AgentLogger.get_logger(  component="system")
 #   but never decides stage transitions or governance.
 # -----------------------------------------------------------------------------
 class AgentRunner:
-    def __init__(self, context: SystemContext, stage_manager: StageManager, agent_manager: AgentManager, llm: ModelManager):
-
+    def __init__(self, context: SystemContext, llm: ModelManager):
         self.context = context
-
-        self.stage_manager = stage_manager
-        self.agent_manager = agent_manager
 
         # Bind the dynamic tools to the LLM
         # The LLM is "primed" with a menu of actions.
-        self.llm = llm.bind_tools(context.get_runtime_tools())
+        # self.llm = llm.bind_tools(context.get_runtime_tools())
 
     def enforce_allowed_agents(self, agent_name, stage_meta: StageSchema):
         if agent_name not in stage_meta.allowed_agents:
@@ -54,7 +50,10 @@ class AgentRunner:
 
         logger.info(f"Received state from agent: '{state.active_agent}', stage: {state.stage}, task: {state.task}")
 
+        logger.info(f"State human_response at entry: {state.human_response}")
+
         user_intent = state.user_intent
+        human_response = state.human_response # if this is a call from AgentHITL for feedback
 
         stage      = state.stage         # Received from AgentPlanner
         agent_name = state.active_agent  # Received from AgentPlanner
@@ -64,6 +63,9 @@ class AgentRunner:
         logger.info(f"Task Received: {task}")
         logger.info(f"Task: {task.id}, description: {task.description}")
         logger.info(f"Tool type: {task.execution}, tool_name: {task.tool_name}")
+
+        self.stage_manager = self.context.stage_manager
+        self.agent_manager = self.context.agent_manager
 
         stage_meta = self.stage_manager.get(stage)
         self.enforce_allowed_agents(agent_name, stage_meta)
@@ -124,7 +126,10 @@ class AgentRunner:
 
         return {
             "task" : state.task,
-            "agents": state.agents
+            "agents": state.agents,
+            "human_response": None,
+            "hitl_completed": None,
+            "approved": None,
         }
 
     async def execute_task(self, task: Task, agent_ctx: AgentContext, data_env: DataEnvelope) -> ToolEnvelope:

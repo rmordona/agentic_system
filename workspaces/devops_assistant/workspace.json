@@ -1,5 +1,6 @@
 {
   "assistant_id": "develops_assistant",
+  "name" : "devops_assistant",
   "domain": "software_engineering",
   "pipeline_template": "dev_sprint_pipeline.md",
   "default_artifact_path": "artifacts/software/",

@@ -1,5 +1,6 @@
 {
   "assistant_id": "plotline_assistant",
+  "name" : "plotline_assistant",
   "domain": "narrative_design",
   "pipeline_template": "novel_development_cycle.md",
   "default_artifact_path": "artifacts/narrative/",

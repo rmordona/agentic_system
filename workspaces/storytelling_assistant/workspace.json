@@ -1,0 +1,10 @@
+{
+  "assistant_id": "storytelling_assistant",
+  "name" : "storrytelling_assistant",
+  "domain": "story_telling",
+  "pipeline_template": "storytelling_pipeline.md",
+  "default_artifact_path": "artifacts/itineraries/",
+  "agent_stack": [
+    "StoryTeller",
+  ]
+}

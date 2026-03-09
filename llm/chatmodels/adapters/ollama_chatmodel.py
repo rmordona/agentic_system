@@ -108,7 +108,7 @@ class OllamaChatModel(BaseChatModel):
     )
 
     endpoint: str = Field(
-        default="http://localhost:11434/api/chat",
+        default="http://localhost:11434/api/generate",
         description="Ollama chat endpoint",
     )
 
@@ -190,6 +190,7 @@ class OllamaChatModel(BaseChatModel):
     ) -> ChatResult:
         payload = self._build_chat_payload(messages, temperature, max_tokens, stream=False)
 
+        logger.info(f"LLM: Endpoint: {self.endpoint}")
         logger.info(f"Building the payload ... {payload}")
         response = requests.post(
             self.endpoint,

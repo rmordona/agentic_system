@@ -11,7 +11,7 @@
 # Usage:
 #   1. Load configuration: ChatModelFactory.load_config(path_to_json)
 #   2. Register new chatmodel providers via ChatModelFactory.register(name, cls)
-#   3. Instantiate models: ChatModelFactory.get(provider="ollama", model_name="qwen2.5")
+#   3. Instantiate models: ChatModelFactory.get(provider="ollama", model_name="qwen3:06b")
 #
 # Author: Raymond M.O. Ordona
 # Created: 2026-01-02

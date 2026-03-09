@@ -53,7 +53,7 @@ useEffect(() => {
 
   socket.connect((data) => {
     // HITL
-    if (data.type === "hitl_required") {
+    if (data.type === "hitl_required" || data.type === "intent_clarification" || data.type === "intent_conversation") {
       setMessages((prev) => [
         ...prev,
         { role: "assistant", content: data.prompt },

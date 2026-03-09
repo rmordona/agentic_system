@@ -1,5 +1,6 @@
 {
   "assistant_id": "travel_assistant",
+  "name" : "travel_assistant",
   "domain": "travel_logistics",
   "pipeline_template": "trip_planning_pipeline.md",
   "default_artifact_path": "artifacts/itineraries/",

@@ -18,14 +18,15 @@ done
 # other: phi3:3.8b, llama3.1, qwen2.5, llama3.2
 # tinyllama ( ~1GB), qwen2:0.5b (~700MB), gemma:2b (~2GB)
 
-model="qwen2:0.5b"
+#model="qwen2:0.5b"
+model="qwen3:0.6b"
 echo " Pulling $model model..."
 podman exec ollama ollama pull $model
 
 #model="qwen2:1.5b"
 #model="qwen2:1.5b-instruct"
 #model="tinyllama"
-model="granite3-moe:1b"
+#model="granite3-moe:1b"
 echo " Pulling $model model..."
 podman exec ollama ollama pull $model
 
@@ -42,6 +43,6 @@ podman exec ollama ollama pull $embedding_model
 echo "Ollama is ready at http://localhost:11434"
 echo ""
 echo "curl http://localhost:11434/api/generate -d '{"
-echo "   'model'  : 'qwen2:0.5b',"
+echo "   'model'  : 'qwen3:0.6b',"
 echo "   'prompt' : 'How is the weather?'"
 echo " }'"

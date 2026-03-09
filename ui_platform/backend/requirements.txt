@@ -39,3 +39,6 @@ alpaca==1.0.0
 alpaca-py==0.43.2
 pytz==2025.2
 bs4==0.0.2
+
+################## Required by Ollama containers ###############
+podman-compose=1.5.0

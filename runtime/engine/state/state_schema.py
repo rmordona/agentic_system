@@ -14,9 +14,11 @@ class StateSchema(BaseModel):
     # -------------------------
     # Session Identity
     # -------------------------
-    session_id: str          # business identity
-    thread_id: str           # graph execution identity
+    session_id: str = None   # business identity
+    thread_id: str = None    # graph execution identity
     domain: str
+    session_is_new: bool = True 
+    context_switch: bool = True
 
     # -------------------------
     # Multi-Agent Registry
@@ -24,21 +26,40 @@ class StateSchema(BaseModel):
     agents: Dict[str, Dict[str, Any]] = Field(default_factory=dict)
     active_agent: Optional[str] = None
 
-    # -------------------------
-    # Workflow State
-    # -------------------------
-    user_intent: Optional[str] = None
+    # ----------------------------------------
+    # Workflow State and Intent Refinements
+    # ----------------------------------------
+    original_intent: Optional[str] = None
+    normalized_intent: Optional[str] = None 
+    structured_intent: Optional[dict] = None
+    entities: dict = Field(default_factory=dict)
+    clarification_needed: bool = False 
+    clarification_question: Optional[str] = None
+    refiner_error: Optional[str] = None
+
+    # ----------------------------------------
+    # Workspace Area
+    # ----------------------------------------
+    workspace_name: str = None
+    workspace_meta: Optional[dict] = None
+    classification_confidence: float = None
 
     # Storage-safe snapshots
     task: Optional[Dict[str, Any]] = None
     hitl: Optional[Dict[str, Any]] = None
 
     stage: Optional[str] = None
+
     final_content: str = ""
     done: bool = False
 
     # HITL
     human_response: Optional[str] = None
+    hitl_required: bool = False
+    hitl_type: Optional[str] = None
+    hitl_prompt: Optional[str] = None
+    hitl_resume_node: Optional[str] = None
+    retry_count: int = 0
 
     # -------------------------
     # Execution Metadata
