@@ -57,13 +57,13 @@ class AgentGovernance:
         # Check for next open task
         next_task = self._next_open_task(state)
         if next_task:
-            logger.info(f"If Next Task, Passing to route_to_next_task.")
+            logger.info(f"If Next Task, then take _next_task.")
             return {} # No change in state, let Planner handle tasks
 
         # Determine next agent in stage
         next_agent = self._next_agent(state)
         if next_agent:
-            logger.info(f"If Next Agent, Passing to route_to_next_task.")
+            logger.info(f"If Next Agent, then take _next_agent.")
             return next_agent
 
         # Evaluate stage exit conditions

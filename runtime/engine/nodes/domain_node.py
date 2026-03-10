@@ -109,7 +109,8 @@ class AgentDomain:
         # --------------------------------------------------
         await self.context.initialize(
             workspace_name = workspace_name,
-            agent_manager = self.agent_manager)
+            agent_manager = self.agent_manager
+        )
         
 
     def initialize_stages(self, workspace_name: str):
