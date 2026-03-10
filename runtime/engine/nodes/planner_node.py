@@ -3,8 +3,9 @@ from core.paths import ARCHITECT_TEMPLATE, load_template
 import re
 import json
 from typing import Dict, Any, List
-from runtime.logger import AgentLogger
+from runtime.engine.state.state_mapper import to_storage
 
+from runtime.logger import AgentLogger
 from runtime.engine.state.state_schema import StateSchema
 from runtime.engine.domain.agent_context import AgentContext
 from runtime.engine.domain.task import Task
@@ -53,19 +54,29 @@ class AgentPlanner:
         if not artifact.current_plan:
             logger.info("Building initial plan for agent")
             artifact.current_plan = await self._build_initial_tasks(state, agent_ctx)
+            if artifact.current_plan:
+                logger.info(f"Current Plan: {artifact.current_plan}")
+                artifact.open_tasks = list(artifact.current_plan)
 
         if artifact.open_tasks:
             next_task = artifact.open_tasks.pop(0)
             state.set_task(next_task)
-            return {"task": next_task, "stage": state.stage, "active_agent": agent_ctx.agent_name}
+            agent_ctx.control_raw = artifact
+            state.agents[agent_ctx.agent_name] = to_storage(agent_ctx)
+            return {"task": to_storage(next_task), 
+                    "stage": state.stage, 
+                    "active_agent": agent_ctx.agent_name,
+                    "agents" : state.agents
+                }
 
-        return {"task": None}
+        # Cycle back to governance if tasks are depleted
+        return "governance"
 
     async def _build_initial_tasks(self, state: StateSchema, agent_ctx: AgentContext) -> List[Task]:
 
         profile: AgentProfile = self.context.agent_manager.get_agent_profile(agent_ctx.agent_name)
 
-        tools = self.context.tool_manager.list_available_tools()
+        tools = self.context.tool_manager.mcp_tools()
 
         stage_schema = self.context.stage_manager.get(state.stage)
         stage_goal = stage_schema.description
@@ -85,22 +96,32 @@ class AgentPlanner:
             "available_tools": tools,
         })
 
-        logger.info(f"Calling LLM to refine user intent: {system_prompt}")
-        response = await self.llm.ainvoke(system_prompt)
-        raw_tasks = getattr(response, "content", str(response))
-        logger.info(f"Raw LLM output: {raw_tasks}")
- 
-        tasks_json = self._extract_json(raw_tasks.content)
-        tasks: List[Task] = []
-        for t in tasks_json:
-            tasks.append(Task(
-                id=t.get("id"),
-                description=t.get("description"),
-                execution=t.get("execution"),
-                tool_name=t.get("tool_name"),
-                stage=state.stage,
-                status="pending"
-            ))
+        retry = 0
+        while True: # Retry if generated tasks is malformed
+            retry = retry + 1
+            logger.info(f"Calling LLM to refine user intent: {system_prompt}")
+            response = await self.llm.ainvoke(system_prompt)
+            raw_tasks = getattr(response, "content", str(response))
+            logger.info(f"Raw LLM output: {raw_tasks}")
+    
+            tasks_json = self._extract_json(raw_tasks)
+            tasks: List[Task] = []
+            tid = 0
+            for t in tasks_json:
+                tool_name = t.get("tool_name")
+                execution = t.get("execution")
+                if tool_name and execution in ["tool", "llm"]:
+                    tid = tid + 1
+                    tasks.append(Task(
+                        id=tid,
+                        description=t.get("description"),
+                        execution=t.get("execution"),
+                        tool_name=t.get("tool_name"),
+                        stage=state.stage,
+                        status="pending"
+                    ))
+            if tasks or retry > 1:
+                break
         return tasks
 
     def _extract_json(self, content: str) -> list:

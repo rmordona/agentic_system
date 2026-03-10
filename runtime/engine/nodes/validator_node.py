@@ -90,6 +90,18 @@ class AgentValidator:
         if artifact.validation_errors:
             artifact.status = "blocked"
             artifact.hitl = HITLState(required = True)
+
+------
+            if intent_type == "unknown":
+                return {
+                    "human_response": None,
+                    "hitl_required": True,
+                    "hitl_type": "intent_clarification",
+                    "hitl_prompt": "I couldn't understand your request. Could you please rephrase what you'd like to do?",
+                    "hitl_resume_node": "refiner"
+                }
+------
+
         elif not artifact.open_tasks:
             artifact.status = "completed"
         else:

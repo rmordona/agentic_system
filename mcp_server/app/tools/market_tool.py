@@ -91,4 +91,60 @@ async def get_ticker_stats(ticker: str) -> dict:
     }
 
 
+@mcp.tool()
+async def get_correlation_tracking(symbol_a: str, symbol_b: str, window: int = 20) -> dict:
+    """
+    Tracks the price correlation between two assets (e.g., SPY and BTC). 
+    Used to detect decoupling or risk-on/risk-off shifts.
+    
+    Args:
+        symbol_a (str): First ticker symbol.
+        symbol_b (str): Second ticker symbol.
+        window (int): Number of trading days for the lookback (default 20).
+    """
+    logger.info(f"[get_correlation_tracking] Checking {symbol_a} vs {symbol_b}")
+    # Assuming macro_market_service is initialized in your market_service or available here
+    result = await market_service.get_correlation_tracking(symbol_a, symbol_b, window)
+    return result
 
+# Explicit metadata for the hot-loader if your system requires it
+get_correlation_tracking._is_mcp_tool = True
+get_correlation_tracking._metadata = {
+    "parameters": ["symbol_a", "symbol_b", "window"]
+}
+
+
+@mcp.tool()
+async def analyze_market_trends(ticker: str, days: int = 30):
+    """
+    Analyzes price action, volume trends, and sentiment for a specific ticker.
+    
+    Args:
+        ticker (str): The stock symbol (e.g., 'TSLA', 'SPY').
+        days (int): Lookback period for trend analysis.
+    """
+    # Logic to fetch and analyze data
+    return await market_service.get_trend_report(ticker, days)
+
+@mcp.tool()
+async def get_trend_report(ticker: str, days: int = 30) -> dict:
+    """
+    Analyzes price action and technical indicators to determine market momentum.
+    
+    Args:
+        ticker (str): The stock symbol (e.g., 'TSLA', 'AAPL').
+        days (int): Lookback window for trend analysis (Max 252).
+    """
+    # 1. Input Predicate/Validation
+    if days > 252:
+        return {"error": "Lookback period too long. Maximum is 252 trading days."}
+    
+    ticker = ticker.strip().upper()
+    logger.info(f"[get_trend_report] Executing for {ticker}")
+
+    # 2. Call Service
+    result = await market_service.get_trend_report(ticker, days)
+    return result
+
+# Register for hot-loader
+get_trend_report._is_mcp_tool = True

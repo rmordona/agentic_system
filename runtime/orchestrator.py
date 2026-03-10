@@ -80,6 +80,8 @@ class Orchestrator:
         self.core_engine = core_engine
         self._graph = self.core_engine.compiled_graph
 
+        self.iter_count = 0
+
 
     async def run_stream(self, user_intent: str, session_id: str):
         """
@@ -98,7 +100,7 @@ class Orchestrator:
         # 4. Use thread_id for LangGraph execution
         config = {
             "configurable": {"thread_id": thread_id},  # Use session_id as LangGraph thread
-            "recursion_limit": 8
+            "recursion_limit": 32
         }
 
         print("GRAPH ID RUN:", id(self._graph))
@@ -107,6 +109,8 @@ class Orchestrator:
         print("THREAD ID:", thread_id)
 
         async for event in self._graph.astream(self.initial_state, config, stream_mode="updates"):
+            self.iter_count = self.iter_count + 1
+            logger.info(f"(Run) Iteration: {self.iter_count}")
             print("EVENT RUN:", event)
             print(f"this will be streamed: {Orchestrator.to_jsonable(event)}")
             yield Orchestrator.to_jsonable(event)   
@@ -128,7 +132,7 @@ class Orchestrator:
 
         config = {
             "configurable": {"thread_id": self.thread_id},
-            "recursion_limit": 8,
+            "recursion_limit": 32,
         }
 
         print("GRAPH ID RESUME:", id(self._graph))
@@ -153,6 +157,8 @@ class Orchestrator:
             config,
             stream_mode="updates",
         ):
+            self.iter_count = self.iter_count + 1
+            logger.info(f"(Resume) Iteration: {self.iter_count}")
             print("EVENT RESUME:", event)
             json_event = Orchestrator.to_jsonable(event)
             print(f"RESUME STREAM: {json_event}")

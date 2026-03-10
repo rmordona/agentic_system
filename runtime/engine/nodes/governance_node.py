@@ -38,35 +38,39 @@ class AgentGovernance:
         logger.info("****                                AgentGovernance is being called                                ******")
         logger.info("*********************************************************************************************************")
 
+        self.stage_manager = self.context.stage_manager
+        self.agent_manager = self.context.agent_manager
+
         logger.info(f"State Type: {type(state)}")
         logger.info(f"State: {state}")
         logger.info(f"Workspace: {state.workspace_name}")
 
-        logger.info(f"Beyond the first Iteration: agent: {state.active_agent}, stage: {state.stage}, task {state.task}")
+        logger.info(f"Agent: {state.active_agent}, stage: {state.stage}, task {state.task}")
 
         logger.info(f"Current Stage: {state.stage}, Active Agent: {state.active_agent}")
 
-        self.stage_manager = self.context.stage_manager
-        self.agent_manager = self.context.agent_manager
-
         # Evaluate task
         if state.task is None:
-            return {}
-
-        # Evaluate stage exit conditions
-        next_stage = self._evaluate_stage_exit(state)
-        if next_stage:
-            return self._route_to_next_stage(state, next_stage)
+            logger.info(f"No Task. Directly passing to Planner.")
+            return {} # No change in state, let Planner handle tasks
 
         # Check for next open task
         next_task = self._next_open_task(state)
         if next_task:
-            return next_task
+            logger.info(f"If Next Task, Passing to route_to_next_task.")
+            return {} # No change in state, let Planner handle tasks
 
         # Determine next agent in stage
         next_agent = self._next_agent(state)
         if next_agent:
+            logger.info(f"If Next Agent, Passing to route_to_next_task.")
             return next_agent
+
+        # Evaluate stage exit conditions
+        next_stage = self._evaluate_stage_exit(state)
+        if next_stage:
+            logger.info(f"If Next Stage, Passing to route_to_next_stage.")
+            return self._route_to_next_stage(state, next_stage)
 
         # Default: remain in current stage
         return {"stage": state.stage, "active_agent": state.active_agent}
@@ -86,10 +90,7 @@ class AgentGovernance:
 
     def _next_open_task(self, state: StateSchema) -> Optional[Dict[str, Any]]:
         artifact = state.get_active_agent().control_raw
-        if artifact.open_tasks:
-            next_task = artifact.open_tasks[0]
-            return {"task": next_task, "stage": state.stage, "next": "runner"}
-        return None
+        return artifact.open_tasks
 
     def _next_agent(self, state: StateSchema) -> Optional[Dict[str, Any]]:
         stage = state.stage

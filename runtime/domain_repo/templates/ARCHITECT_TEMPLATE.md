@@ -36,10 +36,11 @@ Requirements:
 5. Tasks must use the agent's specific tools/capabilities.
 6. Tasks must be composed within the bounds of the forbidden actions.
 7. Do not include any commentary, prose, explanations, notes, or markdown outside the JSON.
+8. Do not add a task with no matching tool or tool_name.
 
 Rules:
 - Use "tool" execution type only if a task can be executed with one of the above tools.
-- If execution type is "tool", you must use one of the exact "name" values above for "tool_name".
+- If execution type is "tool", you must use one of the exact "name" values from the available tools above for "tool_name".
 - Otherwise, execution type is "llm".
  
 

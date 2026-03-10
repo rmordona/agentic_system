@@ -48,11 +48,13 @@ class AgentRunner:
         logger.info("****                                  AgentRunner is being called                                  ******")
         logger.info("*********************************************************************************************************")
 
-        logger.info(f"Received state from agent: '{state.active_agent}', stage: {state.stage}, task: {state.task}")
+        self.stage_manager = self.context.stage_manager
+        self.agent_manager = self.context.agent_manager
 
+        logger.info(f"Received state from agent: '{state.active_agent}', stage: {state.stage}, task: {state.task}")
         logger.info(f"State human_response at entry: {state.human_response}")
 
-        user_intent = state.user_intent
+        user_intent = state.normalized_intent
         human_response = state.human_response # if this is a call from AgentHITL for feedback
 
         stage      = state.stage         # Received from AgentPlanner
@@ -61,24 +63,22 @@ class AgentRunner:
 
         logger.info(f"Current Stage: {stage}")
         logger.info(f"Task Received: {task}")
-        logger.info(f"Task: {task.id}, description: {task.description}")
-        logger.info(f"Tool type: {task.execution}, tool_name: {task.tool_name}")
+        logger.info(f"Task: {task}")
 
-        self.stage_manager = self.context.stage_manager
-        self.agent_manager = self.context.agent_manager
+        logger.info(f"State: {state}")
 
         stage_meta = self.stage_manager.get(stage)
         self.enforce_allowed_agents(agent_name, stage_meta)
 
         # Get Agent Context
         agent_ctx = state.get_active_agent()  
+        artifact = agent_ctx.control_raw
 
         # Get Agent Profile
         agent_profile = self.agent_manager.get_agent_profile(agent_name)
         logger.info(f"Agent Profile: {agent_profile}")
 
-        # Get The Artifact for State Control
-        artifact = agent_ctx.control_raw
+
 
         # Extract tasks to be executed
         artifact.open_tasks = [
@@ -110,7 +110,6 @@ class AgentRunner:
             agent_ctx.result_summary = f"Task {task.id} completed successfully"
             state.task["result"] = asdict(tool_env)
             state.task["status"] = "done"
-            task_id = int(state.task.get("id")) 
             for index, task in enumerate(artifact.current_plan):
                 if task.get("id") == state.task.get("id"):
                     artifact.current_plan[index] = state.task

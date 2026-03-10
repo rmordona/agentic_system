@@ -42,7 +42,7 @@ class MarketService:
 
         logger.info(f"Macro Payload: {macro_payload}")
 
-        logger.info("SystemContext initialization complete")     
+        logger.info("Fetch Alpaca Market completed")     
 
         return macro_payload
 
@@ -99,6 +99,60 @@ class MarketService:
         result = await extractor.extract(user_intent)
         return { 'ticker' : result.content }
 
+    async def get_correlation_tracking(self, symbol_a: str, symbol_b: str, window: int = 20) -> Dict[str, Any]:
+        provider = HTTPMarketDataProvider(
+            api_key=_API_KEY,
+            api_secret=_API_SECRET
+        )
+        
+        macro_service = MacroMarketDataService(provider)
+
+        macro_payload = await macro_service.get_correlation_tracking(symbol_a, symbol_b, window)
+
+        logger.info(f"Macro Payload: {macro_payload}")
+
+        logger.info("Getting correlation completed")       
+
+        return macro_payload
+
+
+    async def get_trend_report(self, ticker: str, days: int = 30) -> Dict[str, Any]:
+        """
+        Calculates Technical Signals: SMA, Trend Direction, and Volume Profile.
+        """
+        logger.info(f"Generating trend report for {ticker} over {days} days")
+        
+        try:
+            # 1. Fetch historical data (using the method we added earlier)
+            prices = await self.provider.get_historical_bars(ticker, limit=days + 50)
+            
+            if len(prices) < days:
+                return {"error": f"Insufficient data for {ticker}. Need {days} bars."}
+
+            # 2. Basic Calculations
+            current_price = prices[-1]
+            sma_50 = sum(prices[-50:]) / 50 if len(prices) >= 50 else sum(prices) / len(prices)
+            
+            # 3. Determine Trend Sentiment
+            price_change_pct = ((prices[-1] - prices[0]) / prices[0]) * 100
+            trend_direction = "BULLISH" if prices[-1] > sma_50 else "BEARISH"
+            
+            return {
+                "summary": {
+                    "ticker": ticker.upper(),
+                    "current_price": round(current_price, 2),
+                    "period_days": days,
+                    "trend_direction": trend_direction
+                },
+                "technical_signals": {
+                    "price_change_pct": round(price_change_pct, 2),
+                    "distance_from_sma50": round(((current_price - sma_50) / sma_50) * 100, 2),
+                    "volatility_ratio": round(max(prices) / min(prices), 2)
+                },
+                "recommendation_engine": "HOLD" if abs(price_change_pct) < 5 else ("BUY" if trend_direction == "BULLISH" else "SELL")
+            }
+        except Exception as e:
+            logger.error(f"Trend report failed for {ticker}: {e}")
+            return {"error": "Technical Analysis Engine Timeout", "success": False}
+
 market_service = MarketService()
-
-

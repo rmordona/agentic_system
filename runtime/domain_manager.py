@@ -1201,6 +1201,15 @@ class ToolManager:
         keys = self.tool_map.keys()
         return list(keys)
 
+    def mcp_tools(self) -> str:
+        tools = ""
+        for tool_name in self.tool_map:
+            tool = self.tool_map[tool_name]
+            name = f" - tool_name: {tool.name}" + "\n"
+            description = f"   description: {tool.description.partition('\n')[0]}" + "\n"
+            tools = tools + name + description
+        return tools
+
     def auto_envelope_wrapper(func, agent_role: str, stage: str):
         @wraps(func)
         async def wrapper(*args, **kwargs):

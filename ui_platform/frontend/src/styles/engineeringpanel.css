@@ -31,8 +31,37 @@
   border: 1px solid #4b5563; /* border-gray-600 */
   resize: vertical;
   margin-bottom: 0.75rem;
+  font-family: 'Courier New', Courier, monospace; /* Good for MD editing */
 }
 
 .engineering-panel textarea::placeholder {
   color: #9ca3af; /* placeholder-gray-400 */
+}
+
+
+.engineering-panel artifact-section {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.engineering-panel label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.engineering-panel gen-btn {
+  padding: 4px 12px;
+  font-size: 0.8rem;
+  background-color: #2da44e; /* Success green */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.engineering-panel gen-btn:hover {
+  background-color: #2c974b;
 }
