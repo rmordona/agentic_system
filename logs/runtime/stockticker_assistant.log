@@ -8253,3 +8253,5 @@
 2026-03-10 00:11:25,464 | ERROR   | runtime:stockticker_assistant | reload_manager:86 | _watch_workspace | Error while watching workspace 'stockticker_assistant': 'dict' object has no attribute '_compute_version_hash'
 2026-03-10 00:11:55,464 | ERROR   | runtime:stockticker_assistant | reload_manager:86 | _watch_workspace | Error while watching workspace 'stockticker_assistant': 'dict' object has no attribute '_compute_version_hash'
 2026-03-10 00:12:25,462 | ERROR   | runtime:stockticker_assistant | reload_manager:86 | _watch_workspace | Error while watching workspace 'stockticker_assistant': 'dict' object has no attribute '_compute_version_hash'
+2026-03-10 00:12:55,462 | ERROR   | runtime:stockticker_assistant | reload_manager:86 | _watch_workspace | Error while watching workspace 'stockticker_assistant': 'dict' object has no attribute '_compute_version_hash'
+2026-03-10 00:13:25,462 | ERROR   | runtime:stockticker_assistant | reload_manager:86 | _watch_workspace | Error while watching workspace 'stockticker_assistant': 'dict' object has no attribute '_compute_version_hash'
