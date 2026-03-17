@@ -16,7 +16,6 @@ from llm.model_manager import ModelManager
 
 logger = AgentLogger.get_logger(component="system")
 
-
 ################################################################################
 # AgentPlanner
 ################################################################################
@@ -64,21 +63,23 @@ class AgentPlanner:
             agent_ctx.control_raw = artifact
             state.agents[agent_ctx.agent_name] = to_storage(agent_ctx)
             return {"task": to_storage(next_task), 
-                    "stage": state.stage, 
+                    "stage_name": state.stage_name, 
                     "active_agent": agent_ctx.agent_name,
                     "agents" : state.agents
                 }
 
-        # Cycle back to governance if tasks are depleted
+        # Circle back to governance if tasks are depleted
         return "governance"
 
     async def _build_initial_tasks(self, state: StateSchema, agent_ctx: AgentContext) -> List[Task]:
 
         profile: AgentProfile = self.context.agent_manager.get_agent_profile(agent_ctx.agent_name)
 
-        tools = self.context.tool_manager.mcp_tools()
+        # tools = self.context.tool_manager.mcp_tools()
+        stage = self.context.stage_manager.get_stage(state.stage_name)
+        relevant_tools = await self.context.tool_manager.select_tools_by_stage_intent(stage.supported_intents)
 
-        stage_schema = self.context.stage_manager.get(state.stage)
+        stage_schema = self.context.stage_manager.get_stage(state.stage_name)
         stage_goal = stage_schema.description
 
         # Hydrate system prompt (pipeline.md or skill.md can be incorporated here)
@@ -90,14 +91,14 @@ class AgentPlanner:
             "profile_task_style" : profile.task_style,
             "profile_can_execute_tools" :  profile.can_execute_tools,
             "profile_forbidden_actions": profile.forbidden_actions,
-            "profile_input_schema": profile.input_schema,
-            "profile_output_schema" : profile.output_schema,
+            #"profile_input_schema": profile.input_schema,
+            #"profile_output_schema" : profile.output_schema,
             "profile_capabilities" : profile.capabilities,
-            "available_tools": tools,
+            "available_tools": relevant_tools,
         })
 
         retry = 0
-        while True: # Retry if generated tasks is malformed
+        while True: # Retry if generated tasks are malformed
             retry = retry + 1
             logger.info(f"Calling LLM to refine user intent: {system_prompt}")
             response = await self.llm.ainvoke(system_prompt)
@@ -117,7 +118,7 @@ class AgentPlanner:
                         description=t.get("description"),
                         execution=t.get("execution"),
                         tool_name=t.get("tool_name"),
-                        stage=state.stage,
+                        stage_name=state.stage_name,
                         status="pending"
                     ))
             if tasks or retry > 1:
@@ -147,7 +148,7 @@ class AgentPlanner:
         logger.info(f"State: {state}")
 
         logger.info(f"Agent: {state.active_agent}")
-        logger.info(f"Stage: {state.stage}")
+        logger.info(f"Stage: {state.stage_name}")
         logger.info(f"Task: {state.task}")
 
         # Get Agent Context

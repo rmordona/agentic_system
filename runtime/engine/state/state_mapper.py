@@ -65,7 +65,7 @@ def to_agent_context(data: dict) -> AgentContext:
 
     return AgentContext(
         agent_name=data["agent_name"],
-        stage=data["stage"],
+        stage_name=data["stage_name"],
         control_raw=control,
         data_raw=data_raw,
         tool_raw=tools,

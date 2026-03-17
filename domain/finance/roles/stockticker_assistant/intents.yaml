@@ -1,0 +1,17 @@
+intents:
+
+  price_lookup:
+    keywords:
+      - price
+      - value
+      - quote
+
+  stock_analysis:
+    keywords:
+      - analyze
+      - valuation
+
+  historical_data:
+    keywords:
+      - history
+      - past

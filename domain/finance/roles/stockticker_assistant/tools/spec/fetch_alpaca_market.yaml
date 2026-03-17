@@ -1,0 +1,71 @@
+type: object
+description: "Agnostic Tool Contract for Raw Real-Time Market Data Retrieval"
+properties:
+  tool_name:
+    type: string
+    const: "fetch_alpaca_market"
+  description:
+    type: string
+    const: "Retrieves the most recent price, volume, and timestamp for a primary benchmark ticker (e.g., SPY)."
+
+  # --- INPUT HANDSHAKE ---
+  # This tool is often parameterless as it targets a system-defined benchmark
+  input_schema:
+    type: object
+    properties:
+      symbol:
+        type: string
+        default: "SPY"
+        description: "Benchmark symbol for macro-context anchoring."
+
+  # --- OUTPUT CONTRACT ---
+  output_schema:
+    type: object
+    required: [market_data, timestamp, risk_mode]
+    properties:
+      market_data:
+        type: object
+        required: [price, volume]
+        properties:
+          price: { type: number, minimum: 0.01 }
+          volume: { type: number, minimum: 0 }
+      timestamp: 
+        type: string
+        format: "date-time"
+        description: "ISO-8601 UTC timestamp of the data snapshot."
+      risk_mode:
+        type: string
+        enum: [NORMAL, CONSERVATIVE, RESTRICTED]
+
+# --- GATEKEEPER PREDICATES ---
+validation_rules:
+  # Integrity: Ensure data isn't older than 15 minutes (Standard SIP delay or stale cache)
+  - "is_recent(fetch_alpaca_market.timestamp, max_minutes=15)"
+  # Logic: Price must be a realistic positive float
+  - "fetch_alpaca_market.market_data.price > 0"
+  # Logic: If volume is 0 during market hours, flag as data-gap
+  - "if_market_open(is_volume_zero=fetch_alpaca_market.market_data.volume == 0) == False"
+
+# --- HITL ESCALATION POLICY ---
+hitl_policy:
+  trigger_conditions:
+    # 1. Stale Data: Data is technically valid but the timestamp is lagging behind system time.
+    - condition: "is_stale(fetch_alpaca_market.timestamp, threshold='5m') == True"
+      reason: "LATENCY_THRESHOLD_EXCEEDED"
+
+    # 2. Flash Move: Current benchmark price has deviated >3% from the last cached price in <1m.
+    - condition: "abs(fetch_alpaca_market.market_data.price - cache.last_price) / cache.last_price > 0.03"
+      reason: "BENCHMARK_FLASH_VOLATILITY"
+
+    # 3. Provider Mode Override: The service returned 'CONSERVATIVE' or 'RESTRICTED' mode.
+    - condition: "fetch_alpaca_market.risk_mode != 'NORMAL'"
+      reason: "PROVIDER_LEVEL_RISK_ESCALATION"
+
+  interaction_mode: "DATA_FEED_AUDIT"
+  allow_state_mutation: true
+
+# --- UPDATED GATEKEEPER EXIT ---
+# Stage exits if data is fresh, price is non-zero, and we aren't in a RESTRICTED mode.
+stage_exit_trigger: "fetch_alpaca_market.market_data.price > 0 AND fetch_alpaca_market.risk_mode != 'RESTRICTED' AND requires_intervention == False"
+
+required: [tool_name, description, input_schema, output_schema, validation_rules, hitl_policy]

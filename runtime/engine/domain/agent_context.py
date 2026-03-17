@@ -65,7 +65,7 @@ class ArtifactSchema:
 @dataclass
 class AgentContext:
     agent_name: str
-    stage: str
+    stage_name: str
     control_raw: ArtifactSchema = field(default_factory=ArtifactSchema)
     data_raw: Optional[DataEnvelope] = None
     tool_raw: List[ToolEnvelope] = field(default_factory=list)

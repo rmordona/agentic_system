@@ -344,3 +344,105 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE chat_messages to johnsmith;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE threads to johnsmith;
 
 GRANT USAGE, SELECT ON SEQUENCE chat_messages_id_seq TO johnsmith;
+
+
+##########################################
+
+INSTALL PGVECTOR
+
+for postgresql 16/17:
+brew install pgvector
+
+for postgresql 18:
+git clone https://github.com/pgvector/pgvector.git
+cd pgvector
+make
+make install
+
+
+For our install, use this:
+'/usr/local/Cellar/postgresql@18/18.3/bin/pg_ctl' -D '/usr/local/var/postgresql@18' -l logfile stop
+'/usr/local/Cellar/postgresql@18/18.3/bin/pg_ctl' -D '/usr/local/var/postgresql@18' -l logfile start
+
+Instead of this:
+brew services restart postgresql
+
+
+psql -U raymondordona -d context_platform
+
+
+CREATE EXTENSION IF NOT EXISTS vector;
+
+
+
+Create Tools table:
+
+CREATE TABLE mcp_tools (
+    tool_name TEXT PRIMARY KEY,
+    description TEXT,
+    embedding VECTOR(768)
+);
+
+Example select:
+
+SELECT tool_name, description
+FROM mcp_tools
+ORDER BY embedding <-> :stage_embedding
+LIMIT 5;
+
+Create index
+
+CREATE INDEX idx_tool_embedding
+ON mcp_tools
+USING ivfflat (embedding vector_cosine_ops)
+WITH (lists = 100);
+
+
+Example select:
+
+SELECT tool_name, description
+FROM mcp_tools
+WHERE description ILIKE ANY(:intent_keywords)
+ORDER BY embedding <-> :embedding
+LIMIT 6;
+
+
+# \d mcp_tools
+                  Table "public.mcp_tools"
+   Column    |     Type     | Collation | Nullable | Default 
+-------------+--------------+-----------+----------+---------
+ tool_name   | text         |           | not null | 
+ description | text         |           |          | 
+ embedding   | vector(1536) |           |          | 
+Indexes:
+    "mcp_tools_pkey" PRIMARY KEY, btree (tool_name)
+    "idx_tool_embedding" ivfflat (embedding vector_cosine_ops) WITH (lists='100')
+
+
+#### SUPERUSER PRIVILEGES ###
+
+postgres=# \du
+                               List of roles
+   Role name   |                         Attributes                         
+---------------+------------------------------------------------------------
+ johnsmith     | 
+ postgres      | Superuser
+ raymondordona | Superuser, Create role, Create DB, Replication, Bypass RLS
+
+postgres=# ALTER ROLE johnsmith WITH SUPERUSER;
+ALTER ROLE
+postgres=# \du
+                               List of roles
+   Role name   |                         Attributes                         
+---------------+------------------------------------------------------------
+ johnsmith     | Superuser
+ postgres      | Superuser
+ raymondordona | Superuser, Create role, Create DB, Replication, Bypass RLS
+
+postgres=# \quit
+pgvector % psql -U johnsmith -d context_platform -c "SHOW config_file;"
+                 config_file                  
+----------------------------------------------
+ /usr/local/var/postgresql@18/postgresql.conf
+(1 row)
+

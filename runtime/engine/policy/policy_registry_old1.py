@@ -1,23 +1,25 @@
-import re
+# runtime/policy_registry.py
+from __future__ import annotations
 import ast
-import json
 import inspect
 import importlib
 from pathlib import Path
-from typing import Any, Callable, Dict, Set, Union
-
+from typing import Any, Callable, Dict, Optional, Set, Union
 from dataclasses import dataclass
 
 from runtime.logger import AgentLogger
+
 logger = AgentLogger.get_logger(component="system")
 
 
 ################################################################################
 # Evaluation Context
 ################################################################################
-
 @dataclass(frozen=True)
 class StageEvalContext:
+    """
+    Immutable evaluation context exposed to policy predicates.
+    """
     task: dict
     artifact: dict
     data: dict
@@ -27,8 +29,8 @@ class StageEvalContext:
 
     def symbols(self) -> Dict[str, Any]:
         """
-        Flattened symbol table exposed to policy expressions.
-        This is the ONLY place domain variables come from.
+        Flattened symbol table exposed to predicates.
+        All domain variables must come from here.
         """
         symbols: Dict[str, Any] = {}
 
@@ -47,10 +49,12 @@ class StageEvalContext:
 ################################################################################
 # Policy Registry
 ################################################################################
-
 class PolicyRegistry:
+    """
+    Central registry for policy predicates and exit conditions.
+    """
 
-    VARIABLES = {
+    DEFAULT_VARIABLES = {
         "hitl_approved": False,
         "hitl_approval": False,
         "human_abort_confirmed": False,
@@ -60,36 +64,46 @@ class PolicyRegistry:
         self.workspace_path = workspace_path
         self.workspace_name = workspace_path.name
 
+        # Registry of user-defined predicates
         self._predicates: Dict[str, Callable[[StageEvalContext], bool]] = {}
-        self.initialize()
 
-        self.evaluator = ExitConditionEvaluator(
+        # Initialize variables
+        self.evaluator: ExitConditionEvaluator = ExitConditionEvaluator(
             function_registry=self._predicates,
-            variable_registry=self.VARIABLES,
+            variable_registry=self.DEFAULT_VARIABLES,
         )
 
-    def initialize(self):
-        module = importlib.import_module(
-            f"workspaces.{self.workspace_name}.tools.predicates"
-        )
-        Policies = getattr(module, "Policies")
-        self.register_from_class(Policies)
+        # Load workspace-defined policies
+        self.initialize_workspace_predicates()
 
-    def register_from_class(self, cls: type, prefix: str | None = None):
+    # -------------------------------------------------------------------------
+    # Load Predicates
+    # -------------------------------------------------------------------------
+    def initialize_workspace_predicates(self):
+        """
+        Load predicates from workspace tools/predicates.py
+        """
+        try:
+            module = importlib.import_module(f"workspaces.{self.workspace_name}.tools.predicates")
+            Policies = getattr(module, "Policies")
+            self.register_from_class(Policies)
+        except ModuleNotFoundError:
+            logger.warning(f"No predicates module found for workspace {self.workspace_name}")
+
+    # -------------------------------------------------------------------------
+    # Register class-based predicates
+    # -------------------------------------------------------------------------
+    def register_from_class(self, cls: type, prefix: Optional[str] = None):
         logger.info(f"Registering policies from class {cls.__name__}")
-
         for _, attr in vars(cls).items():
             if not callable(attr):
                 continue
-
             if not hasattr(attr, "__policy_name__"):
                 continue
 
             sig = inspect.signature(attr)
             if len(sig.parameters) != 1:
-                raise ValueError(
-                    f"Policy '{attr.__name__}' must accept exactly one argument (ctx)"
-                )
+                raise ValueError(f"Policy '{attr.__name__}' must accept exactly one argument (ctx)")
 
             name = attr.__policy_name__
             key = f"{prefix}.{name}" if prefix else name
@@ -101,26 +115,26 @@ class PolicyRegistry:
         for name in self._predicates:
             logger.info(f"Registered predicate: {name}")
 
+    # -------------------------------------------------------------------------
+    # Compile an expression
+    # -------------------------------------------------------------------------
     def compile(self, expr: str) -> ast.Expression:
         return self.evaluator.compile(expr)
 
-    def evaluate(
-        self,
-        compiled_expr: ast.Expression,
-        artifact: dict,
-        state_ctx: dict | None = None,
-    ) -> bool:
+    # -------------------------------------------------------------------------
+    # Evaluate a compiled expression against context
+    # -------------------------------------------------------------------------
+    def evaluate(self, compiled_expr: ast.Expression, artifact: dict, state_ctx: Optional[dict] = None) -> bool:
         ctx_obj = StageEvalContext(
-            task=state_ctx.get("task"),
+            task=state_ctx.get("task") if state_ctx else {},
             artifact=artifact,
             data=state_ctx.get("data", {}) if state_ctx else {},
             tools=state_ctx.get("recent_tools", []) if state_ctx else [],
-            hitl_flags=state_ctx.get("workflow_metadata", {}).get("hitl_flags", {})
-            if state_ctx
-            else {},
+            hitl_flags=state_ctx.get("workflow_metadata", {}).get("hitl_flags", {}) if state_ctx else {},
             stage=state_ctx.get("stage", "unknown") if state_ctx else "unknown",
         )
         return self.evaluator.evaluate(compiled_expr, ctx_obj)
+
 
 ################################################################################
 # Predicate Translator and Evaluator
@@ -248,13 +262,22 @@ class PredicateEngine:
             return False
 
 
-#############################################################################################
-# Predicate Decorator - Required by Assistances ./workspaces/<assistants/tools/predicates.py
-#############################################################################################
+################################################################################
+# Predicate Decorator Helper
+################################################################################
 class Predicates:
+    """
+    Use as a decorator to mark functions as policy predicates.
+    Example:
+
+        @Predicates.policy("check_trade_risk")
+        def check_risk(ctx: StageEvalContext):
+            return ctx.artifact.get("risk_score") < 5
+    """
+
     @staticmethod
-    def policy(name: str | None = None):
-        def decorator(fn):
+    def policy(name: Optional[str] = None):
+        def decorator(fn: Callable):
             fn.__policy_name__ = name or fn.__name__
             return fn
         return decorator
@@ -267,11 +290,9 @@ class Predicates:
         data = task_result.get("output")
         return data
 
-
 ################################################################################
-# Exit Condition Engine
+# Exit Condition Evaluator
 ################################################################################
-
 class ExitConditionError(Exception):
     pass
 
@@ -280,7 +301,7 @@ class ExitConditionEvaluator:
     """
     AST-safe, domain-agnostic policy expression evaluator.
     """
-
+    # Allow only safe AST nodes
     ALLOWED_NODES = {
         ast.Expression,
         ast.BoolOp,
@@ -301,6 +322,7 @@ class ExitConditionEvaluator:
         ast.Not,
     }
 
+    # Built-in safe functions exposed to predicates
     ALLOWED_BUILTINS = {
         "len": len,
         "any": any,
@@ -310,53 +332,46 @@ class ExitConditionEvaluator:
         "max": max,
     }
 
-    STATIC_SYMBOLS = {
-        "ctx",
-        "artifact",
-        "True",
-        "False",
-    }
+    # Reserved symbols
+    STATIC_SYMBOLS = {"ctx", "artifact", "True", "False"}
 
     def __init__(
         self,
         function_registry: Dict[str, Callable],
-        variable_registry: Dict[str, Any] | None = None,
+        variable_registry: Optional[Dict[str, Any]] = None,
     ):
         self.function_registry = function_registry
         self.variable_registry = variable_registry or {}
         self._last_domain_vars: Set[str] = set()
 
     # -------------------------------------------------------------------------
-    # Compile
+    # Compile AST
     # -------------------------------------------------------------------------
-
     def compile(self, expression: str) -> ast.Expression:
         expr = self._normalize_expression(expression)
-
         try:
-            logger.info(f"Expression to parse: {expr}")
             tree = ast.parse(expr, mode="eval")
         except SyntaxError as e:
-            raise ExitConditionError(f"Invalid exit condition syntax: {e}")
+            raise ExitConditionError(f"Invalid syntax in exit condition: {e}")
 
         self._validate_ast(tree)
         self._validate_symbols(tree)
-
         return tree
 
     @staticmethod
     def _normalize_expression(expr: str) -> str:
-        return (
-            expr.replace("||", " or ")
-                .replace("&&", " and ")
-                .replace("!", " not ")
-        )
+        """
+        Normalize logical operators for AST evaluation.
+        """
+        return expr.replace("||", " or ").replace("&&", " and ").replace("!", " not ")
 
     # -------------------------------------------------------------------------
-    # Evaluate
+    # Evaluate AST
     # -------------------------------------------------------------------------
-
     def evaluate(self, compiled_expr: ast.Expression, ctx_obj: StageEvalContext) -> bool:
+        """
+        Evaluate a pre-compiled policy expression in a safe execution context.
+        """
         context = {
             "__builtins__": {},
             "ctx": ctx_obj,
@@ -368,24 +383,20 @@ class ExitConditionEvaluator:
 
         self._inject_domain_variables(context, ctx_obj)
 
-        return bool(
-            eval(compile(compiled_expr, "<exit_condition>", "eval"), context)
-        )
+        return bool(eval(compile(compiled_expr, "<exit_condition>", "eval"), context))
 
     # -------------------------------------------------------------------------
-    # Validation
+    # AST Validation
     # -------------------------------------------------------------------------
-
     def _validate_ast(self, tree: ast.AST):
+        """
+        Ensure only safe AST nodes are allowed.
+        """
         for node in ast.walk(tree):
             if not isinstance(node, tuple(self.ALLOWED_NODES)):
-                raise ExitConditionError(
-                    f"Disallowed AST node: {type(node).__name__}"
-                )
-
+                raise ExitConditionError(f"Disallowed AST node: {type(node).__name__}")
             if isinstance(node, ast.Call) and not isinstance(node.func, ast.Name):
-                raise ExitConditionError("Only direct function calls allowed")
-
+                raise ExitConditionError("Only direct function calls are allowed")
             if isinstance(node, ast.Attribute):
                 raise ExitConditionError("Attribute access is not allowed")
 
@@ -394,35 +405,24 @@ class ExitConditionEvaluator:
 
     def _validate_symbols(self, tree: ast.AST):
         referenced = self._extract_names(tree)
-
         allowed = (
             self.STATIC_SYMBOLS
             | set(self.function_registry.keys())
             | set(self.variable_registry.keys())
             | set(self.ALLOWED_BUILTINS.keys())
         )
-
         domain_vars = referenced - allowed
 
         for name in domain_vars:
             if name.startswith("_"):
-                raise ExitConditionError(
-                    f"Invalid domain variable '{name}'"
-                )
-
+                raise ExitConditionError(f"Invalid domain variable '{name}'")
         self._last_domain_vars = domain_vars
 
     # -------------------------------------------------------------------------
-    # Runtime variable injection
+    # Inject domain variables
     # -------------------------------------------------------------------------
-
-    def _inject_domain_variables(
-        self,
-        context: Dict[str, Any],
-        ctx_obj: StageEvalContext,
-    ):
+    def _inject_domain_variables(self, context: Dict[str, Any], ctx_obj: StageEvalContext):
         symbols = ctx_obj.symbols()
-
         for name in self._last_domain_vars:
             if name in symbols:
                 context[name] = symbols[name]

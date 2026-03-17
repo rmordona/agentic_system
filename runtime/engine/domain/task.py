@@ -8,7 +8,7 @@ INIT_TASK = "--init--"
 class Task:
     id: str
     description: str
-    stage: str
+    stage_name: str
     execution: Literal["tool", "llm"] = "tool"
     tool_name: str = ""
     depends_on: List[str] = field(default_factory=list)

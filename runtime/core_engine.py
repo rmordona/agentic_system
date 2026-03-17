@@ -13,7 +13,7 @@ from typing import TypedDict, List, Dict, Any, Union, Optional
 from langgraph.checkpoint.memory import MemorySaver
 
 from llm.model_manager import ModelManager
-from runtime.stage_manager import StageManager
+from runtime.engine.stage.stage_manager import StageManager
 from runtime.agent_manager import AgentManager
 
 from runtime.domain_manager import SystemContext
@@ -112,7 +112,7 @@ logger = AgentLogger.get_logger(  component="system")
 # This component is the system governor:
 #   it defines how intelligence flows, but does not perform
 #   reasoning or execution itself.
-# -----------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------------------------
 # In terms of the Architecture. We will follow this route
 #
 #    User Intent
@@ -121,14 +121,20 @@ logger = AgentLogger.get_logger(  component="system")
 #        ↓
 #    AgentClassifier → decide agent profile / capability
 #        ↓
-#    AgentGovernance → pipeline stage, allowed agents, HITL flags
+#    AgentGovernance → Control Plane: 
+#        Checks the Macro-Governance: Does the global state satisfy the "Exit Predicates" to move to the next stage?
 #        ↓
-#    AgentPlanner → generate tasks per agent
+#    AgentPlanner → Strategist:
+#        Reads the current skill.md and decides which tools to call to satisfy the stage's goals.
 #        ↓
-#    AgentRunner → execute tasks
+#    AgentRunner → Executor:
+#        Actually executes the MCP tool calls (Alpaca, News, etc.) and updates the state.
 #        ↓
-#    AgentGovernance → next stage (loop)
-# -----------------------------------------------------------------------------
+#    AgentValidator → Compliance
+#        Checks the Micro-Governance: Did the Runner provide valid data? Is the JSON schema correct?
+# -------------------------------------------------------------------------------------------------------------------------
+
+
 class CoreEngine:
     """
     The Orchestration Assembly for the Agnostic OS.
@@ -136,13 +142,16 @@ class CoreEngine:
     """
     def __init__(
         self, 
-        workspace_name: str,
-        workspace_meta: dict,
+        #workspace_name: str,
+        #workspace_meta: dict,
     ):
+
+        '''
         self.workspace_path = WORKSPACES_ROOT / workspace_name
         self.workspace_name = workspace_name
 
         self.domain = workspace_meta.get("domain")
+        '''
 
         self.template_repo = TEMPLATE_ROOT
 
@@ -239,10 +248,11 @@ class CoreEngine:
         workflow.add_node("hitl", self.hitl)
         
         workflow.add_edge("classifier", "domain")
-        workflow.add_edge("domain", "governance")
-        workflow.add_edge("governance", "planner")
+        workflow.add_edge("domain", "planner")
         workflow.add_edge("planner", "runner")
         workflow.add_edge("runner", "validator")
+        workflow.add_edge("validator", "governance")
+        workflow.add_edge("governance", "planner")
 
         # The Planner's output determines the next step
         workflow.add_conditional_edges("planner", self.planner._should_continue )
@@ -267,7 +277,7 @@ class CoreEngine:
             {
                 "Route_To_HITL" : "hitl",
                 "Route_To_Classifier": "classifier",
-                "Route_To_Governance": "governance",
+                "Route_To_Planner": "planner",
             }
         )
 
@@ -288,7 +298,6 @@ class CoreEngine:
         state = StateSchema(
             session_id=session_id,
             thread_id=thread_id,
-            domain=self.domain,
             original_intent=user_intent,
             workflow_metadata={
                 "status": "running",

@@ -5,15 +5,18 @@ from pathlib import Path
 # This file lives inside agentic_system/
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
+############### BOOTSTRAP and RUNTIME  ###############
 RUNTIME_ROOT = PROJECT_ROOT / "runtime"
 BOOTSTRAP_ROOT = RUNTIME_ROOT / "bootstrap"
-WORKSPACES_ROOT = PROJECT_ROOT / "workspaces"
 GLOBAL_CONFIG_PATH = BOOTSTRAP_ROOT / "config.json"
 
+############### DOMAIN CLASSIFICATION  ###############
+
+DOMAIN_ROOT = PROJECT_ROOT / "domain"
+WORKSPACES_ROOT = PROJECT_ROOT / "workspaces"
 TEMPLATE_ROOT = RUNTIME_ROOT / "domain_repo" / "templates"
 
-
-############### TEMPLATES ############### 
+############### PROMPT TEMPLATES ############### 
 
 PLAN_TEMPLATE = TEMPLATE_ROOT / "PLAN_TEMPLATE.md"
 HITL_TEMPLATE = TEMPLATE_ROOT / "HITL_TEMPLATE.md"

@@ -64,7 +64,7 @@ class OllamaEmbeddingClient:
     # ------------------------------------------------------------------
     # Embedding API
     # ------------------------------------------------------------------
-    def embed_text(self, text: str) -> List[float]:
+    async def embed_text(self, text: str) -> List[float]:
         """
         Generate embedding vector for a single text string.
 

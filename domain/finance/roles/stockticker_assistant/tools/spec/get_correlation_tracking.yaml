@@ -1,0 +1,76 @@
+type: object
+description: "Agnostic Tool Contract for Statistical Asset Correlation and Risk Clustering"
+properties:
+  tool_name:
+    type: string
+    const: "get_correlation_tracking"
+  description:
+    type: string
+    const: "Calculates the Pearson correlation coefficient between two tickers over a specific lookback window."
+
+  # --- INPUT HANDSHAKE ---
+  input_schema:
+    type: object
+    required: [symbol_a, symbol_b]
+    properties:
+      symbol_a:
+        type: string
+        pattern: "^[A-Z]{1,5}$"
+        description: "The base ticker (e.g., 'SPY' or 'TSLA')."
+      symbol_b:
+        type: string
+        pattern: "^[A-Z]{1,5}$"
+        description: "The comparison ticker (e.g., 'BTC' or 'TLT')."
+      window:
+        type: integer
+        default: 20
+        minimum: 5
+        maximum: 252
+        description: "Rolling window in trading days."
+
+  # --- OUTPUT CONTRACT ---
+  output_schema:
+    type: object
+    required: [correlation_coefficient, interpretation, sample_size]
+    properties:
+      correlation_coefficient:
+        type: number
+        minimum: -1.0
+        maximum: 1.0
+      interpretation:
+        type: string
+        enum: [STRONG_POSITIVE, WEAK_POSITIVE, UNCORRELATED, WEAK_NEGATIVE, STRONG_NEGATIVE]
+      sample_size:
+        type: int
+        description: "Number of overlapping data points used."
+
+# --- GATEKEEPER PREDICATES ---
+validation_rules:
+  # Integrity: Cannot correlate a ticker with itself (waste of API credits/compute)
+  - "input.symbol_a != input.symbol_b"
+  # Data Quality: Ensure we have enough overlapping days for a valid p-value
+  - "get_correlation_tracking.sample_size >= input.window"
+
+# --- HITL ESCALATION POLICY ---
+hitl_policy:
+  trigger_conditions:
+    # 1. Total Decoupling: Two historically correlated assets (e.g., SPY and QQQ) show sudden divergence
+    - condition: "abs(get_correlation_tracking.correlation_coefficient) < 0.2 AND is_historical_pair(input.symbol_a, input.symbol_b)"
+      reason: "HISTORICAL_CORRELATION_BREAKDOWN"
+
+    # 2. Extreme Concentration: Recommendation is 0.9+ correlated with SPY during a Macro Bear regime
+    - condition: "get_correlation_tracking.correlation_coefficient > 0.90 AND ctx.macro_analysis.regime == 'BEAR_CONTRACTION'"
+      reason: "EXCESSIVE_MARKET_BETA_EXPOSURE"
+
+    # 3. Inverse Volatility: Negative correlation is too high during a crisis (Flight to Safety check)
+    - condition: "get_correlation_tracking.correlation_coefficient < -0.85"
+      reason: "HEDGE_EQUIVALENCY_VERIFICATION"
+
+  interaction_mode: "RELATIONSHIP_AUDIT"
+  allow_state_mutation: true
+
+# --- UPDATED GATEKEEPER EXIT ---
+# Stage exits if correlation is calculated and the sample size is statistically significant.
+stage_exit_trigger: "get_correlation_tracking.correlation_coefficient != None AND get_correlation_tracking.sample_size >= 10 AND requires_intervention == False"
+
+required: [tool_name, description, input_schema, output_schema, validation_rules, hitl_policy]

@@ -66,7 +66,7 @@
 #          └────────────────────────────┘
 ############################################################
 from __future__ import annotations
-from core.paths import WORKSPACES_ROOT, TEMPLATE_ROOT
+from core.paths import DOMAIN_ROOT, TEMPLATE_ROOT
 
 import re
 import os
@@ -79,6 +79,7 @@ import importlib.util
 import asyncio
 import yaml
 import copy
+import psycopg2
 from jsonschema import validate, ValidationError
 
 from pathlib import Path
@@ -102,8 +103,13 @@ from runtime.engine.domain.envelopes import DataEnvelope, ToolEnvelope, DomainTy
 from runtime.tools.mcp_client import MCPClient
 from runtime.tools.mcp_manager import MCPManager
 from runtime.artifact_factory import ArtifactSchema
-from runtime.agent_manager import AgentManager
 from runtime.agent_profiler import AgentOutput, AgentProfiler
+
+from llm.model_manager import ModelManager
+from runtime.agent_manager import AgentManager
+from runtime.engine.stage.stage_manager import StageManager
+from runtime.engine.governance.governance_manager import GovernanceManager
+
 
 import logging
 # SILENCE THE NOISE
@@ -200,21 +206,21 @@ class SchemaFactory:
         schema_type = schema.get("type")
 
         # --- Standard types ---
-        if schema_type == "string":
+        if schema_type == "string" or schema_type == "text":
             if "enum" in schema:
                 enum_values = list(schema["enum"])
                 return Literal[tuple(enum_values)], None
             return str, None
 
-        if schema_type == "integer":
+        if schema_type == "integer" or schema_type == "int":
             return int, None
-        if schema_type == "number":
+        if schema_type == "number" or schema_type == "float":
             return float, None
-        if schema_type == "boolean":
+        if schema_type == "boolean" or schema_type == "bool":
             return bool, None
 
         # --- Array ---
-        if schema_type == "array":
+        if schema_type == "array" or schema_type == "list":
             item_schema = schema.get("items", {})
             return List[SchemaFactory._infer_field(item_schema, definitions, prop_name)[0]], None
 
@@ -272,7 +278,7 @@ class SchemaFactory:
                     return node["enum"][0] if node["enum"] else None
                 elif "default" in node:
                     return node["default"]
-                elif node.get("type") == "array":
+                elif node.get("type") == "array" or node.get("type") == "list":
                     items = node.get("items", {})
                     return [_resolve(items)]
                 else:
@@ -361,7 +367,7 @@ class SchemaFactory:
 
                         if sub_schema.get("type") == "object":
                             obj[key] = build(sub_schema, val or {}, current_path)
-                        elif sub_schema.get("type") == "array":
+                        elif sub_schema.get("type") == "array" or sub_schema.get("type") == "list":
                             if not isinstance(val, list):
                                 raise ValueError(f"Type Error at '{current_path}': Expected array")
                             obj[key] = val
@@ -492,6 +498,7 @@ class DataAdapter(Generic[DomainType]):
                 schema_class: type[DomainType]):
         self.tool_name = tool_name
         self.payload_schema = schema_class
+        self.embedding = []
         logger.info(f"DataAdapter initialized for agent '{tool_name}'")
 
     def create_envelope(
@@ -540,7 +547,7 @@ class DataManager:
         logger.info(f"DataManager initialized")
 
     async def register_schema(self, manifests: dict):
-        logger.info("Scanning schema for tools")
+        logger.info("Scanning schema for tools (Tool Spec)")
 
         for tool_name in manifests:
 
@@ -1033,6 +1040,7 @@ class ToolManager:
     def __init__(self, agent_manager: AgentManager):
 
         self.agent_manager = agent_manager
+        self.llm = ModelManager.spin_model()
 
         self.tool_map: Dict[str, ToolAdapter] = {}
 
@@ -1049,15 +1057,23 @@ class ToolManager:
         logger.info(f"Registration: {registry}")
 
         for tool_data in registry:
+
+            embedding_vector = await self.llm.embed_text(tool_data["description"])
+            tool_name = tool_data["name"]
+            description = tool_data["description"]
+            logger.info(f"Tool: {tool_data["name"]}")
             adapter = ToolAdapter(
-                    name=tool_data["name"],
-                    description=tool_data["description"],
+                    name=tool_name,
+                    description=description,
                     schema=tool_data["arguments"],
                     tool_file="",
                     # mcp_caller=self.call_mcp_tool
                 )
             # Register in the map
             self.tool_map[adapter.name] = adapter
+
+            # Insert into PostgreSQL
+            await self.register_tools_to_db(tool_name, description, embedding_vector)
                     
         logger.info(f"Agent tool scan complete. Total registered tools: {len(self.tool_map)}")
 
@@ -1245,6 +1261,72 @@ class ToolManager:
 
         return wrapper
 
+    async def register_tools_to_db(self, tool_name: str, description: str, embedding: List[float]):
+        conn = psycopg2.connect("dbname=context_platform user=johnsmith password=welcome1")
+        cur = conn.cursor()
+        
+        # Convert the list to the vector string format: '[val1, val2, ...]'
+        vector_string = f"[{','.join(map(str, embedding))}]"
+
+        try:
+            cur.execute(
+                """
+                INSERT INTO mcp_tools (tool_name, description, embedding)
+                VALUES (%s, %s, %s)
+                ON CONFLICT (tool_name) DO NOTHING
+                """,
+                (tool_name, description, vector_string)
+            )
+        except Exception as e:
+            logger.info(f"Failed to insert {adapter.name}: {e}")
+        
+        conn.commit()
+        cur.close()
+        conn.close()
+
+    async def select_tools_by_stage_intent(self, supported_intents: list) -> list:
+
+        stage_intents = " ".join(supported_intents)
+
+        logger.info(f"Fetching Embedding for: {stage_intents}")
+        embedding = await self.llm.embed_text(stage_intents)
+
+        # 1. Establish connection
+        conn = psycopg2.connect("dbname=context_platform user=johnsmith password=welcome1")
+        cur = conn.cursor()
+
+        # 2. Prepare the embedding (convert list of floats to vector string format)
+        # Postgres vector expects '[0.1, 0.2, ...]'
+        vector_data = f"[{','.join(map(str, embedding))}]"
+
+        # 3. The Query
+        # Hybrid: using ILIKE for keywords
+        # <=> is the Cosine Distance operator. Lower distance = higher similarity.
+        query = """
+            SELECT tool_name, description
+            FROM mcp_tools
+            ORDER BY embedding <-> %s
+            LIMIT 3;
+        """
+
+        # 4. Execute (psycopg2 is synchronous, so no 'await' here)
+        cur.execute(query, (vector_data,))
+        rows = cur.fetchall()
+
+        # 5. Cleanup
+        cur.close()
+        conn.close()
+
+        tools = []
+        for tool_name, description in rows:
+            logger.info(f"Tuple: {tool_name}, {description}")
+            tools.append({
+                "tool_name" : tool_name,
+                "description" : description
+            })
+
+        logger.info(f"Tools: {tools}")
+        return tools
 
 ##################################################################
 # SYSTEM CONTEXT
@@ -1258,12 +1340,23 @@ class SystemContext:
         self.tool_manager: Optional[ToolManager] = None
         self.stage_manager: Optional[StageManager] = None
         self.agent_manager: Optional[AgentManager] = None
+        self.governance_manager: Option[GovernanceManager] = None
 
         self.manifests: Dict[str, Any] = {}
 
-    async def initialize(self, workspace_name: str, agent_manager: AgentManager):
+    async def initialize(self, 
+        domain_name: str, 
+        role_name: str,
+        stage_manager: StageManager, 
+        agent_manager: AgentManager, 
+        governance_manager: GovernanceManager):
 
-        self.workspace_path = WORKSPACES_ROOT / workspace_name
+        self.domain_path = DOMAIN_ROOT / domain_name 
+        self.role_path = self.domain_path / "roles" / role_name
+
+        self.stage_manager = stage_manager
+        self.agent_manager = agent_manager
+        self.governance_manager = governance_manager
 
         self.data_manager = DataManager(agent_manager)
         self.tool_manager = ToolManager(agent_manager)
@@ -1282,7 +1375,7 @@ class SystemContext:
 
     async def load_manifest(self) -> None:
 
-        self.manifest_dir = self.workspace_path / "tools" / "spec"
+        self.manifest_dir = self.role_path / "tools" / "spec"
 
         logger.info(f"Scanning Manifest {self.manifest_dir}")
 

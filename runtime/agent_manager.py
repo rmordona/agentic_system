@@ -1,5 +1,5 @@
 from __future__ import annotations
-from core.paths import WORKSPACES_ROOT
+from core.paths import DOMAIN_ROOT
 
 import inspect
 import importlib.util
@@ -39,9 +39,10 @@ class AgentManager:
     The AGENT.md file inside is loaded as the agent's prompt.
     """
 
-    def __init__(self, workspace_name: str):
-        self.workspace_path = WORKSPACES_ROOT / workspace_name
-        self.agents_dir = self.workspace_path / "agents"
+    def __init__(self, domain_name: str, role_name: str):
+        self.domain_path = DOMAIN_ROOT / domain_name
+        self.role_path = self.domain_path / "roles" / role_name
+        self.agents_dir = self.role_path / "agents"
         self._registry: Dict[str, RegisteredAgent] = {}
         self._profiles: Dict[str, AgentProfile] = {}
         self.input_schema: dict = {}
@@ -63,29 +64,12 @@ class AgentManager:
             agent_name = subdir.name
             agent_md_path = subdir / "AGENT.md"
 
-            # Agent Contracts
-            #input_schema_yaml_path = subdir / "INPUT_SCHEMA.yaml"
-            #output_schema_yaml_path = subdir / "OUTPUT_SCHEMA.yaml"
 
             if not agent_md_path.exists():
                 logger.warning(
                     f"Skipping agent '{agent_name}': AGENT.md not found"
                 )
                 continue
-
-            '''
-            if not input_schema_yaml_path.exists():
-                logger.warning(
-                    f"Skipping agent '{agent_name}': INPUT_SCHEMA.yaml not found"
-                )
-                continue
-
-            if not output_schema_yaml_path.exists():
-                logger.warning(
-                    f"Skipping agent '{agent_name}': OUTPUT_SCHEMA.yaml not found"
-                )
-                continue
-            '''
 
             # Register Agent
             try:
@@ -109,39 +93,6 @@ class AgentManager:
             # Read the Default Input Schema <--- Input and Output schema moved to ToolManager
             # We will be using this schema from a non-mcp call, e.g. producing json formats based on given 
             # input parameters (not from a multi-task agent perspective, but for a single-task agent perspective).
-
-            '''
-            try:
-
-                input_result = AgentProfiler._load_schema(input_schema_yaml_path)
-                if input_result.get("success"):
-                    self.input_schema = input_result.get("schema")
-                else:
-                    raise Exception(input_result.get("error"))
-
-            except Exception as e:
-                logger.error(
-                    f"Failed to retrieve input schema for agent '{agent_name}': {e}",
-                    exc_info=True,
-                )
-
-                # Read the Default Output Schema
-            try:
-
-                output_result = AgentProfiler._load_schema(output_schema_yaml_path)
-
-                #logger.info(f"Agent '{agent_name} set with default output schema: {output_result}")
-                if output_result.get("success"):
-                    self.output_schema = output_result.get("schema")
-                else:
-                    raise Exception(output_result.get("error"))
-
-            except Exception as e:
-                logger.error(
-                    f"Failed to retrieve output schema for agent '{agent_name}': {e}",
-                    exc_info=True,
-                )
-            '''
 
             # Profile the agent
             try:

@@ -1,0 +1,25 @@
+domain: finance
+
+roles:
+
+  stockticker_assistant:
+
+    entry_routes:
+
+      - intent: price_lookup
+        stage: ticker_discovery
+        priority: 1
+
+      - intent: stock_analysis
+        stage: deep_analysis
+        priority: 2
+
+      - intent: portfolio_risk
+        stage: macro_context
+        priority: 3
+
+      - intent: trade_execution
+        stage: risk_audit
+        priority: 4
+
+    default_stage: macro_context

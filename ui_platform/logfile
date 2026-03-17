@@ -1,0 +1,60 @@
+2026-03-15 07:27:44.522 PDT [1979] LOG:  starting PostgreSQL 18.2 (Homebrew) on x86_64-apple-darwin22.6.0, compiled by Apple clang version 14.0.3 (clang-1403.0.22.14.1), 64-bit
+2026-03-15 07:27:44.523 PDT [1979] LOG:  listening on IPv6 address "::1", port 5432
+2026-03-15 07:27:44.523 PDT [1979] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2026-03-15 07:27:44.687 PDT [1979] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5432"
+2026-03-15 07:27:46.071 PDT [2000] LOG:  database system was interrupted; last known up at 2026-03-14 20:45:12 PDT
+2026-03-15 07:27:50.544 PDT [2000] LOG:  database system was not properly shut down; automatic recovery in progress
+2026-03-15 07:27:50.712 PDT [2000] LOG:  redo starts at 0/26E04A0
+2026-03-15 07:27:50.712 PDT [2000] LOG:  invalid record length at 0/26E05A8: expected at least 24, got 0
+2026-03-15 07:27:50.712 PDT [2000] LOG:  redo done at 0/26E0570 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+2026-03-15 07:27:51.170 PDT [1998] LOG:  checkpoint starting: end-of-recovery immediate wait
+2026-03-15 07:27:51.701 PDT [1998] LOG:  checkpoint complete: wrote 0 buffers (0.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.069 s, total=0.613 s; sync files=2, longest=0.068 s, average=0.035 s; distance=0 kB, estimate=0 kB; lsn=0/26E05A8, redo lsn=0/26E05A8
+2026-03-15 07:27:51.880 PDT [1979] LOG:  database system is ready to accept connections
+2026-03-15 07:32:51.882 PDT [1998] LOG:  checkpoint starting: time
+2026-03-15 07:32:54.953 PDT [1998] LOG:  checkpoint complete: wrote 4 buffers (0.0%), wrote 0 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.403 s, sync=1.116 s, total=3.071 s; sync files=4, longest=0.346 s, average=0.279 s; distance=29 kB, estimate=29 kB; lsn=0/26E7D08, redo lsn=0/26E7C78
+2026-03-15 07:42:51.944 PDT [1998] LOG:  checkpoint starting: time
+2026-03-15 07:42:52.346 PDT [1998] LOG:  checkpoint complete: wrote 2 buffers (0.0%), wrote 0 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.211 s, sync=0.030 s, total=0.402 s; sync files=2, longest=0.022 s, average=0.015 s; distance=10 kB, estimate=27 kB; lsn=0/26EA580, redo lsn=0/26EA528
+2026-03-15 07:47:51.345 PDT [1998] LOG:  checkpoint starting: time
+2026-03-15 07:47:51.868 PDT [1998] LOG:  checkpoint complete: wrote 4 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.415 s, sync=0.022 s, total=0.524 s; sync files=5, longest=0.008 s, average=0.005 s; distance=16 kB, estimate=26 kB; lsn=0/26EE830, redo lsn=0/26EE7D8
+2026-03-15 15:57:52.907 PDT [1998] LOG:  checkpoint starting: time
+2026-03-15 15:57:53.355 PDT [1998] LOG:  checkpoint complete: wrote 4 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.403 s, sync=0.002 s, total=0.448 s; sync files=5, longest=0.001 s, average=0.001 s; distance=16 kB, estimate=25 kB; lsn=0/26F2BD0, redo lsn=0/26F2B78
+2026-03-15 16:07:52.355 PDT [1998] LOG:  checkpoint starting: time
+2026-03-15 16:07:52.761 PDT [1998] LOG:  checkpoint complete: wrote 4 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.403 s, sync=0.002 s, total=0.407 s; sync files=5, longest=0.001 s, average=0.001 s; distance=17 kB, estimate=24 kB; lsn=0/26F7278, redo lsn=0/26F7220
+2026-03-15 16:12:52.762 PDT [1998] LOG:  checkpoint starting: time
+2026-03-15 16:12:53.169 PDT [1998] LOG:  checkpoint complete: wrote 4 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.403 s, sync=0.002 s, total=0.407 s; sync files=5, longest=0.001 s, average=0.001 s; distance=18 kB, estimate=24 kB; lsn=0/26FBAD8, redo lsn=0/26FBA80
+2026-03-15 16:22:52.147 PDT [1998] LOG:  checkpoint starting: time
+2026-03-15 16:22:52.554 PDT [1998] LOG:  checkpoint complete: wrote 4 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.403 s, sync=0.002 s, total=0.407 s; sync files=5, longest=0.001 s, average=0.001 s; distance=18 kB, estimate=23 kB; lsn=0/2700318, redo lsn=0/27002C0
+2026-03-15 17:03:52.167 PDT [1998] LOG:  checkpoint starting: time
+2026-03-15 17:03:52.575 PDT [1998] LOG:  checkpoint complete: wrote 4 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.405 s, sync=0.002 s, total=0.409 s; sync files=5, longest=0.001 s, average=0.001 s; distance=18 kB, estimate=23 kB; lsn=0/2704C18, redo lsn=0/2704BC0
+2026-03-15 19:11:05.250 PDT [1998] LOG:  checkpoint starting: time
+2026-03-15 19:11:05.660 PDT [1998] LOG:  checkpoint complete: wrote 4 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.406 s, sync=0.003 s, total=0.410 s; sync files=5, longest=0.001 s, average=0.001 s; distance=19 kB, estimate=22 kB; lsn=0/2709820, redo lsn=0/27097C8
+2026-03-15 22:59:13.213 PDT [1998] LOG:  checkpoint starting: time
+2026-03-15 22:59:13.418 PDT [1998] LOG:  checkpoint complete: wrote 2 buffers (0.0%), wrote 0 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.202 s, sync=0.002 s, total=0.205 s; sync files=2, longest=0.001 s, average=0.001 s; distance=12 kB, estimate=21 kB; lsn=0/270C868, redo lsn=0/270C810
+2026-03-15 23:09:13.406 PDT [1998] LOG:  checkpoint starting: time
+2026-03-15 23:09:13.877 PDT [1998] LOG:  checkpoint complete: wrote 4 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.405 s, sync=0.064 s, total=0.471 s; sync files=5, longest=0.062 s, average=0.013 s; distance=19 kB, estimate=21 kB; lsn=0/27115D8, redo lsn=0/2711580
+2026-03-15 23:14:13.871 PDT [1998] LOG:  checkpoint starting: time
+2026-03-15 23:14:14.277 PDT [1998] LOG:  checkpoint complete: wrote 4 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.403 s, sync=0.002 s, total=0.406 s; sync files=5, longest=0.001 s, average=0.001 s; distance=19 kB, estimate=21 kB; lsn=0/2716568, redo lsn=0/2716510
+2026-03-15 23:19:13.272 PDT [1998] LOG:  checkpoint starting: time
+2026-03-15 23:19:13.679 PDT [1998] LOG:  checkpoint complete: wrote 4 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.403 s, sync=0.003 s, total=0.408 s; sync files=5, longest=0.001 s, average=0.001 s; distance=20 kB, estimate=21 kB; lsn=0/271B660, redo lsn=0/271B608
+2026-03-15 23:24:13.704 PDT [1998] LOG:  checkpoint starting: time
+2026-03-15 23:24:14.111 PDT [1998] LOG:  checkpoint complete: wrote 4 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.404 s, sync=0.002 s, total=0.408 s; sync files=5, longest=0.001 s, average=0.001 s; distance=20 kB, estimate=21 kB; lsn=0/27209F0, redo lsn=0/2720998
+2026-03-15 23:34:13.106 PDT [1998] LOG:  checkpoint starting: time
+2026-03-15 23:34:13.515 PDT [1998] LOG:  checkpoint complete: wrote 4 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.405 s, sync=0.003 s, total=0.409 s; sync files=5, longest=0.001 s, average=0.001 s; distance=13 kB, estimate=20 kB; lsn=0/27240F0, redo lsn=0/2724098
+2026-03-16 05:57:48.812 PDT [2124] ERROR:  extension "vector" is not available
+2026-03-16 05:57:48.812 PDT [2124] HINT:  The extension must first be installed on the system where PostgreSQL is running.
+2026-03-16 05:57:48.812 PDT [2124] STATEMENT:  CREATE EXTENSION IF NOT EXISTS vector;
+2026-03-16 06:24:44.614 PDT [64303] ERROR:  extension "vector" is not available
+2026-03-16 06:24:44.614 PDT [64303] HINT:  The extension must first be installed on the system where PostgreSQL is running.
+2026-03-16 06:24:44.614 PDT [64303] STATEMENT:  CREATE EXTENSION IF NOT EXISTS vector;
+2026-03-16 06:26:01.139 PDT [65573] ERROR:  extension "vector" is not available
+2026-03-16 06:26:01.139 PDT [65573] HINT:  The extension must first be installed on the system where PostgreSQL is running.
+2026-03-16 06:26:01.139 PDT [65573] STATEMENT:  CREATE EXTENSION IF NOT EXISTS vector;
+2026-03-16 06:32:43.560 PDT [1979] LOG:  received fast shutdown request
+2026-03-16 06:32:43.560 PDT [1979] LOG:  aborting any active transactions
+2026-03-16 06:32:43.560 PDT [9044] FATAL:  terminating connection due to administrator command
+2026-03-16 06:32:43.560 PDT [9042] FATAL:  terminating connection due to administrator command
+2026-03-16 06:32:43.562 PDT [1979] LOG:  background worker "logical replication launcher" (PID 2005) exited with exit code 1
+2026-03-16 06:32:43.562 PDT [1998] LOG:  shutting down
+2026-03-16 06:32:43.563 PDT [1998] LOG:  checkpoint starting: shutdown immediate
+2026-03-16 06:32:43.638 PDT [1998] LOG:  checkpoint complete: wrote 0 buffers (0.0%), wrote 0 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.076 s; sync files=0, longest=0.000 s, average=0.000 s; distance=0 kB, estimate=18 kB; lsn=0/27241A0, redo lsn=0/27241A0
+2026-03-16 06:32:43.672 PDT [1979] LOG:  database system is shut down

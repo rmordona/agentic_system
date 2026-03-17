@@ -11,8 +11,6 @@ Agent Profile:
 - Task Style: {profile_task_style}
 - Can Execute Tools: {profile_can_execute_tools}
 - Forbidden Actions: {profile_forbidden_actions}
-- Input Schema: {profile_input_schema}
-- Output Schema: {profile_output_schema}
 
 Available tools:
 {available_tools}

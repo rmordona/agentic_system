@@ -124,6 +124,7 @@ async def handle_graph_stream(
 
     async for event in stream:
 
+        logger.info(f"Handle saw event: {event}")
         print("Handler saw event: ", event)
 
         if isinstance(event, dict) and "type" in event:
@@ -139,7 +140,7 @@ async def handle_graph_stream(
             if not isinstance(interrupts, list):
                 interrupts = [interrupts]
 
-            print(f"Interrupt caught: {interrupts}")
+            logger.info(f"Interrupt caught: {interrupts}")
 
             for payload in interrupts:
                 if not isinstance(payload, dict):
@@ -159,11 +160,12 @@ async def handle_graph_stream(
         if isinstance(event, dict) and event.get("type") == "session_update":
             updated_session_id = event["session_id"]
 
+            logger.info(f"Session Update: {updated_session_id}")
             # Persist immediately
             if updated_session_id != thread.session_id:
                 thread.session_id = updated_session_id
                 db.commit()
-
+            logger.info(f"Session Update Completed ...")
             continue
 
         # --------------------------------------------------

@@ -1,7 +1,7 @@
 import json
 from runtime.logger import AgentLogger
 logger = AgentLogger.get_logger(component="system")
-from runtime.policy_registry import Predicates, StageEvalContext
+from runtime.engine.policy.policy_registry import Predicates, StageEvalContext
 
 class Policies:
 ################################################################################

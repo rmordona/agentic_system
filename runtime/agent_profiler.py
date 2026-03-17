@@ -40,8 +40,8 @@ class AgentProfile(BaseModel):
     requires_human_approval: bool = False
     context_placeholder: str = "{conversation_history}"
     task_placeholder: str = "{task}"
-    input_schema: dict = {}
-    output_schema: dict = {}
+    #input_schema: dict = {}
+    #output_schema: dict = {}
 
     class Config:
         frozen = True  # Immutable at runtime

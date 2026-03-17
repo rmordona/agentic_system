@@ -22,7 +22,7 @@ logger = AgentLogger.get_logger(component="system")
 # 3. Produce a structured_intent JSON with keys:
 #      - task: high-level action
 #      - raw_intent: original text
-#      - workspace: target capability/domain assistant
+#      - domain: target capability/domain assistant
 #      - entities: domain-specific key/value pairs
 #      - parameters: domain-specific optional metadata
 #      - metrics: optional quantitative indicators
@@ -41,9 +41,6 @@ class AgentIntentRefiner:
         logger.info("*********************************************************************************************************")
 
         logger.info(f"State at entry: {state}")
-
-        if state.human_response:
-            logger.info("I got a new response.")
 
         try:
             # -----------------------------------------------------------------
@@ -89,9 +86,10 @@ class AgentIntentRefiner:
                 logger.warning("Intent JSON parsing failed. Using fallback.")
                 structured_intent = {
                     "intent_type" : "unknown",
-                    "task": "unknown",
+                    "task" : "unknown",
                     "raw_intent": user_input,
-                    "workspace": "general_assistant",
+                    "domain" : "general",
+                    "role" : "general_assistant",
                     "entities": {},
                     "parameters": {},
                     "metrics": [],
@@ -196,4 +194,4 @@ class AgentIntentRefiner:
             return "Route_To_HITL"
         if state.session_is_new or state.context_switch:
             return "Route_To_Classifier"
-        return "Route_To_Governance"  # skip classifier mid-session
+        return "Route_To_Planner"  # skip classifier mid-session

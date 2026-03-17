@@ -1,0 +1,69 @@
+type: object
+description: "Agnostic Tool Contract for NLP-to-Entity Ticker Extraction"
+properties:
+  tool_name:
+    type: string
+    const: "extract_ticker"
+  description:
+    type: string
+    const: "Parses unstructured user intent to identify the primary stock symbol and asset class."
+
+  # --- INPUT HANDSHAKE ---
+  input_schema:
+    type: object
+    required: [text_input]
+    properties:
+      text_input:
+        type: string
+        description: "The raw user query (e.g., 'What do you think of Nvidia's recent move?')."
+
+  # --- OUTPUT CONTRACT ---
+  output_schema:
+    type: object
+    required: [ticker, confidence, asset_class]
+    properties:
+      ticker:
+        type: string
+        pattern: "^[A-Z0-9]{1,5}$"
+        description: "The cleaned, uppercase ticker symbol."
+      confidence:
+        type: number
+        minimum: 0.0
+        maximum: 1.0
+      asset_class:
+        type: string
+        enum: [EQUITY, CRYPTO, OPTION, FOREX]
+      is_ambiguous:
+        type: bool
+        default: false
+
+# --- GATEKEEPER PREDICATES ---
+validation_rules:
+  # Integrity: Ticker must not be a common English word (e.g., "A", "FOR", "IS")
+  - "not_in_blacklist(extract_ticker.ticker)"
+  # Logic: Confidence must be high enough to proceed without immediate HITL
+  - "extract_ticker.confidence > 0.70"
+
+# --- HITL ESCALATION POLICY ---
+hitl_policy:
+  trigger_conditions:
+    # 1. Ambiguity: User mentioned multiple tickers or a vague name (e.g., "The cloud company")
+    - condition: "extract_ticker.is_ambiguous == True"
+      reason: "AMBIGUOUS_ENTITY_RECOGNITION"
+
+    # 2. Low Confidence: AI is 'guessing' the ticker (e.g., extracting 'NVDA' from 'The green chip maker')
+    - condition: "extract_ticker.confidence < 0.85"
+      reason: "LOW_CONFIDENCE_MAPPING"
+
+    # 3. Unauthorized Asset Class: User is asking about CRYPTO when the policy only allows EQUITY
+    - condition: "extract_ticker.asset_class != 'EQUITY' AND global_policy.allow_crypto == False"
+      reason: "UNSUPPORTED_ASSET_CLASS"
+
+  interaction_mode: "ENTITY_DISAMBIGUATION"
+  allow_state_mutation: true
+
+# --- UPDATED GATEKEEPER EXIT ---
+# Stage exits only if we have a high-confidence ticker and it's an allowed asset class.
+stage_exit_trigger: "extract_ticker.ticker != None AND extract_ticker.confidence >= 0.85 AND requires_intervention == False"
+
+required: [tool_name, description, input_schema, output_schema, validation_rules, hitl_policy]

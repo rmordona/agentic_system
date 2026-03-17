@@ -7,7 +7,7 @@ from runtime.engine.state.state_schema import StateSchema
 from runtime.engine.domain.envelopes import DataEnvelope, ToolEnvelope
 
 from runtime.domain_manager import SystemContext
-from runtime.stage_manager import StageSchema, StageManager
+from runtime.engine.stage.stage_manager import StageSchema, StageManager
 from runtime.agent_manager import AgentManager
 from llm.model_manager import ModelManager
 
@@ -48,26 +48,23 @@ class AgentRunner:
         logger.info("****                                  AgentRunner is being called                                  ******")
         logger.info("*********************************************************************************************************")
 
-        self.stage_manager = self.context.stage_manager
-        self.agent_manager = self.context.agent_manager
-
-        logger.info(f"Received state from agent: '{state.active_agent}', stage: {state.stage}, task: {state.task}")
+        logger.info(f"Received state from agent: '{state.active_agent}', stage: {state.stage_name}, task: {state.task}")
         logger.info(f"State human_response at entry: {state.human_response}")
 
         user_intent = state.normalized_intent
         human_response = state.human_response # if this is a call from AgentHITL for feedback
 
-        stage      = state.stage         # Received from AgentPlanner
+        stage_name = state.stage_name    # Received from AgentPlanner
         agent_name = state.active_agent  # Received from AgentPlanner
         task       = state.get_task()    # Received from AgentPlanner
 
-        logger.info(f"Current Stage: {stage}")
+        logger.info(f"Current Stage: {stage_name}")
         logger.info(f"Task Received: {task}")
         logger.info(f"Task: {task}")
 
         logger.info(f"State: {state}")
 
-        stage_meta = self.stage_manager.get(stage)
+        stage_meta = self.context.stage_manager.get_stage(stage_name)
         self.enforce_allowed_agents(agent_name, stage_meta)
 
         # Get Agent Context
@@ -75,7 +72,7 @@ class AgentRunner:
         artifact = agent_ctx.control_raw
 
         # Get Agent Profile
-        agent_profile = self.agent_manager.get_agent_profile(agent_name)
+        agent_profile = self.context.agent_manager.get_agent_profile(agent_name)
         logger.info(f"Agent Profile: {agent_profile}")
 
 
@@ -89,7 +86,7 @@ class AgentRunner:
         logger.info(f"Open Tasks: {len(artifact.open_tasks)}")
 
         # Process the Data Envelope for Input
-        data_env = await self.context.data_manager.process_input(task.tool_name, agent_name, stage, user_intent)
+        data_env = await self.context.data_manager.process_input(task.tool_name, agent_name, stage_name, user_intent)
         logger.info(f"Data Envelope with Input Data: {data_env}")
   
         # Execute Tool and retrieve the Tool Envelope
@@ -207,7 +204,7 @@ class AgentRunner:
 
         # 1. Get Agent Prompt (AGENT.md with template to input {task} and {conversation_history}).
         #    The AGENT.md also includes JSON schema for output. This will be the result as payload.
-        agent_prompt = self.agent_manager.get_agent_prompt(agent_name)
+        agent_prompt = self.context.agent_manager.get_agent_prompt(agent_name)
 
         # 2. Get Data Envelope
         data_adapter = self.context.data_manager.get_adapter(agent_name)
@@ -246,7 +243,7 @@ class AgentRunner:
         artifact = agent_ctx.control_raw
 
         # Get Agent Profile
-        profile = self.agent_manager.get_agent_profile(state.active_agent)
+        profile = self.context.agent_manager.get_agent_profile(state.active_agent)
 
         # Pull the CURRENT STATE from Data (The Envelope)
         # We look into the payload of the envelope to see what we already know

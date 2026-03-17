@@ -22,7 +22,7 @@ class ToolEnvelope(Generic[DomainType]):
     tool_name: str
     tool_version: Optional[str] = None
     agent_role: Optional[str] = None
-    stage: Optional[str] = None
+    stage_name: Optional[str] = None
     intent: Optional[str] = None
     input: Dict[str, Any] = field(default_factory=dict)
     output: Optional[Any] = None

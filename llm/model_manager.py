@@ -122,7 +122,7 @@ class ModelManager:
         # Load chatmodel config once at platform startup
         logger.info("Loading Chat Model Factory")
         ChatModelFactory.load_config(self.llm_dir / "chatmodels/config.json")
-        self.llm = ChatModelFactory.get(chatmodel_provider)
+        self.chat_model = ChatModelFactory.get(chatmodel_provider)
 
 
     # -----------------------
@@ -137,12 +137,12 @@ class ModelManager:
     # Get Model Detail
     # -----------------------
     def get_model_info(self):
-        if self.llm:
+        if self.chat_model:
             return {
-                "provider": self.llm.endpoint,
-                "model_name" : self.llm.model_name,
-                "temperature" : self.llm.temperature,
-                "max_tokens" : self.llm.max_tokens }
+                "provider": self.chat_model.endpoint,
+                "model_name" : self.chat_model.model_name,
+                "temperature" : self.chat_model.temperature,
+                "max_tokens" : self.chat_model.max_tokens }
         raise RuntimeError("ChatModel not initialized.")
 
 
@@ -181,6 +181,36 @@ class ModelManager:
             raise FileNotFoundError(f"File path '{template}' does not exist")
 
         return template.read_text(encoding="utf-8")
+
+    # -----------------------------------------------------------------------------
+    # async def embed_text
+    # -----------------------------------------------------------------------------
+    # Request for Embedding
+    # -----------------------------------------------------------------------------
+    async def embed_text(
+        self,
+        text: str,
+        model: Optional[str] = None
+    ) -> List[float]:
+        """
+        Generate embedding for given text using the configured embedding provider.
+
+        Args:
+            text: Input string to embed.
+            model: Optional override model name. Uses default if None.
+
+        Returns:
+            List of floats representing the embedding vector.
+        """
+        if not self.embedding_client:
+            raise RuntimeError("Embedding client not initialized.")
+
+        embedding_model = model if model else self.embedding_client.model_name
+        logger.info(f"Embedding Model: {embedding_model}")
+        embedding = await self.embedding_client.embed_text( text=text )
+
+        # Assume result comes back as a dict with 'embedding' key
+        return embedding  # list of floats
 
     # -----------------------------------------------------------------------------
     # async def ainvoke
@@ -226,15 +256,15 @@ class ModelManager:
             """
             
             # 1. Bind tools if provided
-            executor = self.llm
+            executor = self.chat_model
             if self.bound_tools:
-                executor = self.llm.bind_tools(self.bound_tools)
+                executor = self.chat_model.bind_tools(self.bound_tools)
 
             # We can use this later
             config={
-                "temperature": temperature if temperature is not None else self.llm.temperature,
-                "max_tokens": max_tokens if max_tokens is not None else self.llm.max_tokens,
-                "model": self.llm.model_name,  # optional, if your adapter supports it
+                "temperature": temperature if temperature is not None else self.chat_model.temperature,
+                "max_tokens": max_tokens if max_tokens is not None else self.chat_model.max_tokens,
+                "model": self.chat_model.model_name,  # optional, if your adapter supports it
             }
             
             # 2. Direct call to the OllamaChatModel's ainvoke/invoke
@@ -358,12 +388,12 @@ class ModelManager:
         logger.info(f"Prompt: {prompt}")
 
         config={
-            "temperature": temperature if temperature is not None else self.llm.temperature,
-            "max_tokens": max_tokens if max_tokens is not None else self.llm.max_tokens,
-            "model": self.llm.model_name,  # optional, if your adapter supports it
+            "temperature": temperature if temperature is not None else self.chat_model.temperature,
+            "max_tokens": max_tokens if max_tokens is not None else self.chat_model.max_tokens,
+            "model": self.chat_model.model_name,  # optional, if your adapter supports it
         }
 
-        response = await self.llm.ainvoke(prompt, config)
+        response = await self.chat_model.ainvoke(prompt, config)
 
         #content = response.generations[0].message.content
 
@@ -417,7 +447,7 @@ class ModelManager:
             text: The text to reflect upon (prompt + response)
         """
 
-        if not self.llm or not self.memory_manager:
+        if not self.chat_model or not self.memory_manager:
             return
 
         try:
@@ -430,7 +460,7 @@ class ModelManager:
             ]
 
             logger.info("Invoking LLM to generate relflection")
-            reflection = await self.llm.ainvoke(messages)
+            reflection = await self.chat_model.ainvoke(messages)
 
             # -----------------------------
             # 2. Persist as episodic memory
@@ -454,3 +484,7 @@ class ModelManager:
 
         except Exception as e:
             logger.warning(f"Self-reflection failed for {key}: {e}")
+
+
+
+

@@ -1,136 +1,133 @@
-from typing import Dict, Any, Optional
-from dataclasses import asdict
+from __future__ import annotations
+from typing import Any, Dict, Optional
+from langgraph.graph import END
 from runtime.logger import AgentLogger
-
 from runtime.engine.state.state_schema import StateSchema
-from runtime.engine.domain.agent_context import AgentContext
-
-from runtime.domain_manager import SystemContext
-from runtime.stage_manager import StageSchema, StageManager
+from runtime.engine.state.state_mapper import to_agent_context, to_storage
+from runtime.engine.domain.task import HITLState
+from runtime.domain_manager import AgentManager, SystemContext
+from runtime.engine.stage.stage_manager import StageManager
+from runtime.engine.governance.governance_manager import GovernanceManager, GovernanceViolation
 
 logger = AgentLogger.get_logger(component="system")
 
 
-################################################################################
-# AgentGovernance
-################################################################################
-# Macro-level orchestration node for a LangGraph-based multi-agent system.
-#
-# Responsibilities:
-# - Evaluate stage exit conditions to determine workflow transitions.
-# - Select the next allowed agent for the current stage.
-# - Route execution to AgentRunner, AgentPlanner, or HITL as needed.
-# - Maintain stage-level execution context and history.
-# - Build a predicate context for evaluating conditional transitions.
-#
-# Inputs:
-# - state: StateSchema instance containing current stage, active agent, and workflow metadata.
-#
-# Outputs:
-# - Dict indicating next stage, next agent, and/or next task to execute.
-################################################################################
 class AgentGovernance:
+    """
+    LangGraph node: AgentGovernance
+    Responsibilities:
+    - Evaluate stage exit conditions
+    - Validate agent output via GovernanceManager
+    - Determine next stage and agent
+    - Trigger HITL if required
+    - Route execution (Planner, Runner)
+    """
+
     def __init__(self, context: SystemContext):
-        self.context = context
+        self.context: SystemContext = context
 
     async def __call__(self, state: StateSchema) -> Dict[str, Any]:
-        logger.info("*********************************************************************************************************")
-        logger.info("****                                AgentGovernance is being called                                ******")
-        logger.info("*********************************************************************************************************")
+        logger.info(f"=== AgentGovernance called: stage={state.stage_name}, agent={state.active_agent} ===")
 
-        self.stage_manager = self.context.stage_manager
-        self.agent_manager = self.context.agent_manager
+        artifact = self._get_current_artifact(state)
+        state_ctx = self._build_state_ctx(state)
 
-        logger.info(f"State Type: {type(state)}")
-        logger.info(f"State: {state}")
-        logger.info(f"Workspace: {state.workspace_name}")
+        # 1️⃣ Validate agent action
+        agent_schema = self.context.agent_manager.get_agent_schema(state.active_agent)
+        try:
+            self.context.governance_manager.validate_action(agent_schema, artifact)
+        except GovernanceViolation as gv:
+            logger.error(f"Governance violation: {gv.message}")
+            return {"error": gv.to_dict(), "next_node": "END"}
 
-        logger.info(f"Agent: {state.active_agent}, stage: {state.stage}, task {state.task}")
+        # 2️⃣ Evaluate stage exit
+        exit_allowed = await self._should_exit_stage(state, artifact, state_ctx)
+        if exit_allowed:
+            next_stage = self._determine_next_stage(state, artifact, state_ctx)
+            if not next_stage:
+                logger.info("Terminal stage reached")
+                return {"next_node": END}
+            state.stage_name = next_stage
 
-        logger.info(f"Current Stage: {state.stage}, Active Agent: {state.active_agent}")
+        # 3️⃣ Determine next agent
+        next_agent = self._select_next_agent(state)
+        if not next_agent:
+            logger.warning("No eligible agent for next stage")
+            return {"next_node": END}
 
-        # Evaluate task
-        if state.task is None:
-            logger.info(f"No Task. Directly passing to Planner.")
-            return {} # No change in state, let Planner handle tasks
+        # 4️⃣ HITL detection
+        hitl_state = self._check_hitl_requirement(state)
+        if hitl_state:
+            logger.info("HITL required")
+            return {"hitl": to_storage(hitl_state), "next_node": "hitl_node"}
 
-        # Check for next open task
-        next_task = self._next_open_task(state)
-        if next_task:
-            logger.info(f"If Next Task, then take _next_task.")
-            return {} # No change in state, let Planner handle tasks
+        # 5️⃣ Update agent context
+        agent_ctx = self._get_or_create_agent_context(state, next_agent)
+        state.active_agent = next_agent
+        state.agents[next_agent] = to_storage(agent_ctx)
 
-        # Determine next agent in stage
-        next_agent = self._next_agent(state)
-        if next_agent:
-            logger.info(f"If Next Agent, then take _next_agent.")
-            return next_agent
+        # 6️⃣ Route execution
+        route_node = "agent_planner" if agent_ctx.requires_planning else "agent_runner"
+        logger.info(f"Routing execution to {route_node} for agent {next_agent}")
 
-        # Evaluate stage exit conditions
-        next_stage = self._evaluate_stage_exit(state)
-        if next_stage:
-            logger.info(f"If Next Stage, Passing to route_to_next_stage.")
-            return self._route_to_next_stage(state, next_stage)
-
-        # Default: remain in current stage
-        return {"stage": state.stage, "active_agent": state.active_agent}
-
-    def _evaluate_stage_exit(self, state: StateSchema) -> Optional[str]:
-        stage_meta = self.stage_manager.get(state.stage)
-        if not stage_meta.exit_condition:
-            return None
-        agent_ctx = state.get_active_agent()
-
-        compiled = self.stage_manager.compile_predicate(stage_meta.exit_condition)
-        ctx = self._build_state_context(state, agent_ctx)
-        artifact = asdict(agent_ctx.control_raw)
-        result = self.stage_manager.evaluate_predicate(compiled, ctx, artifact)
-        logger.info(f"Stage exit condition {stage_meta.exit_condition} evaluated to {result}")
-        return stage_meta.next_stages[0]["name"] if result else None
-
-    def _next_open_task(self, state: StateSchema) -> Optional[Dict[str, Any]]:
-        artifact = state.get_active_agent().control_raw
-        return artifact.open_tasks
-
-    def _next_agent(self, state: StateSchema) -> Optional[Dict[str, Any]]:
-        stage = state.stage
-        executed = state.executed_agents_per_stage.get(stage, [])
-        allowed_agents = self.stage_manager.allowed_agents(stage)
-        remaining_agents = [a for a in allowed_agents if a not in executed]
-        if not remaining_agents:
-            return None
-        next_agent = remaining_agents[0]
-        state.executed_agents_per_stage.setdefault(stage, []).append(next_agent)
-        state.history_agents.append(next_agent)
-        return {"active_agent": next_agent, "stage": stage}
-
-    def _route_to_next_stage(self, state: StateSchema, next_stage: str) -> Dict[str, Any]:
-        allowed_agents = self.stage_manager.allowed_agents(next_stage)
-        if not allowed_agents:
-            raise RuntimeError(f"No allowed agents for stage {next_stage}")
-        first_agent = self.agent_manager.first_agent(allowed_agents)
-        return {"stage": next_stage, "active_agent": first_agent}
-
-    def _build_state_context(self, state: StateSchema, agent_ctx: AgentContext) -> dict:
-        ctx = {
-            "session_id": state.session_id,
-            "domain": state.domain,
-            "current_stage": state.stage,
-            "current_agent": state.active_agent,
-            "task": state.task,
-            "done": state.done,
-            "user_intent": state.normalized_intent,
-            "workflow_metadata": state.workflow_metadata.copy(),
-            "history_agents": state.history_agents.copy(),
-            "executed_agents_per_stage": state.executed_agents_per_stage.copy(),
+        return {
+            "stage_name": state.stage_name,
+            "active_agent": next_agent,
+            "agents": state.agents,
+            "next_node": route_node,
         }
-        ctx["recent_tools"] = [
-            t.model_dump() if hasattr(t, "model_dump") else t
-            for t in agent_ctx.tool_raw[-5:]
-        ]
-        if hasattr(agent_ctx.data_raw, "payload"):
-            ctx["data"] = agent_ctx.data_raw.payload
-        else:
-            ctx["data"] = agent_ctx.data_raw
-        return ctx
 
+    # -------------------------------------------------------------------------
+    # Internal helpers
+    # -------------------------------------------------------------------------
+    def _get_current_artifact(self, state: StateSchema) -> Dict[str, Any]:
+        agent_record = state.agents.get(state.active_agent)
+        if agent_record:
+            return to_agent_context(agent_record).control_raw
+        return {}
+
+    def _build_state_ctx(self, state: StateSchema) -> Dict[str, Any]:
+        return {
+            "task": state.task,
+            "stage_name": state.stage_name,
+            "data": state.data,
+            "recent_tools": state.recent_tools,
+            "workflow_metadata": state.workflow_metadata,
+        }
+
+    async def _should_exit_stage(
+        self,
+        state: StateSchema,
+        artifact: dict,
+        state_ctx: dict,
+    ) -> bool:
+        try:
+            return self.context.stage_manager.evaluate_exit(state.stage_name, artifact, state_ctx)
+        except Exception as e:
+            logger.error(f"Stage exit evaluation failed: {e}")
+            return False
+
+    def _determine_next_stage(self, state: StateSchema, artifact: dict, state_ctx: dict) -> Optional[str]:
+        allowed_stages = self.context.governance_manager.allowed_next_stages(
+            state.stage_name, artifact, state_ctx
+        )
+        return allowed_stages[0] if allowed_stages else None
+
+    def _select_next_agent(self, state: StateSchema) -> Optional[str]:
+        allowed_agents = self.context.stage_manager.allowed_agents(state.stage_name)
+        return self.context.agent_manager.first_agent(allowed_agents) if allowed_agents else None
+
+    def _check_hitl_requirement(self, state: StateSchema) -> Optional[HITLState]:
+        metadata = state.workflow_metadata or {}
+        flags = metadata.get("hitl_flags", {})
+        if flags.get("requires_approval"):
+            return HITLState(stage_name=state.stage_name, agent_name=state.active_agent, reason="Approval required")
+        if flags.get("abort_requested"):
+            return HITLState(stage_name=state.stage_name, agent_name=state.active_agent, reason="Human abort requested")
+        return None
+
+    def _get_or_create_agent_context(self, state: StateSchema, agent_name: str):
+        existing = state.agents.get(agent_name)
+        if existing:
+            return to_agent_context(existing)
+        return self.context.agent_manager.create_agent_context(agent_name=agent_name, stage_name=state.stage_name)

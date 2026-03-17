@@ -5,7 +5,7 @@ from runtime.engine.state.state_schema import StateSchema
 from runtime.engine.domain.agent_context import AgentContext
 from runtime.engine.domain.task import HITLState
 
-from runtime.policy_registry import PredicateEngine
+from runtime.engine.policy.policy_registry import PredicateEngine
 
 from runtime.logger import AgentLogger
 

@@ -78,7 +78,7 @@ Return VALID JSON ONLY with the following fields:
   "intent_type": "actionable | conversation | unsafe | unknown",
   "task": "short description of the requested task",
   "raw_intent": "original user input",
-  "workspace": "finance | research | report | coding | database | analytics | general | unknown",
+  "domain": "finance | research | report | coding | database | analytics | general | real_estate | marketing | social | unknown",
   "entities": {{}},
   "parameters": {{}},
   "metrics": [],

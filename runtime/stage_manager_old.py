@@ -31,6 +31,7 @@ logger = AgentLogger.get_logger(  component="system")
 #   This schema represents *what a stage is*, not how it is executed.
 #
 # Role in the System:
+#   - Stage here is not treated as pipeline, rather stage is defined as a policy checkpoint.
 #   - Acts as a governance and control-plane definition.
 #   - Drives orchestration decisions made by the PlanArchitect.
 #   - Constrains agent behavior, stage transitions, and termination rules.
@@ -143,6 +144,88 @@ class StageSchema:
         return f"Stage(name={self.name}, allowed_agents={self.allowed_agents})"
     '''
 
+################################################################################
+# StageManager
+################################################################################
+# Governance-aware stage registry and transition manager for a multi-agent
+# workspace execution environment.
+#
+# Architectural Shift:
+# --------------------
+# This component originally supported a traditional *pipeline model*, where
+# stages represented a fixed, linear sequence of execution steps.
+#
+# The system has since transitioned to a **Governance Model**, where a stage
+# is no longer a mandatory step in a pipeline. Instead, a stage represents a
+# **policy checkpoint or decision gate** within a governed workflow.
+#
+# In this model:
+#
+#   Stage = Governance Decision Point
+#
+# Each stage defines:
+#   - Which agents are allowed to operate
+#   - The policy predicates required for entry or exit
+#   - The conditions under which transitions to other stages are permitted
+#
+# Execution Flow:
+# ---------------
+# Rather than enforcing a linear sequence such as:
+#
+#     StageA → StageB → StageC
+#
+# the StageManager supports **policy-driven transitions** such as:
+#
+#     StageA
+#       ├── allow StageB if policy_condition_1
+#       └── allow StageC if policy_condition_2
+#
+# This enables the system to:
+#
+#   • Short-circuit workflows when safety conditions fail
+#   • Route execution dynamically based on runtime context
+#   • Support branching, blocking, and terminal states
+#   • Enforce governance constraints across agent actions
+#
+# Responsibilities:
+# -----------------
+# - Load and register stage definitions for a workspace.
+# - Maintain the entry stage for the governance workflow.
+# - Track allowed agents per stage.
+# - Provide lookup and ordering utilities for stage traversal.
+# - Interface with the PolicyRegistry for evaluating governance rules.
+#
+# The StageManager therefore acts as the **structural backbone of the
+# governance engine**, enabling the system to dynamically route execution
+# through policy-controlled decision gates rather than rigid pipelines.
+#
+# Attributes:
+# -----------
+# workspace_name : str
+#     Name of the active workspace whose governance configuration is loaded.
+#
+# workspace_path : Path
+#     Filesystem location containing workspace configuration files.
+#
+# entry_stage : str
+#     The initial governance checkpoint where execution begins.
+#
+# _stages : Dict[str, StageSchema]
+#     Registry of all stage definitions within the workspace.
+#
+# _allowed_agents : List[str]
+#     Agents permitted to operate within the currently active stage.
+#
+# _order : List[str]
+#     Optional ordered representation of stages for visualization or debugging.
+#
+# pipeline_adapter : PipelineAdapter
+#     Compatibility layer used to convert legacy pipeline specifications into
+#     governance-aware stage definitions.
+#
+# policy_registry : PolicyRegistry
+#     Registry of policy predicates used to evaluate stage transitions.
+################################################################################
 class StageManager:
 
     pipeline_adapter: PipelineAdapter = None
@@ -168,7 +251,6 @@ class StageManager:
             artifact_md="artifact.md",
             audit_log="artifact_audit.json",
             workspace_path=self.workspace_path,
-            #model_manager=self.model_manager,
         )
 
     def register_stages(self):

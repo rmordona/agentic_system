@@ -20,7 +20,7 @@
 # -----------------------------------------------------------------------------
 
 from __future__ import annotations
-from core.paths import WORKSPACES_ROOT
+# from core.paths import WORKSPACES_ROOT
 
 import sys
 import time
@@ -61,16 +61,18 @@ class Orchestrator:
 
     def __init__(
         self,
-        workspace_name: str,
+        #workspace_name: str,
         core_engine: CoreEngine, 
         session_id: None, 
         event_bus: EventBus,
         hitl_callback: Optional[Any] = None
     ):
 
+        '''
         self.workspace_path = WORKSPACES_ROOT /workspace_name
         self.workspace_name = workspace_name
-
+        '''
+        
         self.session_id = session_id
         self.event_bus = event_bus
         self.hitl_callback = hitl_callback

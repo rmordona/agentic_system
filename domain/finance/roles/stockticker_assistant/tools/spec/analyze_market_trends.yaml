@@ -1,0 +1,81 @@
+type: object
+description: "Agnostic Tool Contract for Multi-Factor Market Sentiment and Narrative Synthesis"
+properties:
+  tool_name:
+    type: string
+    const: "analyze_market_trends"
+  description:
+    type: string
+    const: "Synthesizes technical indicators and news sentiment to provide a weighted market outlook."
+
+  # --- INPUT HANDSHAKE ---
+  input_schema:
+    type: object
+    required: [ticker]
+    properties:
+      ticker:
+        type: string
+        pattern: "^[A-Z]{1,5}$"
+      include_sentiment:
+        type: boolean
+        default: true
+      analysis_depth:
+        type: string
+        enum: [QUICK, COMPREHENSIVE]
+        default: "COMPREHENSIVE"
+
+  # --- OUTPUT CONTRACT ---
+  output_schema:
+    type: object
+    required: [outlook, confidence_score, supporting_factors]
+    properties:
+      outlook:
+        type: string
+        enum: [ACCUMULATION, DISTRIBUTION, BREAKOUT, BREAKDOWN, SIDEWAYS]
+      confidence_score:
+        type: number
+        minimum: 0.0
+        maximum: 1.0
+      supporting_factors:
+        type: array
+        items:
+          type: object
+          required: [factor, impact_weight]
+          properties:
+            factor: { type: string }
+            impact_weight: { type: number, minimum: -1.0, maximum: 1.0 }
+      rsi_level:
+        type: number
+        minimum: 0
+        maximum: 100
+
+# --- GATEKEEPER PREDICATES ---
+validation_rules:
+  # Logic: If outlook is BREAKOUT, confidence must be > 0.6
+  - "if_condition(analyze_market_trends.outlook == 'BREAKOUT', analyze_market_trends.confidence_score > 0.6)"
+  # Integrity: Must have at least 2 supporting factors for a non-SIDEWAYS outlook
+  - "if_condition(analyze_market_trends.outlook != 'SIDEWAYS', count(analyze_market_trends.supporting_factors) >= 2)"
+
+# --- HITL ESCALATION POLICY ---
+hitl_policy:
+  trigger_conditions:
+    # 1. Divergence: Bullish outlook but RSI is overbought (>75)
+    - condition: "analyze_market_trends.outlook == 'BREAKOUT' AND analyze_market_trends.rsi_level > 75"
+      reason: "BULL_TRAP_OVERBOUGHT_DIVERGENCE"
+
+    # 2. Contradictory Factors: Supporting factors have conflicting extreme weights (e.g., +0.9 and -0.9)
+    - condition: "has_extreme_conflict(analyze_market_trends.supporting_factors) == True"
+      reason: "NARRATIVE_INCOHERENCE"
+
+    # 3. Low Conviction: Confidence score is below threshold for a high-risk sector
+    - condition: "analyze_market_trends.confidence_score < 0.5 AND is_high_beta(input.ticker)"
+      reason: "LOW_CONVICTION_SPECULATIVE_ASSET"
+
+  interaction_mode: "STRATEGY_REVIEW"
+  allow_state_mutation: true
+
+# --- UPDATED GATEKEEPER EXIT ---
+# Stage exits if the outlook is definitive and the narrative is coherent (no HITL flags).
+stage_exit_trigger: "analyze_market_trends.outlook != None AND analyze_market_trends.confidence_score > 0.4 AND requires_intervention == False"
+
+required: [tool_name, description, input_schema, output_schema, validation_rules, hitl_policy]

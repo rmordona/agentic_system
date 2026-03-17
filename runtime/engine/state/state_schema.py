@@ -16,7 +16,6 @@ class StateSchema(BaseModel):
     # -------------------------
     session_id: str = None   # business identity
     thread_id: str = None    # graph execution identity
-    domain: str
     session_is_new: bool = True 
     context_switch: bool = True
 
@@ -40,15 +39,16 @@ class StateSchema(BaseModel):
     # ----------------------------------------
     # Workspace Area
     # ----------------------------------------
-    workspace_name: str = None
-    workspace_meta: Optional[dict] = None
+    domain_name: str = None
+    role_name: str = None
+    domain_meta: Optional[dict] = None
     classification_confidence: float = None
 
     # Storage-safe snapshots
     task: Optional[Dict[str, Any]] = None
     hitl: Optional[Dict[str, Any]] = None
 
-    stage: Optional[str] = None
+    stage_name: Optional[str] = None
 
     final_content: str = ""
     done: bool = False

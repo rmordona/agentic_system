@@ -1,135 +1,192 @@
-from typing import Dict, Any, Optional
-from dataclasses import asdict
+################################################################################
+# AgentDomain
+################################################################################
+# Entry node responsible for initializing a domain execution domain and
+# bootstrapping the first governance stage.
+#
+# Responsibilities:
+#
+# 1. Load domain runtime components:
+#       - StageManager
+#       - AgentManager
+#       - PolicyRegistry
+#       - GovernanceEngine
+#
+# 2. Initialize governance-aware stage routing.
+#
+# 3. Select the first agent allowed to operate in the entry stage.
+#
+# 4. Create the runtime AgentContext and inject it into the shared workflow state.
+#
+# This node executes exactly once at workflow startup.
+################################################################################
+from typing import Dict, Any
+
 from runtime.logger import AgentLogger
 
 from runtime.engine.state.state_schema import StateSchema
-from runtime.engine.state.state_mapper import to_task, to_storage, to_agent_context, to_hitl_state
+from runtime.engine.state.state_mapper import to_storage
 from runtime.engine.domain.agent_context import AgentContext
 
 from runtime.domain_manager import SystemContext
-from runtime.stage_manager import StageSchema, StageManager
+from runtime.engine.stage.stage_manager import StageManager
 from runtime.agent_manager import AgentManager
+
+from runtime.engine.governance.governance_engine import GovernanceEngine
+from runtime.engine.governance.governance_manager import GovernanceManager
 
 logger = AgentLogger.get_logger(component="system")
 
 
-################################################################################
-# AgentDomain
-################################################################################
-# Domain-level orchestration node responsible for initializing and routing
-# execution within a LangGraph-based multi-agent workflow.
-#
-# Responsibilities:
-# - Determine the initial stage and active agent when the workflow begins.
-# - Coordinate stage-aware agent routing using the StageManager.
-# - Initialize runtime AgentContext for agents entering execution.
-# - Maintain and update agent state within the shared StateSchema.
-# - Bridge system configuration (SystemContext) with runtime workflow state.
-#
-# This node acts as the entry and routing layer between the workflow state,
-# stage definitions, and agent execution pipeline.
-#
-# Inputs:
-# - state: StateSchema containing workspace context, stage information,
-#   active agent, and runtime agent metadata.
-#
-# Outputs:
-# - Dict containing updates to workflow state such as:
-#     - stage: the current or next stage of execution
-#     - active_agent: the agent selected to execute next
-#     - agents: updated serialized agent contexts
-################################################################################
 class AgentDomain:
+
     def __init__(self, context: SystemContext):
+
         self.context = context
 
+        #self.stage_manager: StageManager | None = None
+        #self.agent_manager: AgentManager | None = None
+        #self.policy_registry: PolicyRegistry | None = None
+        #self.governance_engine: GovernanceEngine | None = None
+
+
+    ############################################################################
+    # Runtime Entry
+    ############################################################################
     async def __call__(self, state: StateSchema) -> Dict[str, Any]:
+
         logger.info("*********************************************************************************************************")
         logger.info("****                                AgentDomain is being called                                    ******")
         logger.info("*********************************************************************************************************")
 
-        logger.info(f"State Type: {type(state)}")
-        logger.info(f"State: {state}")
-        logger.info(f"Workspace: {state.workspace_name}")
+        logger.info(f"Domain Name: {state.domain_name}")
+        logger.info(f"Role Name: {state.role_name}")
+        logger.info(f"Active Agent: {state.active_agent}")
 
-        # First iteration: acquire initial stage and agent
+        # Validate domain
+        if state.domain_name is None:
+            return "classifier"
+
+        # First iteration bootstrap
         if state.active_agent is None:
-            logger.info("This is the first iteration ... So acquiring the first stage and first agent ...")
 
-            await self.initialize_domain(state.workspace_name)
+            logger.info("Initializing domain runtime")
 
-            return self.retrieve_initial_stage_agent(state)
+            await self.initialize_domain(state.domain_name, state.role_name)
 
-    def retrieve_initial_stage_agent(self, state: StateSchema):
+            return self.bootstrap_stage(state)
 
-        logger.info("Retrieving initial stage and agent ...")
+        return {}
 
-        # 1. Acquire first stage
-        logger.info("Acquiring the first stage")
-        first_stage = self.stage_manager.get_entry_stage()
-        logger.info(f"First Stage Acquired: {first_stage}")
+    ############################################################################
+    # Initialize Workspace Runtime
+    ############################################################################
+    async def initialize_domain(self, domain_name: str, role_name: str):
 
-        # 2. Find first agent
-        logger.info("Acquiring the first agent")
-        first_agent = self.agent_manager.first_agent(
-            self.stage_manager.allowed_agents(first_stage)
+        logger.info(f"Initializing domain runtime: {domain_name}, {role_name}")
+
+        # ---------------------------------------------------------------------
+        # Stage Manager
+        # ---------------------------------------------------------------------
+        stage_manager = StageManager(domain_name, role_name)
+        stage_manager.register_stages()
+
+        logger.info("StageManager initialized")
+
+
+        # ---------------------------------------------------------------------
+        # Agent Manager
+        # ---------------------------------------------------------------------
+        agent_manager = AgentManager(domain_name, role_name)
+        agent_manager.scan_and_register_agents()
+
+        logger.info("AgentManager initialized")
+
+
+        # ---------------------------------------------------------------------
+        # Governance Graph
+        # ---------------------------------------------------------------------
+        graph = stage_manager.compile_governance_graph()
+
+        logger.info("GovernanceGraph compiled")
+
+        # ---------------------------------------------------------------------
+        # Governance Engine
+        # ---------------------------------------------------------------------
+        governance_engine = GovernanceEngine(
+            graph=graph,
+            policy_registry=stage_manager.policy_registry
         )
-        logger.info(f"First Agent Acquired: {first_agent}")
+
+        logger.info("GovernanceEngine initialized")
+
+        # ---------------------------------------------------------------------
+        # Governance Manager
+        # ---------------------------------------------------------------------
+        governance_manager = GovernanceManager(
+            engine=governance_engine,
+            policy_registry=stage_manager.policy_registry
+        )
+
+        logger.info("GovernanceManager initialized")
+
+        # ---------------------------------------------------------------------
+        # Inject into system context
+        # ---------------------------------------------------------------------
+        await self.context.initialize(
+            domain_name=domain_name,
+            role_name=role_name,
+            stage_manager=stage_manager,
+            agent_manager=agent_manager,
+            governance_manager=governance_manager
+        )
+
+        logger.info("SystemContext initialized")
+
+    ############################################################################
+    # Bootstrap First Stage
+    ############################################################################
+    def bootstrap_stage(self, state: StateSchema) -> Dict[str, Any]:
+
+        logger.info("Bootstrapping first governance stage")
+
+        stage_manager = self.context.stage_manager
+        agent_manager = self.context.agent_manager
+
+        # ---------------------------------------------------------------------
+        # Stage
+        # ---------------------------------------------------------------------
+        intent = state.domain_meta.get("intent")
+
+        logger.info(f"Domain Meta: {state.domain_meta}")
+
+        stage_name = stage_manager.resolve_stage_for_intent(intent)
 
 
-        # Create runtime AgentContext
+        logger.info(f"Entry stage: {stage_name}")
+
+        # ---------------------------------------------------------------------
+        # Agent
+        # ---------------------------------------------------------------------
+
+        allowed_agents = stage_manager.allowed_agents(stage_name)
+
+        agent = agent_manager.first_agent(allowed_agents)
+
+        logger.info(f"Selected first agent: {agent}")
+
+        # ---------------------------------------------------------------------
+        # Runtime Agent Context
+        # ---------------------------------------------------------------------
         agent_ctx = AgentContext(
-            agent_name=first_agent,
-            stage=first_stage
+            agent_name=agent,
+            stage_name=stage_name
         )
 
-        # Serialize BEFORE storing in state
-        state.agents[first_agent] = to_storage(agent_ctx)
+        state.agents[agent] = to_storage(agent_ctx)
 
         return {
-            "stage": first_stage,
-            "active_agent": first_agent,
+            "stage_name": stage_name,
+            "active_agent": agent,
             "agents": state.agents
         }
-
-    async def initialize_domain(self, workspace_name: str):
-
-        # --------------------------------------------------
-        # 1. Stage Management
-        # --------------------------------------------------
-        self.initialize_stages(workspace_name)
-    
-        # --------------------------------------------------
-        # 2. Agent Management
-        # --------------------------------------------------
-        self.initialize_agents(workspace_name)
-
-        # --------------------------------------------------
-        # 3. System Context
-        # --------------------------------------------------
-        await self.context.initialize(
-            workspace_name = workspace_name,
-            agent_manager = self.agent_manager
-        )
-        
-
-    def initialize_stages(self, workspace_name: str):
-        # -----------------------------------------------------------------
-        # Load the stages for the workflow
-        # -----------------------------------------------------------------
-        logger.info("Initializing Stage Manager")
-        self.stage_manager = StageManager(workspace_name=workspace_name)
-        self.stage_manager.register_stages()
-        self.context.stage_manager = self.stage_manager
-
-        logger.info("Stage Manager initialized")
-
-    def initialize_agents(self, workspace_name: str):       
-        # -----------------------------------------------------------------
-        # Load the stages for the workflow
-        # -----------------------------------------------------------------
-        logger.info("Initializing Agent Manager")
-        self.agent_manager = AgentManager(workspace_name=workspace_name)
-        self.agent_manager.scan_and_register_agents()
-        self.context.agent_manager = self.agent_manager
-        logger.info("Agent Manager initialized")

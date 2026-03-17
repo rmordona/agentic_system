@@ -1,0 +1,78 @@
+type: object
+description: "Agnostic Tool Contract for Technical Momentum and Trend Analysis"
+properties:
+  tool_name:
+    type: string
+    const: "get_trend_report"
+  description:
+    type: string
+    const: "Calculates price momentum, SMA crossovers, and volume-weighted trend direction."
+
+  # --- INPUT HANDSHAKE ---
+  input_schema:
+    type: object
+    required: [ticker]
+    properties:
+      ticker:
+        type: string
+        pattern: "^[A-Z]{1,5}$"
+        description: "Stock symbol for technical analysis (e.g., TSLA, NVDA)."
+      days:
+        type: integer
+        default: 30
+        minimum: 5
+        maximum: 252
+        description: "Lookback window for trend calculation."
+
+  # --- OUTPUT CONTRACT ---
+  output_schema:
+    type: object
+    required: [summary, technical_signals]
+    properties:
+      summary:
+        type: object
+        required: [ticker, trend_direction, current_price]
+        properties:
+          ticker: { type: string }
+          trend_direction: 
+            type: string
+            enum: [BULLISH, BEARISH, NEUTRAL]
+          current_price: { type: number }
+      technical_signals:
+        type: object
+        required: [price_change_pct, distance_from_sma50]
+        properties:
+          price_change_pct: { type: number }
+          distance_from_sma50: { type: number }
+          volatility_ratio: { type: number }
+
+# --- GATEKEEPER PREDICATES ---
+validation_rules:
+  # Integrity: Ensure the price is a positive non-zero value
+  - "get_trend_report.summary.current_price > 0"
+  # Logic: Ensure ticker in output matches requested ticker
+  - "get_trend_report.summary.ticker == input.ticker"
+
+# --- HITL ESCALATION POLICY ---
+hitl_policy:
+  trigger_conditions:
+    # 1. Extreme Volatility: Price is too far from the SMA, suggesting a "Blow-off Top" or "Flash Crash"
+    - condition: "abs(get_trend_report.technical_signals.distance_from_sma50) > 20.0"
+      reason: "EXTREME_MEAN_REVERSION_RISK"
+
+    # 2. Trend Exhaustion: Price change is positive but volatility is spiking (Z-Score > 2.5)
+    - condition: "get_trend_report.summary.trend_direction == 'BULLISH' AND get_trend_report.technical_signals.volatility_ratio > 2.5"
+      reason: "PARABOLIC_EXHAUSTION_WARNING"
+
+    # 3. Data Gaps: If volatility ratio is exactly 1.0 (suggests flat/frozen data)
+    - condition: "get_trend_report.technical_signals.volatility_ratio == 1.0"
+      reason: "STALE_DATA_SUSPECTED"
+
+  interaction_mode: "TECHNICAL_AUDIT"
+  allow_state_mutation: true
+
+# --- UPDATED GATEKEEPER EXIT ---
+# Stage exits if we have a clear trend direction and risk isn't astronomical
+stage_exit_trigger: "get_trend_report.summary.trend_direction != 'NEUTRAL' AND requires_intervention == False"
+
+required: [tool_name, description, input_schema, output_schema, validation_rules, hitl_policy]

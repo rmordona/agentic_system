@@ -1,5 +1,5 @@
 from __future__ import annotations
-from core.paths import RUNTIME_ROOT, WORKSPACES_ROOT, GLOBAL_CONFIG_PATH
+from core.paths import RUNTIME_ROOT, GLOBAL_CONFIG_PATH
 
 import asyncio
 import uuid
@@ -58,18 +58,21 @@ class RuntimeManager:
         # ---- Per-session storage ----
         self._orchestrators: Dict[str, Orchestrator] = {}
 
+        '''
         self.workspace_path = WORKSPACES_ROOT / workspace_name
   
         if not self.workspace_path.exists():
             raise ValueError(f"Workspace not found: {workspace_name}")
+        '''
 
         self.runtime_path = RUNTIME_ROOT
-        self.workspace_name = workspace_name
+        #self.workspace_name = workspace_name
         self.session_manager = session_manager
         self.event_bus = event_bus
 
+        '''
         logger.info(f"Initializing Runtime Agent: {self.workspace_name}... ")
-  
+
         # Load Workspace Configuration (workspace.json)
         self.workspace_meta = WorkspaceLoader(self.workspace_name).load_workspace()
         logger.info(f"Workspace metadata loaded: {self.workspace_meta.get('name')}")
@@ -81,11 +84,12 @@ class RuntimeManager:
         
         self.reload_manager.start_periodic_reload()
         logger.info("Hot-reload enabled for skills/context")
+        '''
 
         # Note: async initialization will be called from workspace_hub
         self.core_engine = CoreEngine(
-            workspace_name=self.workspace_name,
-            workspace_meta=self.workspace_meta
+            # workspace_name=self.workspace_name,
+            # workspace_meta=self.workspace_meta
         )
 
     # ------------------------------------------------------------------
@@ -108,7 +112,7 @@ class RuntimeManager:
         else:
             logger.info(f"Creating new orchestrator for session: {session_ctx.session_id}")
             orchestrator = Orchestrator(
-                workspace_name=self.workspace_name,
+                # workspace_name=self.workspace_name,
                 core_engine=self.core_engine,
                 session_id=session_ctx.session_id,
                 event_bus=self.event_bus
